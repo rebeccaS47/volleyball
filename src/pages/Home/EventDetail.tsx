@@ -1,9 +1,11 @@
-function EventDetail(){
-    return(
-        <>
-            <h1>EventDetail</h1>
-        </>
-    )
-}
+interface EventDetailProps {}
 
-export default EventDetail
+const EventDetail: React.FC<EventDetailProps> = () => {
+  return (
+    <div>
+      <h1>EventDetail</h1>
+    </div>
+  );
+};
+
+export default EventDetail;

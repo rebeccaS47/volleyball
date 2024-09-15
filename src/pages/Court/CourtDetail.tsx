@@ -1,9 +1,11 @@
-function CourtDetail(){
-    return(
-        <>
-            <h1>CourtDetail</h1>
-        </>
-    )
-}
+interface CourtDetailProps {}
 
-export default CourtDetail
+const CourtDetail: React.FC<CourtDetailProps> = () => {
+  return (
+    <div>
+      <h1>Court</h1>
+    </div>
+  );
+};
+
+export default CourtDetail;

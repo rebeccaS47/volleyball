@@ -1,9 +1,11 @@
-function HoldEvent(){
-    return(
-        <>
-            <h1>HoldEvent</h1>
-        </>
-    )
-}
+interface HoldEventProps {}
 
-export default HoldEvent
+const HoldEvent: React.FC<HoldEventProps> = () => {
+  return (
+    <div>
+      <h1>HoldEvent</h1>
+    </div>
+  );
+};
+
+export default HoldEvent;
