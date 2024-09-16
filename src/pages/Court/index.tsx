@@ -6,6 +6,7 @@ interface CourtProps {}
 interface Court {
   id: string;
   name: string;
+  city: string;
   address: string;
   isInDoor: boolean;
   hasAC: boolean;
@@ -13,10 +14,10 @@ interface Court {
 
 const Court: React.FC<CourtProps> = () => {
   const [courtList, setCourtList] = useState<Court[]>([]);
-  const courtCollectionRef = collection(db, 'courts');
 
   const getCourtList = useCallback(async () => {
     try {
+      const courtCollectionRef = collection(db, 'courts');
       const data = await getDocs(courtCollectionRef);
       const filteredData = data.docs.map((doc) => ({
         ...doc.data(),
@@ -27,7 +28,7 @@ const Court: React.FC<CourtProps> = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [courtCollectionRef]);
+  }, []);
 
   useEffect(() => {
     getCourtList();
