@@ -40,7 +40,7 @@ const Court: React.FC<CourtProps> = () => {
       {courtList.map((court) => (
         <div key={court.id}>
           <h2>{court.name}</h2>
-          <p>{court.address}</p>
+          <p>{court.city}{court.address}</p>
         </div>
       ))}
     </div>
