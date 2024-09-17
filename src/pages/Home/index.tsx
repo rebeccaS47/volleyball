@@ -21,6 +21,8 @@ const Event: React.FC<EventProps> = () => {
       <h1>Event</h1>
       <h2>Hi, {user ? user.displayName : 'there'}</h2>
       <button onClick={handleLogout}>Logout</button>
+      <br /><br />
+      <button onClick={() => navigate('/holdevent')}>發起活動</button>
     </div>
   );
 };
