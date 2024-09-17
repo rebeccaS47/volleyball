@@ -2,12 +2,15 @@ import { RouterProvider } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
 import { UserAuthProvider } from './context/userAuthContext';
 import router from './routes';
+import { CityCourtProvider } from './context/CityCourtContext';
 function App() {
   return (
     <>
       <GlobalStyle />
       <UserAuthProvider>
-        <RouterProvider router={router} />
+        <CityCourtProvider>
+          <RouterProvider router={router} />
+        </CityCourtProvider>
       </UserAuthProvider>
     </>
   );

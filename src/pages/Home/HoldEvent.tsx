@@ -1,57 +1,53 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { db } from '../../../firebaseConfig';
 import {
-  getDocs,
   collection,
   addDoc,
   serverTimestamp,
 } from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
+import type { Court, Event } from '../../types';
+import {useCityCourtContext } from  '../../context/useCityCourtContext';
+import { CitySelector } from '../../components/CitySelector';
+import { CourtSelector } from '../../components/CourtSelector';
+
 
 interface HoldEventProps {}
-interface Court {
-  id: string;
-  name: string;
-  city: string;
-  address: string;
-  isInDoor: boolean;
-  hasAC: boolean;
-}
-
-interface FormData {
-  courtId: string | null;
-  createUserId: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  friendlinessLevel: string;
-  level: string;
-  isAC: boolean;
-  totalCost: number;
-  notes: string;
-}
 
 const HoldEvent: React.FC<HoldEventProps> = () => {
-  const [cities, setCities] = useState<string[]>([]);
-  const [courts, setCourts] = useState<Court[]>([]);
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [filteredCourts, setFilteredCourts] = useState<Court[]>([]);
   const [selectedCourt, setSelectedCourt] = useState<number>();
   const { user } = useUserAuth();
   const navigate = useNavigate();
+  const { cities, courts } = useCityCourtContext();
 
-  const [formData, setFormData] = useState<FormData>({
-    courtId: null,
+  const [formData, setFormData] = useState<Event>({
+    id: '',
+    court: {
+      id: '',
+      name: '',
+      city: '',
+      address: '',
+      isInDoor: false,
+      hasAC: false,
+    },
     createUserId: user?.uid || '',
     date: '',
     startTime: '',
     endTime: '',
+    netHeight: '',
     friendlinessLevel: '',
     level: '',
     isAC: false,
+    findNum: 0,
     totalCost: 0,
     notes: '',
+    playerList: [],
+    eventStatus: 'hold',
+    createdEventAt: '',
+    applicationList: [],
   });
 
   const handleInputChange = (
@@ -75,6 +71,9 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
       await addDoc(eventCollectionRef, {
         ...formData,
         createdEventAt: serverTimestamp(),
+        applicationList: [],
+        playerList: [user?.uid],
+        eventStatus: 'hold',
       });
       alert('活動建立成功');
       navigate('/');
@@ -86,38 +85,38 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
   const handleCourtChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedIndex = Number(e.target.value);
     if (selectedIndex === -1) {
-      setFormData((prevData) => ({ ...prevData, courtId: null }));
+      setFormData((prevData) => ({
+        ...prevData,
+        court: {
+          id: '',
+          name: '',
+          city: '',
+          address: '',
+          isInDoor: false,
+          hasAC: false,
+        },
+      }));
     } else {
       const selectedCourt = filteredCourts[selectedIndex];
-      setFormData((prevData) => ({ ...prevData, courtId: selectedCourt.id }));
+      setFormData((prevData) => ({
+        ...prevData,
+        court: {
+          id: selectedCourt.id,
+          name: selectedCourt.name,
+          city: selectedCourt.city,
+          address: selectedCourt.address,
+          isInDoor: selectedCourt.isInDoor,
+          hasAC: selectedCourt.hasAC,
+        },
+      }));
     }
     setSelectedCourt(selectedIndex);
   };
 
-  const getCourtList = useCallback(async () => {
-    try {
-      const courtCollectionRef = collection(db, 'courts');
-      const data = await getDocs(courtCollectionRef);
-      const filteredData = data.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      })) as Court[];
-      setCourts(filteredData);
-
-      const citySet = new Set<string>();
-      filteredData.forEach((court) => {
-        citySet.add(court.city);
-      });
-      setCities(Array.from(citySet));
-      console.log('cities', Array.from(citySet));
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
-
-  useEffect(() => {
-    getCourtList();
-  }, [getCourtList]);
+  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCity(e.target.value);
+    setSelectedCourt(-1);
+  };
 
   useEffect(() => {
     if (selectedCity) {
@@ -134,39 +133,16 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
       <div>
         <h1>HoldEvent</h1>
         <label>選擇球場</label>
-        <select
-          value={selectedCity}
-          onChange={(e) => {
-            setSelectedCity(e.target.value);
-            setSelectedCourt(-1);
-          }}
-        >
-          <option value="">選擇城市</option>
-          {cities.map((city, index) => (
-            <option key={index} value={city}>
-              {city}
-            </option>
-          ))}
-        </select>
-        <select
-          id="court"
-          name="court"
-          value={
-            formData.courtId === null
-              ? '-1'
-              : filteredCourts.findIndex(
-                  (court) => court.id === formData.courtId
-                )
-          }
-          onChange={handleCourtChange}
-        >
-          <option value="-1">選擇場地</option>
-          {filteredCourts.map((court, index) => (
-            <option key={court.id} value={index}>
-              {court.name}
-            </option>
-          ))}
-        </select>
+        <CitySelector
+        cities={cities}
+        selectedCity={selectedCity}
+        onChange={handleCityChange}
+      />
+      <CourtSelector
+        filteredCourts={filteredCourts}
+        selectedCourt={selectedCourt}
+        onChange={handleCourtChange}
+      />
         {selectedCourt !== undefined && selectedCourt !== -1 ? (
           <p>
             地址: {filteredCourts[selectedCourt].city}
@@ -203,7 +179,29 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           required
         />
       </div>
-
+      <div>
+        <label>網高</label>
+        <label>
+          <input
+            type="radio"
+            name="netHeight"
+            value="女網"
+            checked={formData.netHeight === '女網'}
+            onChange={handleInputChange}
+          />
+          女網
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="netHeight"
+            value="男網"
+            checked={formData.netHeight === '男網'}
+            onChange={handleInputChange}
+          />
+          男網
+        </label>
+      </div>
       <div>
         <label>友善程度</label>
         <select
@@ -229,7 +227,6 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           <option value="">請選擇分級</option>
           <option value="A">A</option>
           <option value="B">B</option>
-          <option value="B">B</option>
           <option value="C">C</option>
           <option value="D">D</option>
           <option value="E">E</option>
@@ -245,6 +242,16 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           />
           是否有開冷氣
         </label>
+      </div>
+      <div>
+        <label>找尋人數</label>
+        <input
+          type="number"
+          name="findNum"
+          value={formData.findNum}
+          onChange={handleInputChange}
+          required
+        />
       </div>
       <div>
         <label>總金額</label>

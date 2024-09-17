@@ -26,7 +26,7 @@ export const router = createBrowserRouter([
     errorElement: <Error />,
   },
   {
-    path: '/eventdetail',
+    path: '/eventdetail/:eventId',
     element: <EventDetail />,
     errorElement: <Error />,
   },
