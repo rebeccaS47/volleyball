@@ -1,16 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../firebaseConfig';
 import { getDocs, collection } from 'firebase/firestore';
+import type { Court } from '../../types';
 
 interface CourtProps {}
-interface Court {
-  id: string;
-  name: string;
-  city: string;
-  address: string;
-  isInDoor: boolean;
-  hasAC: boolean;
-}
 
 const Court: React.FC<CourtProps> = () => {
   const [courtList, setCourtList] = useState<Court[]>([]);
@@ -35,15 +28,28 @@ const Court: React.FC<CourtProps> = () => {
   }, [getCourtList]);
 
   return (
-    <div>
+    <>
       <h1>Court</h1>
-      {courtList.map((court) => (
-        <div key={court.id}>
-          <h2>{court.name}</h2>
-          <p>{court.city}{court.address}</p>
-        </div>
-      ))}
-    </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        {courtList.map((court) => (
+          <div
+            key={court.id}
+            style={{
+              border: '1px solid black',
+              padding: '10px',
+              width: '350px',
+              margin: '10px',
+            }}
+          >
+            <h2>{court.name}</h2>
+            <p>
+              {court.city}
+              {court.address}
+            </p>
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 

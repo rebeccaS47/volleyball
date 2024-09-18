@@ -58,7 +58,7 @@ const EventDetail: React.FC<EventDetailProps> = () => {
           <p>室內室外:{event.court.isInDoor ? '室內' : '室外'}</p>
           <p>有無冷氣:{event.isAC ? '有' : '沒有'}</p>
           <p>
-            價格:{event.totalCost / (event.findNum + event.playerList.length)}
+            價格:{Math.round(event.totalCost / (event.findNum + event.playerList.length))}
           </p>
           <p>隊員名單:{event.playerList}</p>
           <p>剩餘名額:{event.findNum - (event.playerList.length + 1)}</p>

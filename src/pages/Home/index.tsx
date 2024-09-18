@@ -165,7 +165,7 @@ const Event: React.FC<EventProps> = () => {
             </p>
             <p>
               價格/人:
-              {event.totalCost / (event.findNum + event.playerList.length)}
+              {Math.round(event.totalCost / (event.findNum + event.playerList.length))}
             </p>
           </div>
         ))}
