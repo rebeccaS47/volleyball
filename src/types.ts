@@ -21,7 +21,6 @@ export interface Court {
 export interface Event {
   id: string;
   court: Court;
-  
   createUserId: string;
   date: string;
   startTime: string;
