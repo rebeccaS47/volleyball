@@ -1,9 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../../../firebaseConfig';
-import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { useEffect, useState, useCallback } from 'react';
+import { doc, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import type { Event } from '../../types';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
+import { handleUserNameList } from '../../firebase';
 
 interface EventDetailProps {}
 
@@ -11,29 +12,46 @@ const EventDetail: React.FC<EventDetailProps> = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  const [playerNames, setPlayerNames] = useState<string>('');
+
   const { user } = useUserAuth();
   const navigate = useNavigate();
-  const fetchEvent = useCallback(async () => {
-    if (eventId) {
-      try {
-        const docRef = doc(db, 'events', eventId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setEvent({ ...docSnap.data(), id: docSnap.id } as Event);
-        } else {
-          console.log('沒有該document!');
-        }
-      } catch (error) {
-        console.error('Error fetching document: ', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-  }, [eventId]);
 
   useEffect(() => {
-    fetchEvent();
-  }, [fetchEvent]);
+    if (!eventId) {
+      setLoading(false);
+      return;
+    }
+
+    const docRef = doc(db, 'events', eventId);
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const eventData = { ...docSnap.data(), id: docSnap.id } as Event;
+          setEvent(eventData);
+          setLoading(false);
+
+          if (eventData.playerList) {
+            handleUserNameList(eventData.playerList).then((namesArray) => {
+              setPlayerNames(
+                namesArray.filter((name) => name !== '').join(', ')
+              );
+            });
+          }
+        } else {
+          console.log('沒有該document!');
+          setLoading(false);
+        }
+      },
+      (error) => {
+        console.error('Error fetching document: ', error);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [eventId]);
 
   const handleApply = async () => {
     console.log('eventDetail', { event });
@@ -42,22 +60,22 @@ const EventDetail: React.FC<EventDetailProps> = () => {
       navigate('/login');
       return;
     }
-    if (event?.playerList.includes(user?.uid)) {
+    if (!event) return;
+    if (event.playerList.includes(user?.uid)) {
       alert('你已是隊員');
       return;
     }
-    if (event?.applicationList.includes(user?.uid)) {
+    if (event.applicationList.includes(user?.uid)) {
       alert('你已申請過');
       return;
     }
-    if (event?.id) {
+    if (event.id) {
       try {
         const docRef = doc(db, 'events', event.id);
         await updateDoc(docRef, {
           applicationList: arrayUnion(user.uid),
         });
         alert('成功申請');
-        fetchEvent();
       } catch (error) {
         console.error('Error updating document: ', error);
       }
@@ -94,8 +112,8 @@ const EventDetail: React.FC<EventDetailProps> = () => {
               event.totalCost / (event.findNum + event.playerList.length)
             )}
           </p>
-          <p>隊員名單:{event.playerList}</p>
-          <p>剩餘名額:{event.findNum - (event.playerList.length + 1)}</p>
+          <p>隊員名單:{playerNames}</p>
+          <p>剩餘名額:{event.findNum - event.playerList.length}</p>
         </div>
       ) : (
         <p>沒有這個活動</p>

@@ -2,10 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../firebaseConfig';
-import { getDocs, collection, doc, getDoc } from 'firebase/firestore';
+import { getDocs, collection } from 'firebase/firestore';
 import type { Event, User } from '../../types';
 import { CitySelector } from '../../components/CitySelector';
 import { useCityCourtContext } from '../../context/useCityCourtContext';
+import { findUserById } from '../../firebase';
 
 interface EventProps {}
 
@@ -30,7 +31,7 @@ const Event: React.FC<EventProps> = () => {
     endTime: '',
     level: '',
   });
-  const [userData, setUserData] = useState<User| null>(null);
+  const [userData, setUserData] = useState<User | null>(null);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -74,7 +75,7 @@ const Event: React.FC<EventProps> = () => {
     if (user) {
       const data = await findUserById(user.uid);
       setUserData(data);
-    }else{
+    } else {
       setUserData(null);
     }
   }, [user]);
@@ -94,23 +95,6 @@ const Event: React.FC<EventProps> = () => {
       await logOut();
     } catch (error) {
       console.log('Error : ', error);
-    }
-  };
-
-  const findUserById = async (uid: string): Promise<User | null> => {
-    try {
-      const userDocRef = doc(db, 'users', uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        return { id: userDoc.id, ...userDoc.data() } as User;
-      } else {
-        console.error('No such document!');
-        return null;
-      }
-    } catch (error) {
-      console.error('Error fetching user document:', error);
-      return null;
     }
   };
 
