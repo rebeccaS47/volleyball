@@ -1,86 +1,81 @@
-import * as React from 'react';
-import { UserLogIn } from '../../types.ts';
-import { Link, useNavigate } from 'react-router-dom';
-import { useUserAuth } from '../../context/userAuthContext.tsx';
+import React, { useState } from 'react';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, provider } from '../../../firebaseConfig';
+import { useNavigate } from 'react-router-dom';
+import { setDoc, doc, getDoc } from 'firebase/firestore';
+import { db } from '../../../firebaseConfig';
 
-interface LoginProps {}
-
-const initialValue: UserLogIn = {
-  email: '',
-  password: '',
-};
-
-const Login: React.FC<LoginProps> = () => {
-  const { googleSignIn, logIn } = useUserAuth();
+const Login: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const [userLogInInfo, setuserLogInInfo] =
-    React.useState<UserLogIn>(initialValue);
 
-  const handleGoogleSignIn = async (e: React.MouseEvent<HTMLElement>) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await googleSignIn();
+      await signInWithEmailAndPassword(auth, email, password);
       navigate('/');
     } catch (error) {
-      console.log('Error : ', error);
+      setError('Failed to log in. Please check your credentials.');
+      console.error(error);
     }
   };
 
-  const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleGoogleLogin = async () => {
     try {
-      console.log('The user info is : ', userLogInInfo);
-      await logIn(userLogInInfo.email, userLogInInfo.password);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (!userDocSnap.exists()) {
+        await setDoc(userDocRef, {
+          name: user.displayName,
+          imgURL: user.photoURL,
+          id: user.uid,
+          email: user.email,
+        });
+      }
       navigate('/');
     } catch (error) {
-      console.log('Error : ', error);
+      setError('Failed to log in with Google.');
+      console.error(error);
     }
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
+    <div className="login-container">
+      <h2>Login</h2>
+      {error && <p className="error">{error}</p>}
+      <form onSubmit={handleLogin}>
         <div>
-          <p>Sign In With Google To Continue</p>
-          <button onClick={handleGoogleSignIn}>Sign In With Google</button>
-        </div>
-        <div>
-          <label htmlFor="email">Email address</label>
+          <label htmlFor="email">Email:</label>
           <input
-            id="email"
             type="email"
-            placeholder="123@example.com"
-            value={userLogInInfo.email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setuserLogInInfo({
-                ...userLogInInfo,
-                email: e.target.value,
-              })
-            }
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </div>
         <div>
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Password:</label>
           <input
-            id="password"
             type="password"
-            placeholder="Password"
-            value={userLogInInfo.password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setuserLogInInfo({
-                ...userLogInInfo,
-                password: e.target.value,
-              })
-            }
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </div>
-        <button type="submit">Login</button>
-        <p>
-          Don't have an account ? <Link to="/signup">Sign up</Link>
-        </p>
+        <button type="submit">Log In</button>
       </form>
-      <br />
+      <button onClick={handleGoogleLogin}>Log In with Google</button>
+      <p>
+        Don't have an account? <a href="/signup">Sign up</a>
+      </p>
     </div>
   );
 };

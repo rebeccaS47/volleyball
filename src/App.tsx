@@ -1,6 +1,6 @@
 import { RouterProvider } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
-import { UserAuthProvider } from './context/userAuthContext';
+import UserAuthProvider from './context/userAuthContext';
 import router from './routes';
 import { CityCourtProvider } from './context/CityCourtContext';
 function App() {

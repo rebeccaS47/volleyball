@@ -7,7 +7,9 @@ import EventDetail from './pages/home/EventDetail';
 import Court from './pages/court';
 import CourtDetail from './pages/court/CourtDetail';
 import HoldEvent from './pages/home/HoldEvent';
+import UserInfo  from './pages/user/info';
 import ProtectedRoutes from './components/ProtectedRoutes';
+
 
 export const router = createBrowserRouter([
   {
@@ -50,6 +52,12 @@ export const router = createBrowserRouter([
     element: <Signup />,
     errorElement: <Error />,
   },
+  {
+    path: '/info',
+    element: <UserInfo  />,
+    errorElement: <Error />,
+  },
+
 ]);
 
 export default router;

@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../firebaseConfig';
-import { getDocs, collection } from 'firebase/firestore';
-import type { Event } from '../../types';
+import { getDocs, collection, doc, getDoc } from 'firebase/firestore';
+import type { Event, User } from '../../types';
 import { CitySelector } from '../../components/CitySelector';
 import { useCityCourtContext } from '../../context/useCityCourtContext';
 
@@ -30,6 +30,7 @@ const Event: React.FC<EventProps> = () => {
     endTime: '',
     level: '',
   });
+  const [userData, setUserData] = useState<User| null>(null);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -50,7 +51,7 @@ const Event: React.FC<EventProps> = () => {
         id: doc.id,
       })) as Event[];
       setEventList(filteredData);
-      console.log('eventList', filteredData);
+      console.log('2222eventList', filteredData);
     } catch (error) {
       console.log(error);
     }
@@ -69,9 +70,19 @@ const Event: React.FC<EventProps> = () => {
     setFilteredEventList(filteredList);
   }, [filterState, eventList]);
 
+  const fetchUserData = useCallback(async () => {
+    if (user) {
+      const data = await findUserById(user.uid);
+      setUserData(data);
+    }else{
+      setUserData(null);
+    }
+  }, [user]);
+
   useEffect(() => {
     getEventList();
-  }, [getEventList]);
+    fetchUserData();
+  }, [getEventList, fetchUserData]);
 
   useEffect(() => {
     filterEvents();
@@ -81,15 +92,32 @@ const Event: React.FC<EventProps> = () => {
     e.preventDefault();
     try {
       await logOut();
-      navigate('/');
     } catch (error) {
       console.log('Error : ', error);
     }
   };
+
+  const findUserById = async (uid: string): Promise<User | null> => {
+    try {
+      const userDocRef = doc(db, 'users', uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        return { id: userDoc.id, ...userDoc.data() } as User;
+      } else {
+        console.error('No such document!');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching user document:', error);
+      return null;
+    }
+  };
+
   return (
     <div>
       <h1>Event</h1>
-      <h2>Hi, {user ? user.displayName : 'there'}</h2>
+      <h2>Hi, {userData === null ? 'there' : userData.name}</h2>
       <button onClick={handleLogout}>Logout</button>
       <div style={{ display: 'flex' }}>
         <CitySelector
@@ -157,7 +185,10 @@ const Event: React.FC<EventProps> = () => {
               margin: '10px',
             }}
           >
-            <p>{event.date}{" "}{event.startTime}~{event.endTime}{event.level}</p>
+            <p>
+              {event.date} {event.startTime}~{event.endTime}
+              {event.level}
+            </p>
             <p>場地:{event.court.name}</p>
             <p>
               地址:{event.court.city}
@@ -165,7 +196,9 @@ const Event: React.FC<EventProps> = () => {
             </p>
             <p>
               價格/人:
-              {Math.round(event.totalCost / (event.findNum + event.playerList.length))}
+              {Math.round(
+                event.totalCost / (event.findNum + event.playerList.length)
+              )}
             </p>
           </div>
         ))}

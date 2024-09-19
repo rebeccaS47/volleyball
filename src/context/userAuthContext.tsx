@@ -1,83 +1,51 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import {
-  GoogleAuthProvider,
-  User,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-} from 'firebase/auth';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User, signOut } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 
-interface UserAuthProviderProps {
-  children: React.ReactNode;
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  logOut: () => Promise<void>;
 }
 
-type AuthContextData = {
-  user: User | null;
-  logIn: typeof logIn;
-  signUp: typeof signUp;
-  logOut: typeof logOut;
-  googleSignIn: typeof googleSignIn;
-};
-
-const logIn = (email: string, password: string) => {
-  return signInWithEmailAndPassword(auth, email, password);
-};
-
-const signUp = (email: string, password: string) => {
-  return createUserWithEmailAndPassword(auth, email, password);
-};
-
-const logOut = () => {
-  return signOut(auth);
-};
-
-const googleSignIn = () => {
-  const googleAuthProvider = new GoogleAuthProvider();
-  return signInWithPopup(auth, googleAuthProvider);
-};
-
-export const UserAuthContext = createContext<AuthContextData>({
+const AuthContext = createContext<AuthContextType>({
   user: null,
-  logIn,
-  signUp,
-  logOut,
-  googleSignIn,
+  loading: true,
+  logOut: async () => {},
 });
 
-export const UserAuthProvider: React.FC<UserAuthProviderProps> = ({
+export const useUserAuth = () => useContext(AuthContext);
+
+const UserAuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log('Auth state changed. Current user: ', currentUser);
-      setUser(currentUser);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+      console.log('user認證資料', user);
+      setLoading(false);
     });
 
-    return () => {
-      unsubscribe();
-    };
+    return unsubscribe;
   }, []);
 
-  const value: AuthContextData = {
-    user,
-    logIn,
-    signUp,
-    logOut,
-    googleSignIn,
+  const logOut = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      console.error('Failed to log out', error);
+    }
   };
 
   return (
-    <UserAuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loading, logOut }}>
       {children}
-    </UserAuthContext.Provider>
+    </AuthContext.Provider>
   );
 };
 
-export const useUserAuth = () => {
-  return useContext(UserAuthContext);
-};
+export default UserAuthProvider;

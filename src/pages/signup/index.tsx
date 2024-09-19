@@ -1,93 +1,71 @@
-import * as React from 'react';
-import { UserSignIn } from '../../types.ts';
-import { Link, useNavigate } from 'react-router-dom';
-import { useUserAuth } from '../../context/userAuthContext.tsx';
+import React, { useState } from 'react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../../firebaseConfig';
+import { useNavigate } from 'react-router-dom';
 
-const initialValue: UserSignIn = {
-  email: '',
-  password: '',
-  confirmPassword: '',
-};
-
-interface SignupProps {}
-
-const Signup: React.FC<SignupProps> = () => {
-  const [userInfo, setUserInfo] = React.useState<UserSignIn>(initialValue);
+const Signup: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { googleSignIn, signUp } = useUserAuth();
 
-  const handleGoogleSignIn = async (e: React.MouseEvent<HTMLElement>) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Passwords don't match");
+      return;
+    }
     try {
-      await googleSignIn();
-      navigate('/');
+      await createUserWithEmailAndPassword(auth, email, password);
+      navigate('/info');
     } catch (error) {
-      console.log('Error : ', error);
+      setError('Failed to create an account.');
+      console.error(error);
     }
   };
-  const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      console.log('The user info is : ', userInfo);
-      await signUp(userInfo.email, userInfo.password);
-      navigate('/');
-    } catch (error) {
-      console.log('Error : ', error);
-    }
-  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Signup</h1>
-      <div>
-        <p>Sign In With Google To Continue</p>
-        <button onClick={handleGoogleSignIn}>Sign In With Google</button>
-      </div>
-      <div>
-        <label htmlFor="email">Email address</label>
-        <input
-          id="email"
-          type="email"
-          placeholder="123@example.com"
-          value={userInfo.email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setUserInfo({ ...userInfo, email: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          placeholder="Password"
-          value={userInfo.password}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setUserInfo({ ...userInfo, password: e.target.value })
-          }
-        />
-      </div>
-      <div>
-        <label htmlFor="confirmpassword">Confirm password</label>
-        <input
-          id="confirmpassword"
-          type="password"
-          placeholder="Confirm password"
-          value={userInfo.confirmPassword}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setUserInfo({
-              ...userInfo,
-              confirmPassword: e.target.value,
-            })
-          }
-        />
-      </div>
-      <button type="submit">Sign Up</button>
-      <div>
-        <p>
-          Already have an account ? <Link to="/login">Login</Link>
-        </p>
-      </div>
-    </form>
+    <div className="signup-container">
+      <h2>Sign Up</h2>
+      {error && <p className="error">{error}</p>}
+      <form onSubmit={handleSignup}>
+        <div>
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="confirm-password">Confirm Password:</label>
+          <input
+            type="password"
+            id="confirm-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit">Sign Up</button>
+      </form>
+      <p>
+        Already have an account? <a href="/login">Log in</a>
+      </p>
+    </div>
   );
 };
 
