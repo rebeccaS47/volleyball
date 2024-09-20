@@ -52,4 +52,9 @@ const GlobalStyle = createGlobalStyle`
     cursor: pointer;
     border: none;
   }
+
+  th, td {
+  padding: 15px;
+}
+
 `;

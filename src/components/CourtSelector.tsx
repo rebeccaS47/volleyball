@@ -7,7 +7,11 @@ interface CourtSelectorProps {
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-export const CourtSelector: React.FC<CourtSelectorProps> = ({ filteredCourts, selectedCourt, onChange }) => (
+export const CourtSelector: React.FC<CourtSelectorProps> = ({
+  filteredCourts,
+  selectedCourt,
+  onChange,
+}) => (
   <select
     id="court"
     name="court"

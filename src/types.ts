@@ -32,7 +32,7 @@ export interface User {
   name: string;
   email: string;
   photoURL: string;
-  history: {[key: string]: History};
+  history: { [key: string]: History };
 }
 
 export interface History {
