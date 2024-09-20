@@ -7,9 +7,9 @@ import EventDetail from './pages/home/EventDetail';
 import Court from './pages/court';
 import CourtDetail from './pages/court/CourtDetail';
 import HoldEvent from './pages/home/HoldEvent';
-import UserInfo  from './pages/user/info';
+import UserInfo from './pages/user/info';
 import ProtectedRoutes from './components/ProtectedRoutes';
-import Approval from './pages/approval'
+import Approval from './pages/approval';
 
 export const router = createBrowserRouter([
   {
@@ -59,10 +59,9 @@ export const router = createBrowserRouter([
   },
   {
     path: '/info',
-    element: <UserInfo  />,
+    element: <UserInfo />,
     errorElement: <Error />,
   },
-
 ]);
 
 export default router;

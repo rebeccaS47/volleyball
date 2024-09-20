@@ -11,9 +11,13 @@ export interface CityCourtContextType {
   getCityCourtList: () => Promise<void>;
 }
 
-export const CityCourtContext = createContext<CityCourtContextType | undefined>(undefined);
+export const CityCourtContext = createContext<CityCourtContextType | undefined>(
+  undefined
+);
 
-export const CityCourtProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const CityCourtProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [courts, setCourts] = useState<Court[]>([]);
   const [cities, setCities] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +53,9 @@ export const CityCourtProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, [getCityCourtList]);
 
   return (
-    <CityCourtContext.Provider value={{ courts, cities, loading, error, getCityCourtList }}>
+    <CityCourtContext.Provider
+      value={{ courts, cities, loading, error, getCityCourtList }}
+    >
       {children}
     </CityCourtContext.Provider>
   );

@@ -1,14 +1,10 @@
 import { useState, useEffect } from 'react';
 import { db } from '../../../firebaseConfig';
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-} from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
 import type { Court, Event } from '../../types';
-import {useCityCourtContext } from  '../../context/useCityCourtContext';
+import { useCityCourtContext } from '../../context/useCityCourtContext';
 import { CitySelector } from '../../components/CitySelector';
 import { CourtSelector } from '../../components/CourtSelector';
 import { v4 as uuidv4 } from 'uuid';
@@ -135,15 +131,15 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
         <h1>HoldEvent</h1>
         <label>選擇球場</label>
         <CitySelector
-        cities={cities}
-        selectedCity={selectedCity}
-        onChange={handleCityChange}
-      />
-      <CourtSelector
-        filteredCourts={filteredCourts}
-        selectedCourt={selectedCourt}
-        onChange={handleCourtChange}
-      />
+          cities={cities}
+          selectedCity={selectedCity}
+          onChange={handleCityChange}
+        />
+        <CourtSelector
+          filteredCourts={filteredCourts}
+          selectedCourt={selectedCourt}
+          onChange={handleCourtChange}
+        />
         {selectedCourt !== undefined && selectedCourt !== -1 ? (
           <p>
             地址: {filteredCourts[selectedCourt].city}

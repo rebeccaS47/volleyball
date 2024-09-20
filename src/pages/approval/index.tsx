@@ -4,10 +4,12 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import type { Event, User } from '../../types';
 import { findUserById } from '../../firebase';
+import HistoryDetail from '../../components/HistoryDetail';
 
 interface ApplicantData {
   name: string;
   averageGrade: number;
+  history: User['history'];
 }
 
 interface ApprovalProps {}
@@ -19,29 +21,6 @@ const Approval: React.FC<ApprovalProps> = () => {
   }>({});
 
   const { user } = useUserAuth();
-
-  // useEffect(() => {
-  //   if (!user) return;
-  //   const eventsRef = collection(db, 'events');
-  //   const q = query(
-  //     eventsRef,
-  //     where('createUserId', '==', user.uid),
-  //     where('eventStatus', '==', 'hold')
-  //   );
-
-  //   const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  //     const events: Event[] = [];
-  //     querySnapshot.forEach((doc) => {
-  //       events.push({ id: doc.id, ...doc.data()} as Event);
-  //     });
-  //     setEventList(events);
-  //     console.log('監聽到的events', events);
-  //   });
-
-  //   return () => unsubscribe();
-  // }, [user]);
-
-  // 監聽 events 的變化
   useEffect(() => {
     if (!user) return;
     const eventsRef = collection(db, 'events');
@@ -72,6 +51,7 @@ const Approval: React.FC<ApprovalProps> = () => {
               id: applicantId,
               name: applicantUser.name,
               averageGrade,
+              history: applicantUser.history,
             };
           }
           return null;
@@ -79,15 +59,19 @@ const Approval: React.FC<ApprovalProps> = () => {
       );
 
       const applicantDataResults = await Promise.all(applicantDataPromises);
-      const newApplicantData = applicantDataResults.reduce((acc, result) => {
-        if (result) {
-          acc[result.id] = {
-            name: result.name,
-            averageGrade: result.averageGrade,
-          };
-        }
-        return acc;
-      }, {} as { [key: string]: ApplicantData });
+      const newApplicantData = applicantDataResults.reduce(
+        (acc, result) => {
+          if (result) {
+            acc[result.id] = {
+              name: result.name,
+              averageGrade: result.averageGrade,
+              history: result.history,
+            };
+          }
+          return acc;
+        },
+        {} as { [key: string]: ApplicantData }
+      );
 
       setApplicantData(newApplicantData);
       setEventList(events);
@@ -117,7 +101,7 @@ const Approval: React.FC<ApprovalProps> = () => {
       {eventList.map((event) =>
         event.applicationList.length === 0 ? null : (
           <div key={event.id}>
-            <table border={1} cellPadding={10}>
+            <table border={1}>
               <thead>
                 <tr>
                   <th>Event 時間</th>
@@ -147,9 +131,11 @@ const Approval: React.FC<ApprovalProps> = () => {
                     )}
                     <td>{applicantData[applicantId]?.name || 'Loading...'}</td>
                     <td>
-                      {applicantData[applicantId]?.averageGrade.toFixed(2) ||
-                        'N/A'}
-
+                      {applicantData[applicantId]?.averageGrade.toFixed(2)}
+                      <br />
+                      <HistoryDetail
+                        userHistory={applicantData[applicantId]?.history || {}}
+                      />
                     </td>
                     <td>
                       <button onClick={() => handleAccept(applicantId)}>
