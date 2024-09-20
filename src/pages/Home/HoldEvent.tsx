@@ -11,7 +11,7 @@ import type { Court, Event } from '../../types';
 import {useCityCourtContext } from  '../../context/useCityCourtContext';
 import { CitySelector } from '../../components/CitySelector';
 import { CourtSelector } from '../../components/CourtSelector';
-
+import { v4 as uuidv4 } from 'uuid';
 
 interface HoldEventProps {}
 
@@ -70,6 +70,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
       const eventCollectionRef = collection(db, 'events');
       await addDoc(eventCollectionRef, {
         ...formData,
+        id: uuidv4(),
         createdEventAt: serverTimestamp(),
         applicationList: [],
         playerList: [user?.uid],

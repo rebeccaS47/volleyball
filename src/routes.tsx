@@ -9,7 +9,7 @@ import CourtDetail from './pages/court/CourtDetail';
 import HoldEvent from './pages/home/HoldEvent';
 import UserInfo  from './pages/user/info';
 import ProtectedRoutes from './components/ProtectedRoutes';
-
+import Approval from './pages/approval'
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +18,11 @@ export const router = createBrowserRouter([
       {
         path: '/holdevent',
         element: <HoldEvent />,
+        errorElement: <Error />,
+      },
+      {
+        path: '/approval',
+        element: <Approval />,
         errorElement: <Error />,
       },
     ],

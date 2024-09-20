@@ -1,14 +1,3 @@
-export interface UserLogIn {
-  email: string;
-  password: string;
-}
-
-export interface UserSignIn {
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
 export interface Court {
   id: string;
   name: string;
@@ -43,4 +32,17 @@ export interface User {
   name: string;
   email: string;
   photoURL: string;
+  history: {[key: string]: History};
+}
+
+export interface History {
+  id: string;
+  courtName: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  friendlinessLevel: string;
+  level: string;
+  grade: number;
+  note: string;
 }
