@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import type { User } from '../types';
+import type { History } from '../types';
 import Modal from 'react-modal';
 
-const HistoryDetail: React.FC<{ userHistory: User['history'] }> = ({
+const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
   userHistory,
 }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);

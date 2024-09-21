@@ -36,7 +36,8 @@ export interface User {
 }
 
 export interface History {
-  id: string;
+  userId: string;
+  eventId: string;
   courtName: string;
   date: string;
   startTime: string;
