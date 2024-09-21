@@ -12,7 +12,6 @@ import type { Court, Event } from '../../types';
 import { useCityCourtContext } from '../../context/useCityCourtContext';
 import { CitySelector } from '../../components/CitySelector';
 import { CourtSelector } from '../../components/CourtSelector';
-// import { v4 as uuidv4 } from 'uuid';
 
 interface HoldEventProps {}
 
