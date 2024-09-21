@@ -59,19 +59,16 @@ const Approval: React.FC<ApprovalProps> = () => {
       );
 
       const applicantDataResults = await Promise.all(applicantDataPromises);
-      const newApplicantData = applicantDataResults.reduce(
-        (acc, result) => {
-          if (result) {
-            acc[result.id] = {
-              name: result.name,
-              averageGrade: result.averageGrade,
-              history: result.history,
-            };
-          }
-          return acc;
-        },
-        {} as { [key: string]: ApplicantData }
-      );
+      const newApplicantData = applicantDataResults.reduce((acc, result) => {
+        if (result) {
+          acc[result.id] = {
+            name: result.name,
+            averageGrade: result.averageGrade,
+            history: result.history,
+          };
+        }
+        return acc;
+      }, {} as { [key: string]: ApplicantData });
 
       setApplicantData(newApplicantData);
       setEventList(events);
@@ -98,23 +95,22 @@ const Approval: React.FC<ApprovalProps> = () => {
 
   return (
     <div>
-      {eventList.map((event) =>
-        event.applicationList.length === 0 ? null : (
-          <div key={event.id}>
-            <table border={1}>
-              <thead>
-                <tr>
-                  <th>Event 時間</th>
-                  <th>Event 地點</th>
-                  <th>申請人</th>
-                  <th>平均分數</th>
-                  <th>接受</th>
-                  <th>拒絕</th>
-                </tr>
-              </thead>
-              <tbody>
-                {event.applicationList.map((applicantId, index) => (
-                  <tr key={index}>
+      <table border={1}>
+        <thead>
+          <tr>
+            <th>Event 時間</th>
+            <th>Event 地點</th>
+            <th>申請人</th>
+            <th>平均分數</th>
+            <th>接受</th>
+            <th>拒絕</th>
+          </tr>
+        </thead>
+        <tbody>
+          {eventList.flatMap((event) =>
+            event.applicationList.length > 0
+              ? event.applicationList.map((applicantId, index) => (
+                  <tr key={`${event.id}-${index}`}>
                     {index === 0 && (
                       <>
                         <td rowSpan={event.applicationList.length}>
@@ -148,12 +144,11 @@ const Approval: React.FC<ApprovalProps> = () => {
                       </button>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
-      )}
+                ))
+              : []
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };

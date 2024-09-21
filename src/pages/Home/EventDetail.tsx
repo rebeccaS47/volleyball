@@ -1,6 +1,12 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../../../firebaseConfig';
-import { doc, onSnapshot, updateDoc, arrayUnion } from 'firebase/firestore';
+import {
+  doc,
+  onSnapshot,
+  updateDoc,
+  arrayUnion,
+  setDoc,
+} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import type { Event } from '../../types';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
@@ -75,6 +81,21 @@ const EventDetail: React.FC<EventDetailProps> = () => {
         await updateDoc(docRef, {
           applicationList: arrayUnion(user.uid),
         });
+
+        const participationRef = doc(
+          db,
+          'teamParticipation',
+          `${event.id}_${user.uid}`
+        );
+        await setDoc(participationRef, {
+          eventId: event.id,
+          userId: user.uid,
+          state: 'pending',
+          date: event.date,
+          startTime: event.startTime,
+          endTime: event.endTime,
+        });
+
         alert('成功申請');
       } catch (error) {
         console.error('Error updating document: ', error);
