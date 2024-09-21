@@ -6,6 +6,10 @@ import {
   query,
   where,
   getDocs,
+  doc,
+  updateDoc,
+  arrayRemove,
+  arrayUnion,
 } from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import type { Event, History } from '../../types';
@@ -52,7 +56,6 @@ const Approval: React.FC<ApprovalProps> = () => {
       });
 
       setEventList(events);
-
       const applicantDataPromises = Array.from(applicants).map(
         async (applicantId) => {
           const applicantUser = await findUserById(applicantId);
@@ -117,17 +120,49 @@ const Approval: React.FC<ApprovalProps> = () => {
       .map((item) => item.grade)
       .filter((grade) => !isNaN(grade));
     const sum = grades.reduce((acc, grade) => acc + grade, 0);
-
-    console.log('grades:', grades);
-    console.log('sum:', sum);
     return grades.length > 0 ? sum / grades.length : 0;
   };
 
-  const handleAccept = async (applicant: string) => {
-    console.log(applicant);
+  const handleAccept = async (applicant: string, eventId: string) => {
+    try {
+      const eventRef = doc(db, 'events', eventId);
+      await updateDoc(eventRef, {
+        applicationList: arrayRemove(applicant),
+        playerList: arrayUnion(applicant),
+      });
+
+      const participationRef = doc(
+        db,
+        'teamParticipation',
+        `${eventId}_${applicant}`
+      );
+      await updateDoc(participationRef, {
+        state: 'accept',
+      });
+    } catch (error) {
+      console.error('更新參與狀態時發生錯誤:', error);
+      throw error;
+    }
   };
-  const handleReject = async (applicant: string) => {
-    console.log(applicant);
+  const handleDecline = async (applicant: string, eventId: string) => {
+    try {
+      const eventRef = doc(db, 'events', eventId);
+      await updateDoc(eventRef, {
+        applicationList: arrayRemove(applicant),
+      });
+
+      const participationRef = doc(
+        db,
+        'teamParticipation',
+        `${eventId}_${applicant}`
+      );
+      await updateDoc(participationRef, {
+        state: 'decline',
+      });
+    } catch (error) {
+      console.error('更新參與狀態時發生錯誤:', error);
+      throw error;
+    }
   };
 
   return (
@@ -173,12 +208,16 @@ const Approval: React.FC<ApprovalProps> = () => {
                       />
                     </td>
                     <td>
-                      <button onClick={() => handleAccept(applicantId)}>
+                      <button
+                        onClick={() => handleAccept(applicantId, event.id)}
+                      >
                         接受
                       </button>
                     </td>
                     <td>
-                      <button onClick={() => handleReject(applicantId)}>
+                      <button
+                        onClick={() => handleDecline(applicantId, event.id)}
+                      >
                         拒絕
                       </button>
                     </td>

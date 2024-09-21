@@ -1,13 +1,18 @@
 import { useState, useEffect } from 'react';
 import { db } from '../../../firebaseConfig';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  updateDoc,
+} from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
 import type { Court, Event } from '../../types';
 import { useCityCourtContext } from '../../context/useCityCourtContext';
 import { CitySelector } from '../../components/CitySelector';
 import { CourtSelector } from '../../components/CourtSelector';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 
 interface HoldEventProps {}
 
@@ -64,14 +69,15 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     console.log('Form Data Submitted:', formData);
     try {
       const eventCollectionRef = collection(db, 'events');
-      await addDoc(eventCollectionRef, {
+      const docRef = await addDoc(eventCollectionRef, {
         ...formData,
-        id: uuidv4(),
         createdEventAt: serverTimestamp(),
         applicationList: [],
         playerList: [user?.uid],
         eventStatus: 'hold',
       });
+
+      await updateDoc(docRef, { id: docRef.id });
       alert('活動建立成功');
       navigate('/');
     } catch (error) {

@@ -6,7 +6,6 @@ const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
   userHistory,
 }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  console.log('userHistory', userHistory);
 
   const hasHistory = Object.keys(userHistory).length > 0;
   return (
