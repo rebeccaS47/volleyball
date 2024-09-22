@@ -47,3 +47,13 @@ export interface History {
   grade: number;
   note: string;
 }
+
+export interface TeamParticipation {
+  date: string;
+  startTime: string;
+  endTime: string;
+  eventId: string;
+  state: 'pending' | 'accept' | 'decline';
+  userId: string;
+  courtName: string;
+}

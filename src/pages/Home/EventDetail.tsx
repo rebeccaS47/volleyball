@@ -90,6 +90,7 @@ const EventDetail: React.FC<EventDetailProps> = () => {
         await setDoc(participationRef, {
           eventId: event.id,
           userId: user.uid,
+          courtName: event.court.name,
           state: 'pending',
           date: event.date,
           startTime: event.startTime,
