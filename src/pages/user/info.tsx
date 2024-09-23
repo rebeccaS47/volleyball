@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useUserAuth } from '../../context/userAuthContext';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { doc, setDoc } from 'firebase/firestore';
-import { v4 as uuidv4 } from 'uuid';
 import { db, storage } from '../../../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 
@@ -30,7 +29,7 @@ const Info: React.FC<InfoProps> = () => {
 
     try {
       setUploading(true);
-      const fileRef = ref(storage, `images/${uuidv4()}`);
+      const fileRef = ref(storage, `userPhotos/${user.uid}}`);
       await uploadBytes(fileRef, file);
       const imgURL = await getDownloadURL(fileRef);
 
