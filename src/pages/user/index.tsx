@@ -10,6 +10,7 @@ import {
   DocumentData,
   doc,
   getDoc,
+  getDocs,
   updateDoc,
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -20,7 +21,8 @@ import {
 } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import type { TeamParticipation, Event, User } from '../../types';
+import type { TeamParticipation, Event, User, History } from '../../types';
+import HistoryDetail from '../../components/HistoryDetail';
 
 interface UserProps {}
 
@@ -44,6 +46,9 @@ const User: React.FC<UserProps> = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [historyData, setHistoryData] = useState<{
+    [key: string]: History[];
+  }>({});
   useEffect(() => {
     if (!user) return;
 
@@ -102,14 +107,32 @@ const User: React.FC<UserProps> = () => {
       return () => unsubscribe();
     };
 
+    const fetchHistory = async () => {
+      if (user) {
+        const historyRef = collection(db, 'history');
+        const q = query(historyRef, where('userId', '==', user.uid));
+
+        try {
+          const querySnapshot = await getDocs(q);
+          const items: History[] = [];
+          querySnapshot.forEach((doc) => {
+            items.push({ ...doc.data() } as History);
+          });
+          setHistoryData({ [user.uid]: items });
+        } catch (error) {
+          console.error('Error fetching history: ', error);
+        }
+      }
+    };
+
     fetchUserData();
     fetchEvents();
+    fetchHistory();
   }, [user]);
-
+  console.log('history:', historyData);
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setNewImgFile(e.target.files[0]);
-      // 創建一個本地 URL 用於預覽
       const localURL = URL.createObjectURL(e.target.files[0]);
       setImgURL(localURL);
     }
@@ -140,7 +163,7 @@ const User: React.FC<UserProps> = () => {
       if (newImgFile) {
         const photoURL = await uploadPhoto();
         updates.imgURL = photoURL;
-        setImgURL(photoURL); // 更新 imgURL 狀態
+        setImgURL(photoURL);
       }
 
       if (Object.keys(updates).length > 0) {
@@ -215,11 +238,8 @@ const User: React.FC<UserProps> = () => {
     return {
       style: {
         backgroundColor,
-        // borderRadius: '5px',
         opacity: 0.8,
         color: '#FFFFFF',
-        // border: 'none',
-        // display: 'block'
       },
     };
   };
@@ -284,10 +304,13 @@ const User: React.FC<UserProps> = () => {
                 取消
               </button>
             </div>
+            {user && (
+              <HistoryDetail userHistory={historyData[user.uid] || []} />
+            )}
           </div>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <h3 style={{ marginRight: '10px' }}>名稱: {userData.name}</h3>
+            <h3 style={{ marginRight: '10px' }}> {userData.name}</h3>
             <button onClick={() => setIsEditing(true)}>編輯</button>
           </div>
         )}
