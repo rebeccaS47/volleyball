@@ -129,7 +129,7 @@ const User: React.FC<UserProps> = () => {
     fetchEvents();
     fetchHistory();
   }, [user]);
-  console.log('history:', historyData);
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setNewImgFile(e.target.files[0]);
@@ -304,15 +304,19 @@ const User: React.FC<UserProps> = () => {
                 取消
               </button>
             </div>
-            {user && (
-              <HistoryDetail userHistory={historyData[user.uid] || []} />
-            )}
           </div>
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <h3 style={{ marginRight: '10px' }}> {userData.name}</h3>
-            <button onClick={() => setIsEditing(true)}>編輯</button>
-          </div>
+          <>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <h3 style={{ marginRight: '10px' }}> {userData.name}</h3>
+              <button style={{ marginRight: '10px' }} onClick={() => setIsEditing(true)}>編輯</button>
+            </div>
+            <div>
+              {user && (
+                <HistoryDetail userHistory={historyData[user.uid] || []} />
+              )}
+            </div>
+          </>
         )}
       </div>
       <div style={containerStyle}>
