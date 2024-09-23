@@ -22,7 +22,7 @@ export interface Event {
   totalCost: number;
   notes: string;
   playerList: string[];
-  eventStatus: 'hold' | 'finish';
+  eventStatus: 'hold' | 'closed';
   createdEventAt: string;
   applicationList: string[];
 }
@@ -56,4 +56,17 @@ export interface TeamParticipation {
   state: 'pending' | 'accept' | 'decline';
   userId: string;
   courtName: string;
+}
+
+export interface Feedback {
+  eventId: string;
+  userId: string;
+  courtName: string;
+  friendlinessLevel: string;
+  level: string;
+  grade: number;
+  note: string;
+  date: string;
+  startTime: string;
+  endTime: string;
 }

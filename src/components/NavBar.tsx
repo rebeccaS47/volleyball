@@ -21,16 +21,22 @@ const NavBar: React.FC<NavBarProps> = () => {
         Home
       </Link>
       <Link
+        to="/holdevent"
+        style={isActive('/holdevent') ? activeLinkStyle : linkStyle}
+      >
+        Hold Event
+      </Link>
+      <Link
         to="/approval"
         style={isActive('/approval') ? activeLinkStyle : linkStyle}
       >
         Approval
       </Link>
       <Link
-        to="/holdevent"
-        style={isActive('/holdevent') ? activeLinkStyle : linkStyle}
+        to="/feedback"
+        style={isActive('/feedback') ? activeLinkStyle : linkStyle}
       >
-        Hold Event
+        Feedback
       </Link>
       <Link to="/user" style={isActive('/user') ? activeLinkStyle : linkStyle}>
         User

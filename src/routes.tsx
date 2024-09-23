@@ -12,6 +12,7 @@ import User from './pages/user';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import Approval from './pages/approval';
 import Layout from './Layout';
+import Feedback from './pages/feedback';
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
           {
             path: '/user',
             element: <User />,
+          },
+          {
+            path: '/feedback',
+            element: <Feedback />,
           },
         ],
       },
