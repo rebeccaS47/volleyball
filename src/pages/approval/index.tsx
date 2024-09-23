@@ -167,6 +167,7 @@ const Approval: React.FC<ApprovalProps> = () => {
 
   return (
     <div>
+      <h1>Approval</h1>
       <table border={1}>
         <thead>
           <tr>

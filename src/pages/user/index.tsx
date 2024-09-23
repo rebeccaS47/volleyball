@@ -129,7 +129,7 @@ const User: React.FC<UserProps> = () => {
     fetchEvents();
     fetchHistory();
   }, [user]);
-  
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setNewImgFile(e.target.files[0]);
@@ -247,7 +247,7 @@ const User: React.FC<UserProps> = () => {
   const containerStyle: React.CSSProperties = {
     overflow: 'auto',
     height: '500px',
-    width: '80%',
+    // width: '80%',
     margin: '0 auto',
     padding: '20px 0',
   };
@@ -263,7 +263,6 @@ const User: React.FC<UserProps> = () => {
 
   return (
     <div>
-      <h1>User</h1>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <img
           src={imgURL}
@@ -309,7 +308,12 @@ const User: React.FC<UserProps> = () => {
           <>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <h3 style={{ marginRight: '10px' }}> {userData.name}</h3>
-              <button style={{ marginRight: '10px' }} onClick={() => setIsEditing(true)}>編輯</button>
+              <button
+                style={{ marginRight: '10px' }}
+                onClick={() => setIsEditing(true)}
+              >
+                編輯
+              </button>
             </div>
             <div>
               {user && (

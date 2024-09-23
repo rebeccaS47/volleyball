@@ -19,7 +19,7 @@ interface FilterState {
 }
 
 const Event: React.FC<EventProps> = () => {
-  const { logOut, user } = useUserAuth();
+  const { user } = useUserAuth();
   const { cities } = useCityCourtContext();
   const navigate = useNavigate();
   const [eventList, setEventList] = useState<Event[]>([]);
@@ -89,20 +89,9 @@ const Event: React.FC<EventProps> = () => {
     filterEvents();
   }, [filterState, eventList, filterEvents]);
 
-  const handleLogout = async (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    try {
-      await logOut();
-    } catch (error) {
-      console.log('Error : ', error);
-    }
-  };
-
   return (
     <div>
-      <h1>Event</h1>
-      <h2>Hi, {userData === null ? 'there' : userData.name}</h2>
-      <button onClick={handleLogout}>Logout</button>
+      <h1>Hi, {userData === null ? 'there' : userData.name}</h1>
       <div style={{ display: 'flex' }}>
         <CitySelector
           cities={cities}
@@ -187,7 +176,6 @@ const Event: React.FC<EventProps> = () => {
           </div>
         ))}
       </div>
-      <button onClick={() => navigate('/holdevent')}>發起活動</button>
     </div>
   );
 };

@@ -28,14 +28,7 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     /* font-family: 'Noto Sans TC', sans-serif; */
   }
-
-  /* #root {
-
-    @media screen and (max-width: 1279px) {
-      
-    }
-  } */
-
+  
     :root{
     /* --primary-color: rgba(244, 67, 54, 1); */
   }

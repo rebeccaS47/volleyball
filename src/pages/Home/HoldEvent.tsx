@@ -132,7 +132,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <h1>HoldEvent</h1>
         <label>選擇球場</label>
         <CitySelector
@@ -152,7 +152,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           </p>
         ) : null}
       </div>
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <label>日期</label>
         <input
           type="date"
@@ -163,7 +163,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
         />
       </div>
 
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <label>時間</label>
         <input
           type="time"
@@ -181,7 +181,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           required
         />
       </div>
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <label>網高</label>
         <label>
           <input
@@ -204,7 +204,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           男網
         </label>
       </div>
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <label>友善程度</label>
         <select
           name="friendlinessLevel"
@@ -219,7 +219,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           <option value="E">E</option>
         </select>
       </div>
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <label>分級</label>
         <select
           name="level"
@@ -234,7 +234,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           <option value="E">E</option>
         </select>
       </div>
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <label>
           <input
             type="checkbox"
@@ -245,7 +245,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           是否有開冷氣
         </label>
       </div>
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <label>找尋人數</label>
         <input
           type="number"
@@ -255,7 +255,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           required
         />
       </div>
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <label>總金額</label>
         <input
           type="number"
@@ -265,7 +265,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
         />
       </div>
 
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <label>備註</label>
         <textarea
           name="notes"

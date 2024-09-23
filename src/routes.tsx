@@ -11,62 +11,59 @@ import UserInfo from './pages/user/info';
 import User from './pages/user';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import Approval from './pages/approval';
+import Layout from './Layout';
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
   {
-    element: <ProtectedRoutes />,
+    element: <Layout />,
+    errorElement: <Error />,
     children: [
       {
-        path: '/holdevent',
-        element: <HoldEvent />,
-        errorElement: <Error />,
+        element: <ProtectedRoutes />,
+        children: [
+          {
+            path: '/holdevent',
+            element: <HoldEvent />,
+          },
+          {
+            path: '/approval',
+            element: <Approval />,
+          },
+          {
+            path: '/user',
+            element: <User />,
+          },
+        ],
       },
       {
-        path: '/approval',
-        element: <Approval />,
-        errorElement: <Error />,
+        path: '/',
+        element: <Home />,
       },
       {
-        path: '/user',
-        element: <User />,
-        errorElement: <Error />,
+        path: '/eventdetail/:eventId',
+        element: <EventDetail />,
+      },
+      {
+        path: '/court',
+        element: <Court />,
+      },
+      {
+        path: '/courtdetail',
+        element: <CourtDetail />,
+      },
+      {
+        path: '/login',
+        element: <Login />,
+      },
+      {
+        path: '/signup',
+        element: <Signup />,
+      },
+      {
+        path: '/info',
+        element: <UserInfo />,
       },
     ],
-  },
-  {
-    path: '/',
-    element: <Home />,
-    errorElement: <Error />,
-  },
-  {
-    path: '/eventdetail/:eventId',
-    element: <EventDetail />,
-    errorElement: <Error />,
-  },
-  {
-    path: '/court',
-    element: <Court />,
-    errorElement: <Error />,
-  },
-  {
-    path: '/courtdetail',
-    element: <CourtDetail />,
-    errorElement: <Error />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-    errorElement: <Error />,
-  },
-  {
-    path: '/signup',
-    element: <Signup />,
-    errorElement: <Error />,
-  },
-  {
-    path: '/info',
-    element: <UserInfo />,
-    errorElement: <Error />,
   },
 ]);
 
