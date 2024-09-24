@@ -9,6 +9,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  Timestamp,
 } from 'firebase/firestore';
 import { findUserById } from '../../firebase.ts';
 import type { Event, Feedback } from '../../types';
@@ -51,7 +52,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
         const q = query(
           eventsRef,
           where('createUserId', '==', user.uid),
-          where('eventStatus', '==', 'closed')
+          where('endTimeStamp', '<', Timestamp.now())
         );
 
         const querySnapshot = await getDocs(q);
@@ -203,7 +204,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
 
   return (
     <div>
-      <h2>已結束的活動</h2>
+      <h1>Feedback</h1>
       {closedEvents.length === 0 ? (
         <p>沒有找到已結束的活動。</p>
       ) : (
@@ -224,22 +225,28 @@ const Feedback: React.FC<FeedbackProps> = () => {
             <p>正在加載用戶名稱...</p>
           ) : (
             <ul>
-              {userNames.map((user) => (
-                <li key={user.id} onClick={() => handlePlayerClick(user.id)}>
-                  {user.name}
-                </li>
-              ))}
+              {userNames
+                //.filter((item) => item.id !== user?.uid)
+                .map((user) => (
+                  <li key={user.id} onClick={() => handlePlayerClick(user.id)}>
+                    {user.name}
+                  </li>
+                ))}
             </ul>
           )}
         </div>
       )}
       {selectedPlayer && (
         <div>
-          <h3>{selectedPlayer} 的回饋</h3>
+          <h3>回饋表單</h3>
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSubmitFeedback();
+            }}
+            style={{
+              opacity: user?.uid === selectedPlayer ? 0.5 : 1,
+              pointerEvents: user?.uid === selectedPlayer ? 'none' : 'auto',
             }}
           >
             <div style={{ marginBottom: '10px' }}>

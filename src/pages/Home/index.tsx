@@ -52,7 +52,6 @@ const Event: React.FC<EventProps> = () => {
         id: doc.id,
       })) as Event[];
       setEventList(filteredData);
-      console.log('2222eventList', filteredData);
     } catch (error) {
       console.log(error);
     }
@@ -170,7 +169,7 @@ const Event: React.FC<EventProps> = () => {
             <p>
               價格/人:
               {Math.round(
-                event.totalCost / (event.findNum + event.playerList.length)
+                event.totalCost / event.findNum
               )}
             </p>
           </div>

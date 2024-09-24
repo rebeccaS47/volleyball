@@ -1,8 +1,10 @@
+import {useState} from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useUserAuth } from '../context/userAuthContext';
 interface NavBarProps {}
 
 const NavBar: React.FC<NavBarProps> = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const isActive = (path: string): boolean => location.pathname === path;
   const { logOut } = useUserAuth();
@@ -16,7 +18,12 @@ const NavBar: React.FC<NavBarProps> = () => {
     }
   };
   return (
-    <nav style={navStyle}>
+    <div
+      style={navbarStyles.container}
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+    {/* <nav style={navStyle.navbar(isOpen)}>
       <Link to="/" style={isActive('/') ? activeLinkStyle : linkStyle}>
         Home
       </Link>
@@ -44,43 +51,111 @@ const NavBar: React.FC<NavBarProps> = () => {
       <div style={logoutStyle} onClick={handleLogout}>
         Logout
       </div>
-    </nav>
+    </nav> */}
+    <nav style={navbarStyles.navbar(isOpen)}>
+        <Link to="/" style={{...navbarStyles.link, ...(isActive('/') ? navbarStyles.activeLink : {})}}>
+          Home
+        </Link>
+        <Link to="/holdevent" style={{...navbarStyles.link, ...(isActive('/holdevent') ? navbarStyles.activeLink : {})}}>
+        Hold Event
+        </Link>
+        <Link to="/approval" style={{...navbarStyles.link, ...(isActive('/approval') ? navbarStyles.activeLink : {})}}>
+          Approval
+        </Link>
+        <Link to="/feedback" style={{...navbarStyles.link, ...(isActive('/feedback') ? navbarStyles.activeLink : {})}}>
+          Feedback
+        </Link>
+        <Link to="/user" style={{...navbarStyles.link, ...(isActive('/user') ? navbarStyles.activeLink : {})}}>
+          User
+        </Link>
+        <button onClick={handleLogout} style={navbarStyles.logoutBtn}>
+          Logout
+        </button>
+      </nav>
+    </div>
   );
 };
 
 export default NavBar;
 
-const navStyle: React.CSSProperties = {
-  backgroundColor: '#f3f2e8',
-  color: 'black',
-  width: '280px',
-  height: '100vh',
-  position: 'fixed',
-  left: 0,
-  top: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  padding: '20px 0',
-};
+// const navStyle: React.CSSProperties = {
+//   backgroundColor: '#f3f2e8',
+//   color: 'black',
+//   width: '280px',
+//   height: '100vh',
+//   position: 'fixed',
+//   left: 0,
+//   top: 0,
+//   display: 'flex',
+//   flexDirection: 'column',
+//   padding: '20px 0',
+// };
 
-const linkStyle: React.CSSProperties = {
-  color: 'black',
-  textDecoration: 'none',
-  padding: '15px 25px',
-  fontSize: '18px',
-  transition: 'background-color 0.3s',
-};
+// const linkStyle: React.CSSProperties = {
+//   color: 'black',
+//   textDecoration: 'none',
+//   padding: '15px 25px',
+//   fontSize: '18px',
+//   transition: 'background-color 0.3s',
+// };
 
-const activeLinkStyle: React.CSSProperties = {
-  ...linkStyle,
-  color: 'white',
-  backgroundColor: '#838181',
-};
+// const activeLinkStyle: React.CSSProperties = {
+//   ...linkStyle,
+//   color: 'white',
+//   backgroundColor: '#838181',
+// };
 
-const logoutStyle: React.CSSProperties = {
-  ...linkStyle,
-  marginTop: 'auto',
-  backgroundColor: '#cfcdbb',
-  textAlign: 'center',
-  cursor: 'pointer',
+// const logoutStyle: React.CSSProperties = {
+//   ...linkStyle,
+//   marginTop: 'auto',
+//   backgroundColor: '#cfcdbb',
+//   textAlign: 'center',
+//   cursor: 'pointer',
+// };
+
+const navbarStyles = {
+  container: {
+    position: 'fixed' as const,
+    top: 0,
+    left: 0,
+    width: '20px',
+    height: '100vh',
+    zIndex: 1000,
+  },
+  navbar: (isOpen: boolean): React.CSSProperties => ({
+    position: 'fixed',
+    top: 0,
+    left: isOpen ? 0 : '-270px', // 隱藏時留下 20px 用於觸發
+    width: '300px',
+    height: '100vh',
+    color: 'black',
+    backgroundColor: '#f3f2e8',
+    transition: 'left 0.3s ease-in-out',
+    zIndex: 1000,
+    boxShadow: isOpen ? '2px 0 5px rgba(0,0,0,0.3)' : 'none',
+  }),
+  link: {
+    display: 'block',
+    color: 'black',
+    padding: '15px 25px',
+    textDecoration: 'none',
+    fontSize: '18px',
+    transition: 'background-color 0.3s',
+  } as const,
+  activeLink: {
+    color: 'white',
+    backgroundColor: '#838181',
+  } as const,
+  logoutBtn: {
+    display: 'block',
+    width: '100%',
+    padding: '15px 25px',
+    backgroundColor: '#cfcdbb',
+    color: 'white',
+    textAlign: 'center' as const,
+    cursor: 'pointer',
+    border: 'none',
+    fontSize: '18px',
+    marginTop: 'auto',
+  } as const,
 };

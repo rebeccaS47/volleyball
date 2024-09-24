@@ -5,6 +5,7 @@ import {
   addDoc,
   serverTimestamp,
   updateDoc,
+  Timestamp,
 } from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
@@ -46,8 +47,9 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     notes: '',
     playerList: [],
     eventStatus: 'hold',
-    createdEventAt: '',
+    createdEventAt: Timestamp.now(),
     applicationList: [],
+    endTimeStamp:  Timestamp.now(),
   });
 
   const handleInputChange = (
@@ -67,12 +69,19 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     e.preventDefault();
     console.log('Form Data Submitted:', formData);
     try {
+      const [year, month, day] = formData.date.split('-').map(Number);
+      const [hours, minutes] = formData.endTime.split(':').map(Number);
+      const endDate = new Date(year, month - 1, day, hours, minutes);
+      
+      const endTimeStamp = Timestamp.fromDate(endDate);
+
       const eventCollectionRef = collection(db, 'events');
       const docRef = await addDoc(eventCollectionRef, {
         ...formData,
         createdEventAt: serverTimestamp(),
         applicationList: [],
         playerList: [user?.uid],
+        endTimeStamp,
         eventStatus: 'hold',
       });
 

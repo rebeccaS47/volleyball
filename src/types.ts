@@ -1,3 +1,5 @@
+import {Timestamp} from 'firebase/firestore';
+
 export interface Court {
   id: string;
   name: string;
@@ -23,8 +25,9 @@ export interface Event {
   notes: string;
   playerList: string[];
   eventStatus: 'hold' | 'closed';
-  createdEventAt: string;
+  createdEventAt: Timestamp;
   applicationList: string[];
+  endTimeStamp: Timestamp;
 }
 
 export interface User {

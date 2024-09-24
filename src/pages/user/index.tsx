@@ -60,6 +60,7 @@ const User: React.FC<UserProps> = () => {
         if (userDoc.exists()) {
           const data = userDoc.data() as User;
           setUserData(data);
+          console.log("抓取到的user ",data)
           setNewDisplayName(data.name);
           setImgURL(data.imgURL);
         } else {
@@ -307,7 +308,7 @@ const User: React.FC<UserProps> = () => {
         ) : (
           <>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <h3 style={{ marginRight: '10px' }}> {userData.name}</h3>
+              <h1 style={{ marginRight: '10px' }}> {userData.name}</h1>
               <button
                 style={{ marginRight: '10px' }}
                 onClick={() => setIsEditing(true)}
