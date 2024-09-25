@@ -7,7 +7,7 @@ const NavBar: React.FC<NavBarProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const isActive = (path: string): boolean => location.pathname === path;
-  const { logOut } = useUserAuth();
+  const { user, logOut } = useUserAuth();
 
   const handleLogout = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
@@ -68,9 +68,10 @@ const NavBar: React.FC<NavBarProps> = () => {
         <Link to="/user" style={{...navbarStyles.link, ...(isActive('/user') ? navbarStyles.activeLink : {})}}>
           User
         </Link>
-        <button onClick={handleLogout} style={navbarStyles.logoutBtn}>
+        {user ? <button onClick={handleLogout} style={navbarStyles.btn}>Logout</button>:<Link to="/login" style={navbarStyles.btn}>Login</Link>}
+        {/* <button onClick={handleLogout} style={navbarStyles.btn}>
           Logout
-        </button>
+        </button> */}
       </nav>
     </div>
   );
@@ -146,7 +147,7 @@ const navbarStyles = {
     color: 'white',
     backgroundColor: '#838181',
   } as const,
-  logoutBtn: {
+  btn: {
     display: 'block',
     width: '100%',
     padding: '15px 25px',
@@ -156,6 +157,6 @@ const navbarStyles = {
     cursor: 'pointer',
     border: 'none',
     fontSize: '18px',
-    marginTop: 'auto',
+    marginTop: '500px',
   } as const,
 };

@@ -10,7 +10,6 @@ import {
   updateDoc,
   arrayRemove,
   arrayUnion,
-  // Timestamp,
 } from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import type { Event, History } from '../../types';
@@ -40,8 +39,7 @@ const Approval: React.FC<ApprovalProps> = () => {
     const q = query(
       eventsRef,
       where('createUserId', '==', user.uid),
-      where('eventStatus', '==', 'hold'),
-      // where('endTimeStamp', '<', Timestamp.now())
+      // where('eventStatus', '==', 'hold'),
     );
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {

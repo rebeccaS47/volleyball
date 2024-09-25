@@ -24,9 +24,10 @@ export interface Event {
   totalCost: number;
   notes: string;
   playerList: string[];
-  eventStatus: 'hold' | 'closed';
+  // eventStatus: 'hold' | 'closed';
   createdEventAt: Timestamp;
   applicationList: string[];
+  startTimeStamp: Timestamp;
   endTimeStamp: Timestamp;
 }
 

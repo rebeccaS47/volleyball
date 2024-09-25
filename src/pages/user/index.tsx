@@ -217,7 +217,6 @@ const User: React.FC<UserProps> = () => {
       尋找人數: ${eventDeatil.findNum}
       總費用: ${eventDeatil.totalCost}
       備註: ${eventDeatil.notes}
-      活動狀態: ${eventDeatil.eventStatus}
     `);
   };
 

@@ -46,10 +46,11 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     totalCost: 0,
     notes: '',
     playerList: [],
-    eventStatus: 'hold',
+    // eventStatus: 'hold',
     createdEventAt: Timestamp.now(),
     applicationList: [],
     endTimeStamp:  Timestamp.now(),
+    startTimeStamp: Timestamp.now(),
   });
 
   const handleInputChange = (
@@ -70,9 +71,13 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     console.log('Form Data Submitted:', formData);
     try {
       const [year, month, day] = formData.date.split('-').map(Number);
-      const [hours, minutes] = formData.endTime.split(':').map(Number);
-      const endDate = new Date(year, month - 1, day, hours, minutes);
       
+      const [startHours, startMinutes] = formData.startTime.split(':').map(Number);
+      const startDate = new Date(year, month - 1, day, startHours, startMinutes);
+      const startTimeStamp = Timestamp.fromDate(startDate);
+
+      const [endHours, endMinutes] = formData.endTime.split(':').map(Number);
+      const endDate = new Date(year, month - 1, day, endHours, endMinutes);
       const endTimeStamp = Timestamp.fromDate(endDate);
 
       const eventCollectionRef = collection(db, 'events');
@@ -81,8 +86,9 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
         createdEventAt: serverTimestamp(),
         applicationList: [],
         playerList: [user?.uid],
+        startTimeStamp,
         endTimeStamp,
-        eventStatus: 'hold',
+        // eventStatus: 'hold',
       });
 
       await updateDoc(docRef, { id: docRef.id });

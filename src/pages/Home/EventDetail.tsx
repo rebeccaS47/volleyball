@@ -130,9 +130,10 @@ const EventDetail: React.FC<EventDetailProps> = () => {
           <p>有無冷氣:{event.isAC ? '有' : '沒有'}</p>
           <p>
             價格:
-            {Math.round(
+            {/* {Math.round(
               event.totalCost / (event.findNum + event.playerList.length)
-            )}
+            )} */}
+            {Math.round(event.totalCost / event.findNum)}
           </p>
           <p>隊員名單:{playerNames}</p>
           <p>剩餘名額:{event.findNum - event.playerList.length}</p>

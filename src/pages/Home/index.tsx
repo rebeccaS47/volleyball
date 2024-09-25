@@ -2,7 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../firebaseConfig';
-import { getDocs, collection } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  where,
+  Timestamp,
+} from 'firebase/firestore';
 import type { Event, User } from '../../types';
 import { CitySelector } from '../../components/CitySelector';
 import { useCityCourtContext } from '../../context/useCityCourtContext';
@@ -46,7 +53,15 @@ const Event: React.FC<EventProps> = () => {
   const getEventList = useCallback(async () => {
     try {
       const eventCollectionRef = collection(db, 'events');
-      const data = await getDocs(eventCollectionRef);
+      const now = Timestamp.now();
+      const q = query(
+        eventCollectionRef,
+        where('startTimeStamp', '>=', now),
+        orderBy('date', 'asc'),
+        orderBy('startTimeStamp', 'asc')
+      );
+      const data = await getDocs(q);
+      // const data = await getDocs(eventCollectionRef);
       const filteredData = data.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
@@ -64,7 +79,7 @@ const Event: React.FC<EventProps> = () => {
         (!filterState.date || event.date === filterState.date) &&
         (!filterState.startTime || event.startTime >= filterState.startTime) &&
         (!filterState.endTime || event.endTime <= filterState.endTime) &&
-        (!filterState.level || event.level === filterState.level)
+        (!filterState.level || event.level === filterState.level) 
       );
     });
     setFilteredEventList(filteredList);
@@ -168,9 +183,7 @@ const Event: React.FC<EventProps> = () => {
             </p>
             <p>
               價格/人:
-              {Math.round(
-                event.totalCost / event.findNum
-              )}
+              {Math.round(event.totalCost / event.findNum)}
             </p>
           </div>
         ))}
