@@ -13,6 +13,7 @@ import type { Court, Event } from '../../types';
 import { useCityCourtContext } from '../../context/useCityCourtContext';
 import { CitySelector } from '../../components/CitySelector';
 import { CourtSelector } from '../../components/CourtSelector';
+import UserSelector from '../../components/UserSelector';
 
 interface HoldEventProps {}
 
@@ -46,7 +47,6 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     totalCost: 0,
     notes: '',
     playerList: [],
-    // eventStatus: 'hold',
     createdEventAt: Timestamp.now(),
     applicationList: [],
     endTimeStamp:  Timestamp.now(),
@@ -85,10 +85,9 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
         ...formData,
         createdEventAt: serverTimestamp(),
         applicationList: [],
-        playerList: [user?.uid],
+        playerList: [formData.createUserId, ...formData.playerList],
         startTimeStamp,
         endTimeStamp,
-        // eventStatus: 'hold',
       });
 
       await updateDoc(docRef, { id: docRef.id });
@@ -133,6 +132,13 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
   const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCity(e.target.value);
     setSelectedCourt(-1);
+  };
+
+  const handleUserSelect = (selectedUsers: string[]) => {
+    setFormData(prevData => ({
+      ...prevData,
+      playerList: selectedUsers
+    }));
   };
 
   useEffect(() => {
@@ -259,6 +265,10 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           />
           是否有開冷氣
         </label>
+      </div>
+      <div>
+      <label>內建名單</label>
+        <UserSelector onSelect={handleUserSelect} currentUserId={formData.createUserId}/>
       </div>
       <div style={{ marginBottom: '10px' }}>
         <label>找尋人數</label>
