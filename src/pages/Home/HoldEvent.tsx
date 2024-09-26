@@ -6,6 +6,8 @@ import {
   serverTimestamp,
   updateDoc,
   Timestamp,
+  doc,
+  setDoc,
 } from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
@@ -49,7 +51,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     playerList: [],
     createdEventAt: Timestamp.now(),
     applicationList: [],
-    endTimeStamp:  Timestamp.now(),
+    endTimeStamp: Timestamp.now(),
     startTimeStamp: Timestamp.now(),
   });
 
@@ -71,9 +73,17 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     console.log('Form Data Submitted:', formData);
     try {
       const [year, month, day] = formData.date.split('-').map(Number);
-      
-      const [startHours, startMinutes] = formData.startTime.split(':').map(Number);
-      const startDate = new Date(year, month - 1, day, startHours, startMinutes);
+
+      const [startHours, startMinutes] = formData.startTime
+        .split(':')
+        .map(Number);
+      const startDate = new Date(
+        year,
+        month - 1,
+        day,
+        startHours,
+        startMinutes
+      );
       const startTimeStamp = Timestamp.fromDate(startDate);
 
       const [endHours, endMinutes] = formData.endTime.split(':').map(Number);
@@ -89,8 +99,29 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
         startTimeStamp,
         endTimeStamp,
       });
-
       await updateDoc(docRef, { id: docRef.id });
+
+      await Promise.all(
+        [formData.createUserId, ...formData.playerList].map(
+          async (playerId) => {
+            const participationRef = doc(
+              db,
+              'teamParticipation',
+              `${docRef.id}_${playerId}`
+            );
+            await setDoc(participationRef, {
+              eventId: docRef.id,
+              userId: playerId,
+              courtName: formData.court.name,
+              state: 'accept',
+              date: formData.date,
+              startTime: formData.startTime,
+              endTime: formData.endTime,
+            });
+          }
+        )
+      );
+
       alert('活動建立成功');
       navigate('/');
     } catch (error) {
@@ -135,9 +166,9 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
   };
 
   const handleUserSelect = (selectedUsers: string[]) => {
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
-      playerList: selectedUsers
+      playerList: selectedUsers,
     }));
   };
 
@@ -267,8 +298,11 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
         </label>
       </div>
       <div>
-      <label>內建名單</label>
-        <UserSelector onSelect={handleUserSelect} currentUserId={formData.createUserId}/>
+        <label>內建名單</label>
+        <UserSelector
+          onSelect={handleUserSelect}
+          currentUserId={formData.createUserId}
+        />
       </div>
       <div style={{ marginBottom: '10px' }}>
         <label>找尋人數</label>
