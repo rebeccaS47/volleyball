@@ -24,7 +24,6 @@ export interface Event {
   totalCost: number;
   notes: string;
   playerList: string[];
-  // eventStatus: 'hold' | 'closed';
   createdEventAt: Timestamp;
   applicationList: string[];
   startTimeStamp: Timestamp;
@@ -73,4 +72,9 @@ export interface Feedback {
   date: string;
   startTime: string;
   endTime: string;
+}
+
+export interface Option {
+  value: string;
+  label: string;
 }

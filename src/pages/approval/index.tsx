@@ -39,7 +39,6 @@ const Approval: React.FC<ApprovalProps> = () => {
     const q = query(
       eventsRef,
       where('createUserId', '==', user.uid),
-      // where('eventStatus', '==', 'hold'),
     );
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
