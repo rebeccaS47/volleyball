@@ -78,3 +78,10 @@ export interface Option {
   value: string;
   label: string;
 }
+
+export interface Message{
+  roomId: string;
+  text: string;
+  createdAt: Timestamp;
+  user: string;
+}
