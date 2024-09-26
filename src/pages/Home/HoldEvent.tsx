@@ -40,7 +40,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     createUserId: user?.uid || '',
     date: '',
     startTime: '',
-    endTime: '',
+    duration: 0,
     netHeight: '',
     friendlinessLevel: '',
     level: '',
@@ -77,6 +77,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
       const [startHours, startMinutes] = formData.startTime
         .split(':')
         .map(Number);
+
       const startDate = new Date(
         year,
         month - 1,
@@ -86,8 +87,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
       );
       const startTimeStamp = Timestamp.fromDate(startDate);
 
-      const [endHours, endMinutes] = formData.endTime.split(':').map(Number);
-      const endDate = new Date(year, month - 1, day, endHours, endMinutes);
+      const endDate = new Date(startDate.getTime() + formData.duration * 60 * 60 * 1000);
       const endTimeStamp = Timestamp.fromDate(endDate);
 
       const eventCollectionRef = collection(db, 'events');
@@ -115,8 +115,8 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
               courtName: formData.court.name,
               state: 'accept',
               date: formData.date,
-              startTime: formData.startTime,
-              endTime: formData.endTime,
+              startTime: startTimeStamp,
+              endTime: endTimeStamp,
             });
           }
         )
@@ -224,13 +224,23 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           onChange={handleInputChange}
           required
         />
-        <span> ~ </span>
+        {/* <label>活動時長(hr)</label>
         <input
-          type="time"
-          name="endTime"
-          value={formData.endTime}
+          type="number"
+          name="duration"
+          value={formData.duration}
           onChange={handleInputChange}
-          required
+        /> */}
+        <label htmlFor="duration">活動時長(hr): {formData.duration}</label>
+        <input
+          id="duration"
+          type="range"
+          name="duration"
+          value={formData.duration}
+          onChange={handleInputChange}
+          min="1"
+          max="24"
+          // step="0.5"
         />
       </div>
       <div style={{ marginBottom: '10px' }}>

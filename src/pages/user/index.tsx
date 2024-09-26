@@ -60,7 +60,7 @@ const User: React.FC<UserProps> = () => {
         if (userDoc.exists()) {
           const data = userDoc.data() as User;
           setUserData(data);
-          console.log("抓取到的user ",data)
+          console.log('抓取到的user ', data);
           setNewDisplayName(data.name);
           setImgURL(data.imgURL);
         } else {
@@ -82,18 +82,18 @@ const User: React.FC<UserProps> = () => {
           const fetchedEvents: CalendarEventExtended[] = snapshot.docs.map(
             (doc) => {
               const data = doc.data() as TeamParticipation;
-              const start = moment(
-                `${data.date} ${data.startTime}`,
-                'YYYY-MM-DD HH:mm'
-              ).toDate();
-              const end = moment(
-                `${data.date} ${data.endTime}`,
-                'YYYY-MM-DD HH:mm'
-              ).toDate();
+              // const start = moment(
+              //   `${data.date} ${data.startTime}`,
+              //   'YYYY-MM-DD HH:mm'
+              // ).toDate();
+              // const end = moment(
+              //   `${data.date} ${data.endTime}`,
+              //   'YYYY-MM-DD HH:mm'
+              // ).toDate();
               return {
                 title: data.courtName,
-                start,
-                end,
+                start: data.startTime.toDate(),
+                end: data.endTime.toDate(),
                 eventId: data.eventId,
                 state: data.state as 'pending' | 'accept' | 'decline',
                 userId: data.userId,
@@ -209,7 +209,7 @@ const User: React.FC<UserProps> = () => {
       場地: ${eventDeatil.court.name}
       日期: ${eventDeatil.date}
       起始時間: ${eventDeatil.startTime}
-      結束時間: ${eventDeatil.endTime}
+      結束時間: ${eventDeatil.endTimeStamp.toDate().toLocaleString()}
       網高: ${eventDeatil.netHeight}
       友善程度: ${eventDeatil.friendlinessLevel}
       能力: ${eventDeatil.level}

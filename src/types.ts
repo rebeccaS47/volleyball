@@ -15,7 +15,8 @@ export interface Event {
   createUserId: string;
   date: string;
   startTime: string;
-  endTime: string;
+  duration: number;
+  // endTime: string;
   netHeight: string;
   friendlinessLevel: string;
   level: string;
@@ -53,8 +54,8 @@ export interface History {
 
 export interface TeamParticipation {
   date: string;
-  startTime: string;
-  endTime: string;
+  startTime: Timestamp;
+  endTime: Timestamp;
   eventId: string;
   state: 'pending' | 'accept' | 'decline';
   userId: string;
