@@ -68,6 +68,9 @@ const NavBar: React.FC<NavBarProps> = () => {
         <Link to="/user" style={{...navbarStyles.link, ...(isActive('/user') ? navbarStyles.activeLink : {})}}>
           User
         </Link>
+        <Link to="/chat" style={{...navbarStyles.link, ...(isActive('/chat') ? navbarStyles.activeLink : {})}}>
+          Chat
+        </Link>
         {user ? <button onClick={handleLogout} style={navbarStyles.btn}>Logout</button>:<Link to="/login" style={navbarStyles.btn}>Login</Link>}
         {/* <button onClick={handleLogout} style={navbarStyles.btn}>
           Logout

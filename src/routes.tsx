@@ -13,6 +13,7 @@ import ProtectedRoutes from './components/ProtectedRoutes';
 import Approval from './pages/approval';
 import Layout from './Layout';
 import Feedback from './pages/feedback';
+import Chat from './pages/chat';
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
           {
             path: '/feedback',
             element: <Feedback />,
+          },
+          {
+            path: '/chat',
+            element: <Chat />,
           },
         ],
       },
