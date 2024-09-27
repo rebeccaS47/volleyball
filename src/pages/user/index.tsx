@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
-import { db, storage } from '../../../firebaseConfig';
+import { db, storage } from '../../../firebaseConfig.ts';
 import {
   collection,
   onSnapshot,
@@ -14,26 +14,22 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import {
-  Calendar,
-  momentLocalizer,
-  Event as CalendarEvent,
-} from 'react-big-calendar';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import type { TeamParticipation, Event, User, History } from '../../types';
-import HistoryDetail from '../../components/HistoryDetail';
+import type {
+  TeamParticipation,
+  Event,
+  User,
+  History,
+  CalendarEvent,
+} from '../../types.ts';
+import HistoryDetail from '../../components/HistoryDetail.tsx';
 
 interface UserProps {}
 
-interface CalendarEventExtended extends CalendarEvent {
-  eventId: string;
-  state: string;
-  userId: string;
-}
-
 const User: React.FC<UserProps> = () => {
-  const [events, setEvents] = useState<CalendarEventExtended[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const { user } = useUserAuth();
   const localizer = momentLocalizer(moment);
   const [eventDeatil, setEventDeatil] = useState<Event | null>(null);
@@ -79,23 +75,19 @@ const User: React.FC<UserProps> = () => {
       const unsubscribe = onSnapshot(
         q,
         (snapshot: QuerySnapshot<DocumentData>) => {
-          const fetchedEvents: CalendarEventExtended[] = snapshot.docs.map(
-            (doc) => {
+          const fetchedEvents: CalendarEvent[] = snapshot.docs
+            .map((doc) => {
               const data = doc.data() as TeamParticipation;
               return {
-                // title: data.courtName,
-                // start: data.startTime.toDate(),
-                // end: data.endTime.toDate(),
-                // eventId: data.eventId,
-                // state: data.state as 'pending' | 'accept' | 'decline',
-                // userId: data.userId,
-                ...data,
                 title: data.courtName,
-                start: data.startTimeStamp.toDate(),
-                end: data.endTimeStamp.toDate(),
+                start: new Date(data.startTimeStamp.seconds * 1000),
+                end: new Date(data.endTimeStamp.seconds * 1000),
+                eventId: data.eventId,
+                state: data.state,
+                userId: data.userId,
               };
-            }
-          );
+            })
+            .filter((event): event is CalendarEvent => event !== null);
           setEvents(fetchedEvents);
         }
       );
@@ -178,7 +170,7 @@ const User: React.FC<UserProps> = () => {
     }
   };
 
-  const handleSelectEvent = async (event: CalendarEventExtended) => {
+  const handleSelectEvent = async (event: CalendarEvent) => {
     try {
       console.log('event', event);
       const eventRef = doc(db, 'events', event.eventId);
@@ -215,7 +207,7 @@ const User: React.FC<UserProps> = () => {
     `);
   };
 
-  const eventStyleGetter = (event: CalendarEventExtended) => {
+  const eventStyleGetter = (event: CalendarEvent) => {
     let backgroundColor = '';
     switch (event.state) {
       case 'pending':

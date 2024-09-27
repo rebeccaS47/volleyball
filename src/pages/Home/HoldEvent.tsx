@@ -87,7 +87,9 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
       );
       const startTimeStamp = Timestamp.fromDate(startDate);
 
-      const endDate = new Date(startDate.getTime() + formData.duration * 60 * 60 * 1000);
+      const endDate = new Date(
+        startDate.getTime() + formData.duration * 60 * 60 * 1000
+      );
       const endTimeStamp = Timestamp.fromDate(endDate);
 
       const eventCollectionRef = collection(db, 'events');
@@ -115,8 +117,8 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
               courtName: formData.court.name,
               state: 'accept',
               date: formData.date,
-              startTime: startTimeStamp,
-              endTime: endTimeStamp,
+              startTimeStamp,
+              endTimeStamp,
             });
           }
         )

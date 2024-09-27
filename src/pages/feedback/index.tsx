@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
-import { db } from '../../../firebaseConfig';
+import { db } from '../../../firebaseConfig.ts';
 import {
   collection,
   query,
@@ -12,7 +12,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { findUserById } from '../../firebase.ts';
-import type { Event, Feedback } from '../../types';
+import type { Event, Feedback } from '../../types.ts';
 
 interface FeedbackProps {}
 

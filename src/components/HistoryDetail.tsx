@@ -24,8 +24,7 @@ const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
               <tr>
                 <th>日期</th>
                 <th>地點</th>
-                <th>開始時間</th>
-                <th>結束時間</th>
+                <th>時間</th>
                 <th>友善度</th>
                 <th>等級</th>
                 <th>評分</th>
@@ -38,8 +37,10 @@ const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
                 <tr key={key}>
                   <td>{item.date}</td>
                   <td>{item.courtName}</td>
-                  <td>{item.startTime}</td>
-                  <td>{item.endTime}</td>
+                  <td>
+                    {item.startTimeStamp.toDate().toLocaleTimeString()}
+                    {item.endTimeStamp.toDate().toLocaleTimeString()}
+                  </td>
                   <td>{item.friendlinessLevel}</td>
                   <td>{item.level}</td>
                   <td>{item.grade}</td>

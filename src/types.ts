@@ -43,8 +43,8 @@ export interface History {
   eventId: string;
   courtName: string;
   date: string;
-  startTime: string;
-  endTime: string;
+  startTimeStamp: Timestamp;
+  endTimeStamp: Timestamp;
   friendlinessLevel: string;
   level: string;
   grade: number;
@@ -84,4 +84,13 @@ export interface Message {
   text: string;
   createdAt: Timestamp;
   user: string;
+}
+
+export interface CalendarEvent {
+  title: string;
+  start: Date;
+  end: Date;
+  eventId: string;
+  state: 'pending' | 'accept' | 'decline';
+  userId: string;
 }

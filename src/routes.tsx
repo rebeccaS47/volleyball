@@ -1,19 +1,19 @@
 import { createBrowserRouter } from 'react-router-dom';
-import Login from './pages/login';
-import Signup from './pages/signup';
-import Error from './pages/error';
-import Home from './pages/home';
-import EventDetail from './pages/home/EventDetail';
-import Court from './pages/court';
-import CourtDetail from './pages/court/CourtDetail';
-import HoldEvent from './pages/home/HoldEvent';
-import UserInfo from './pages/user/info';
-import User from './pages/user';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Error from './pages/Error';
+import Home from './pages/Home';
+import EventDetail from './pages/Home/EventDetail';
+import Court from './pages/Court';
+import CourtDetail from './pages/Court/CourtDetail';
+import HoldEvent from './pages/Home/HoldEvent';
+import UserInfo from './pages/User/info';
+import User from './pages/User';
 import ProtectedRoutes from './components/ProtectedRoutes';
-import Approval from './pages/approval';
+import Approval from './pages/Approval';
 import Layout from './Layout';
-import Feedback from './pages/feedback';
-import Chat from './pages/chat';
+import Feedback from './pages/Feedback';
+import Chat from './pages/Chat';
 
 const router = createBrowserRouter([
   {

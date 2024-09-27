@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { db } from '../../../firebaseConfig';
+import { db } from '../../../firebaseConfig.ts';
 import {
   collection,
   onSnapshot,
@@ -12,9 +12,9 @@ import {
   arrayUnion,
 } from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
-import type { Event, History } from '../../types';
-import { findUserById } from '../../firebase';
-import HistoryDetail from '../../components/HistoryDetail';
+import type { Event, History } from '../../types.ts';
+import { findUserById } from '../../firebase.ts';
+import HistoryDetail from '../../components/HistoryDetail.tsx';
 
 interface ApplicantData {
   name: string;
@@ -36,10 +36,7 @@ const Approval: React.FC<ApprovalProps> = () => {
   useEffect(() => {
     if (!user) return;
     const eventsRef = collection(db, 'events');
-    const q = query(
-      eventsRef,
-      where('createUserId', '==', user.uid),
-    );
+    const q = query(eventsRef, where('createUserId', '==', user.uid));
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       const events: Event[] = [];
@@ -186,9 +183,9 @@ const Approval: React.FC<ApprovalProps> = () => {
                         <td rowSpan={event.applicationList.length}>
                           {event.date +
                             ' ' +
-                            event.startTime +
+                            event.startTimeStamp.toDate().toLocaleTimeString() +
                             '~' +
-                            event.endTime}
+                            event.endTimeStamp.toDate().toLocaleTimeString()}
                         </td>
                         <td rowSpan={event.applicationList.length}>
                           {event.court.name}

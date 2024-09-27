@@ -93,8 +93,8 @@ const EventDetail: React.FC<EventDetailProps> = () => {
           courtName: event.court.name,
           state: 'pending',
           date: event.date,
-          startTime: event.startTimeStamp,
-          endTime: event.endTimeStamp,
+          startTimeStamp: event.startTimeStamp,
+          endTimeStamp: event.endTimeStamp,
         });
 
         alert('成功申請');

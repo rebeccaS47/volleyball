@@ -97,8 +97,8 @@ const Chat: React.FC<ChatProps> = () => {
             >
               <p>日期: {groupChat.date}</p>
               <p>
-                時間: {groupChat.startTime.toDate().toLocaleTimeString()} -{' '}
-                {groupChat.endTime.toDate().toLocaleTimeString()}
+                時間: {groupChat.startTimeStamp.toDate().toLocaleTimeString()} -{' '}
+                {groupChat.endTimeStamp.toDate().toLocaleTimeString()}
               </p>
               <p>場地: {groupChat.courtName}</p>
               <p>eventId: {groupChat.eventId}</p>
