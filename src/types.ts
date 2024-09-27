@@ -1,4 +1,4 @@
-import {Timestamp} from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 
 export interface Court {
   id: string;
@@ -15,7 +15,7 @@ export interface Event {
   createUserId: string;
   date: string;
   startTime: string;
-  endTime: string;
+  duration: number;
   netHeight: string;
   friendlinessLevel: string;
   level: string;
@@ -53,8 +53,8 @@ export interface History {
 
 export interface TeamParticipation {
   date: string;
-  startTime: string;
-  endTime: string;
+  startTimeStamp: Timestamp;
+  endTimeStamp: Timestamp;
   eventId: string;
   state: 'pending' | 'accept' | 'decline';
   userId: string;
@@ -70,8 +70,8 @@ export interface Feedback {
   grade: number;
   note: string;
   date: string;
-  startTime: string;
-  endTime: string;
+  startTimeStamp: Timestamp | null;
+  endTimeStamp: Timestamp | null;
 }
 
 export interface Option {
@@ -79,7 +79,7 @@ export interface Option {
   label: string;
 }
 
-export interface Message{
+export interface Message {
   roomId: string;
   text: string;
   createdAt: Timestamp;

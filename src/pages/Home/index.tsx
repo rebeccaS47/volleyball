@@ -74,12 +74,16 @@ const Event: React.FC<EventProps> = () => {
 
   const filterEvents = useCallback(async () => {
     const filteredList = eventList.filter((event) => {
+      const endTimeDate = event.endTimeStamp.toDate();
+      const hours = endTimeDate.getHours().toString().padStart(2, '0');
+      const minutes = endTimeDate.getMinutes().toString().padStart(2, '0');
+      const formattedTime = `${hours}:${minutes}`;
       return (
         (!filterState.city || event.court.city === filterState.city) &&
         (!filterState.date || event.date === filterState.date) &&
         (!filterState.startTime || event.startTime >= filterState.startTime) &&
-        (!filterState.endTime || event.endTime <= filterState.endTime) &&
-        (!filterState.level || event.level === filterState.level) 
+        (!filterState.endTime || formattedTime <= filterState.endTime) &&
+        (!filterState.level || event.level === filterState.level)
       );
     });
     setFilteredEventList(filteredList);
@@ -173,8 +177,8 @@ const Event: React.FC<EventProps> = () => {
             }}
           >
             <p>
-              {event.date} {event.startTime}~{event.endTime}
-              {event.level}
+              {event.date} {event.startTimeStamp.toDate().toLocaleTimeString()}~
+              {event.endTimeStamp.toDate().toLocaleTimeString()} {event.level}
             </p>
             <p>場地:{event.court.name}</p>
             <p>
