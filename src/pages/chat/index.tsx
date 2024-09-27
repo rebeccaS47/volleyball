@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { db } from '../../../firebaseConfig';
-import {collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  addDoc,
+  serverTimestamp,
 } from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext';
 import type { TeamParticipation, Message } from '../../types';
@@ -15,7 +22,6 @@ const Chat: React.FC<ChatProps> = () => {
   const [newMessage, setNewMessage] = useState('');
   const messagesRef = collection(db, 'messages');
 
-  
   useEffect(() => {
     if (!user) return;
     const q = query(
@@ -40,8 +46,8 @@ const Chat: React.FC<ChatProps> = () => {
 
     const queryMessages = query(
       messagesRef,
-      where("roomId", "==", selectedEventId),
-      orderBy("createdAt")
+      where('roomId', '==', selectedEventId),
+      orderBy('createdAt')
     );
 
     const unsubscribe = onSnapshot(queryMessages, (snapshot) => {
@@ -80,22 +86,28 @@ const Chat: React.FC<ChatProps> = () => {
           {groupChats.map((groupChat) => (
             <div
               key={groupChat.eventId}
-              style={{ width: '300px', margin: '10px', cursor: 'pointer', backgroundColor: selectedEventId === groupChat.eventId ?  'lightgray': 'white' }}
+              style={{
+                width: '300px',
+                margin: '10px',
+                cursor: 'pointer',
+                backgroundColor:
+                  selectedEventId === groupChat.eventId ? 'lightgray' : 'white',
+              }}
               onClick={() => handleGroupChatSelect(groupChat.eventId)}
-            
             >
-              <p>Date: {groupChat.date}</p>
+              <p>日期: {groupChat.date}</p>
               <p>
-                Time: {groupChat.startTime} - {groupChat.endTime}
+                時間: {groupChat.startTime.toDate().toLocaleTimeString()} -{' '}
+                {groupChat.endTime.toDate().toLocaleTimeString()}
               </p>
-              <p>Court: {groupChat.courtName}</p>
+              <p>場地: {groupChat.courtName}</p>
               <p>eventId: {groupChat.eventId}</p>
               <hr />
             </div>
           ))}
         </div>
         <div>
-          { selectedEventId && (
+          {selectedEventId && (
             <>
               <p>Group Chat</p>
               <div

@@ -93,8 +93,8 @@ const EventDetail: React.FC<EventDetailProps> = () => {
           courtName: event.court.name,
           state: 'pending',
           date: event.date,
-          startTime: event.startTime,
-          endTime: event.endTime,
+          startTime: event.startTimeStamp,
+          endTime: event.endTimeStamp,
         });
 
         alert('成功申請');
@@ -121,7 +121,8 @@ const EventDetail: React.FC<EventDetailProps> = () => {
           <p>
             時間:{event.date}
             {'  '}
-            {event.startTime}~{event.endTime}
+            {event.startTimeStamp.toDate().toLocaleTimeString()}~
+            {event.endTimeStamp.toDate().toLocaleTimeString()}
           </p>
           <p>網高:{event.netHeight}</p>
           <p>友善程度:{event.friendlinessLevel}</p>

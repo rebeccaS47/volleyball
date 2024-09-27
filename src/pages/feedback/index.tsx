@@ -37,8 +37,8 @@ const Feedback: React.FC<FeedbackProps> = () => {
     grade: 0,
     note: '',
     date: '',
-    startTime: '',
-    endTime: '',
+    startTimeStamp: null,
+    endTimeStamp: null,
   });
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [userNames, setUserNames] = useState<UserName[]>([]);
@@ -123,8 +123,8 @@ const Feedback: React.FC<FeedbackProps> = () => {
       grade: 0,
       note: '',
       date: event.date,
-      startTime: event.startTime,
-      endTime: event.endTime,
+      startTimeStamp: event.startTimeStamp,
+      endTimeStamp: event.endTimeStamp,
     };
 
     setFeedback(initialFeedback);
@@ -211,7 +211,9 @@ const Feedback: React.FC<FeedbackProps> = () => {
         <ul>
           {closedEvents.map((event) => (
             <li key={event.id} onClick={() => handleEventClick(event)}>
-              {event.date}&nbsp;&nbsp;&nbsp; {event.startTime}-{event.endTime}
+              {event.date}&nbsp;&nbsp;&nbsp;{' '}
+              {event.startTimeStamp.toDate().toLocaleTimeString()}~
+              {event.endTimeStamp.toDate().toLocaleTimeString()}
               &nbsp;&nbsp;&nbsp;&nbsp;{event.court.name}
             </li>
           ))}

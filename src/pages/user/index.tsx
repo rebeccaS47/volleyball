@@ -82,26 +82,21 @@ const User: React.FC<UserProps> = () => {
           const fetchedEvents: CalendarEventExtended[] = snapshot.docs.map(
             (doc) => {
               const data = doc.data() as TeamParticipation;
-              // const start = moment(
-              //   `${data.date} ${data.startTime}`,
-              //   'YYYY-MM-DD HH:mm'
-              // ).toDate();
-              // const end = moment(
-              //   `${data.date} ${data.endTime}`,
-              //   'YYYY-MM-DD HH:mm'
-              // ).toDate();
               return {
+                // title: data.courtName,
+                // start: data.startTime.toDate(),
+                // end: data.endTime.toDate(),
+                // eventId: data.eventId,
+                // state: data.state as 'pending' | 'accept' | 'decline',
+                // userId: data.userId,
+                ...data,
                 title: data.courtName,
-                start: data.startTime.toDate(),
-                end: data.endTime.toDate(),
-                eventId: data.eventId,
-                state: data.state as 'pending' | 'accept' | 'decline',
-                userId: data.userId,
+                start: data.startTimeStamp.toDate(),
+                end: data.endTimeStamp.toDate(),
               };
             }
           );
           setEvents(fetchedEvents);
-          console.log('日曆事件:', fetchedEvents);
         }
       );
 
