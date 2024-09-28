@@ -36,7 +36,7 @@ const Approval: React.FC<ApprovalProps> = () => {
   useEffect(() => {
     if (!user) return;
     const eventsRef = collection(db, 'events');
-    const q = query(eventsRef, where('createUserId', '==', user.uid));
+    const q = query(eventsRef, where('createUserId', '==', user.id));
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       const events: Event[] = [];

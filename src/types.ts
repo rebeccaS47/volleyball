@@ -35,7 +35,6 @@ export interface User {
   name: string;
   email: string;
   imgURL: string;
-  history: { [key: string]: History };
 }
 
 export interface History {

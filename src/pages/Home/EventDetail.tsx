@@ -67,11 +67,11 @@ const EventDetail: React.FC<EventDetailProps> = () => {
       return;
     }
     if (!event) return;
-    if (event.playerList.includes(user?.uid)) {
+    if (event.playerList.includes(user?.id)) {
       alert('你已是隊員');
       return;
     }
-    if (event.applicationList.includes(user?.uid)) {
+    if (event.applicationList.includes(user?.id)) {
       alert('你已申請過');
       return;
     }
@@ -79,17 +79,17 @@ const EventDetail: React.FC<EventDetailProps> = () => {
       try {
         const docRef = doc(db, 'events', event.id);
         await updateDoc(docRef, {
-          applicationList: arrayUnion(user.uid),
+          applicationList: arrayUnion(user.id),
         });
 
         const participationRef = doc(
           db,
           'teamParticipation',
-          `${event.id}_${user.uid}`
+          `${event.id}_${user.id}`
         );
         await setDoc(participationRef, {
           eventId: event.id,
-          userId: user.uid,
+          userId: user.id,
           courtName: event.court.name,
           state: 'pending',
           date: event.date,

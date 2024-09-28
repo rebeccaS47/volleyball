@@ -29,14 +29,14 @@ const Info: React.FC<InfoProps> = () => {
 
     try {
       setUploading(true);
-      const fileRef = ref(storage, `userPhotos/${user.uid}}`);
+      const fileRef = ref(storage, `userPhotos/${user.id}}`);
       await uploadBytes(fileRef, file);
       const imgURL = await getDownloadURL(fileRef);
 
-      await setDoc(doc(db, 'users', user.uid), {
+      await setDoc(doc(db, 'users', user.id), {
         name: name,
         imgURL: imgURL,
-        id: user.uid,
+        id: user.id,
         email: user.email,
       });
       alert('成功上傳!');
