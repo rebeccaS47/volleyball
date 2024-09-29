@@ -51,7 +51,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
         const eventsRef = collection(db, 'events');
         const q = query(
           eventsRef,
-          where('createUserId', '==', user.uid),
+          where('createUserId', '==', user.id),
           where('endTimeStamp', '<', Timestamp.now())
         );
 
@@ -247,8 +247,8 @@ const Feedback: React.FC<FeedbackProps> = () => {
               handleSubmitFeedback();
             }}
             style={{
-              opacity: user?.uid === selectedPlayer ? 0.5 : 1,
-              pointerEvents: user?.uid === selectedPlayer ? 'none' : 'auto',
+              opacity: user?.id === selectedPlayer ? 0.5 : 1,
+              pointerEvents: user?.id === selectedPlayer ? 'none' : 'auto',
             }}
           >
             <div style={{ marginBottom: '10px' }}>

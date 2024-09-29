@@ -37,7 +37,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
       isInDoor: false,
       hasAC: false,
     },
-    createUserId: user?.uid || '',
+    createUserId: user?.id || '',
     date: '',
     startTime: '',
     duration: 0,
@@ -226,13 +226,6 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           onChange={handleInputChange}
           required
         />
-        {/* <label>活動時長(hr)</label>
-        <input
-          type="number"
-          name="duration"
-          value={formData.duration}
-          onChange={handleInputChange}
-        /> */}
         <label htmlFor="duration">活動時長(hr): {formData.duration}</label>
         <input
           id="duration"
@@ -241,7 +234,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           value={formData.duration}
           onChange={handleInputChange}
           min="1"
-          max="24"
+          max="12"
           // step="0.5"
         />
       </div>

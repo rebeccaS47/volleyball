@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, signOut } from 'firebase/auth';
+import { User as FirebaseUser, signOut } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
+import { findUserById } from '../firebase';
+import type { User } from '../types.ts';
 
 interface AuthContextType {
   user: User | null;
@@ -23,11 +25,28 @@ const UserAuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-      console.log('user認證資料', user);
-      setLoading(false);
-    });
+    const unsubscribe = auth.onAuthStateChanged(
+      async (authUser: FirebaseUser | null) => {
+        if (authUser) {
+          try {
+            const userFirestore = await findUserById(authUser.uid);
+            if (userFirestore) {
+              setUser(userFirestore);
+              console.log('user認證資料', userFirestore);
+            } else {
+              console.log('未找到用戶數據');
+              setUser(null);
+            }
+          } catch (error) {
+            console.error('獲取用戶數據時出錯:', error);
+            setUser(null);
+          }
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
 
     return unsubscribe;
   }, []);

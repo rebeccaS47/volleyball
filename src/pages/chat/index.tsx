@@ -26,7 +26,7 @@ const Chat: React.FC<ChatProps> = () => {
     if (!user) return;
     const q = query(
       collection(db, 'teamParticipation'),
-      where('userId', '==', user.uid),
+      where('userId', '==', user.id),
       where('state', '==', 'accept')
     );
 
@@ -68,7 +68,8 @@ const Chat: React.FC<ChatProps> = () => {
     await addDoc(messagesRef, {
       text: newMessage,
       createdAt: serverTimestamp(),
-      user: user?.uid,
+      user: user?.name,
+      userImgURL: user?.imgURL,
       roomId: selectedEventId,
     });
     setNewMessage('');
@@ -134,7 +135,6 @@ const Chat: React.FC<ChatProps> = () => {
                     type="text"
                     value={newMessage}
                     onChange={(event) => setNewMessage(event.target.value)}
-                    // className="new-message-input"
                     placeholder="Type your message here..."
                   />
                   <button type="submit" className="send-button">

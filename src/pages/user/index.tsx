@@ -52,7 +52,7 @@ const User: React.FC<UserProps> = () => {
       setLoading(true);
       setError(null);
       try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userDoc = await getDoc(doc(db, 'users', user.id));
         if (userDoc.exists()) {
           const data = userDoc.data() as User;
           setUserData(data);
@@ -71,7 +71,7 @@ const User: React.FC<UserProps> = () => {
 
     const fetchEvents = async () => {
       const eventsRef = collection(db, 'teamParticipation');
-      const q = query(eventsRef, where('userId', '==', user.uid));
+      const q = query(eventsRef, where('userId', '==', user.id));
       const unsubscribe = onSnapshot(
         q,
         (snapshot: QuerySnapshot<DocumentData>) => {
@@ -98,7 +98,7 @@ const User: React.FC<UserProps> = () => {
     const fetchHistory = async () => {
       if (user) {
         const historyRef = collection(db, 'history');
-        const q = query(historyRef, where('userId', '==', user.uid));
+        const q = query(historyRef, where('userId', '==', user.id));
 
         try {
           const querySnapshot = await getDocs(q);
@@ -106,7 +106,7 @@ const User: React.FC<UserProps> = () => {
           querySnapshot.forEach((doc) => {
             items.push({ ...doc.data() } as History);
           });
-          setHistoryData({ [user.uid]: items });
+          setHistoryData({ [user.id]: items });
         } catch (error) {
           console.error('Error fetching history: ', error);
         }
@@ -130,7 +130,7 @@ const User: React.FC<UserProps> = () => {
     if (!newImgFile || !user)
       throw new Error('No photo selected or user not logged in');
 
-    const storageRef = ref(storage, `userPhotos/${user.uid}`);
+    const storageRef = ref(storage, `userPhotos/${user.id}`);
     await uploadBytes(storageRef, newImgFile);
     const url = await getDownloadURL(storageRef);
     return url;
@@ -155,7 +155,7 @@ const User: React.FC<UserProps> = () => {
       }
 
       if (Object.keys(updates).length > 0) {
-        await updateDoc(doc(db, 'users', user.uid), updates);
+        await updateDoc(doc(db, 'users', user.id), updates);
         setUserData((prev) => (prev ? { ...prev, ...updates } : null));
       }
 

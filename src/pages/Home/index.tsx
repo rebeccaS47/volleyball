@@ -91,7 +91,7 @@ const Event: React.FC<EventProps> = () => {
 
   const fetchUserData = useCallback(async () => {
     if (user) {
-      const data = await findUserById(user.uid);
+      const data = await findUserById(user.id);
       setUserData(data);
     } else {
       setUserData(null);
