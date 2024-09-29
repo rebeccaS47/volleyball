@@ -5,7 +5,6 @@ import {
   Box,
   Avatar,
   Typography,
-  Link,
   IconButton,
   Menu,
   MenuItem,
@@ -31,6 +30,10 @@ const UserStatus: React.FC = () => {
     navigate('/user');
   };
 
+  const handleToLoginPage = () => {
+    navigate('/login');
+  };
+
   return (
     <Box
       sx={{
@@ -48,7 +51,7 @@ const UserStatus: React.FC = () => {
           <IconButton
             onClick={handleClick}
             size="small"
-            sx={{ ml: 2 }}
+            // sx={{ ml: 2 }}
             aria-controls={open ? 'account-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
@@ -105,9 +108,10 @@ const UserStatus: React.FC = () => {
           </Menu>
         </>
       ) : (
-        <Link href="/login" underline="none" color="primary">
-          Login
-        </Link>
+        <>
+          <Typography variant="subtitle1">Hi, there</Typography>
+          <Avatar onClick={handleToLoginPage} />
+        </>
       )}
     </Box>
   );
