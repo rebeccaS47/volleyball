@@ -1,12 +1,12 @@
 import { RouterProvider } from 'react-router-dom';
-import { createGlobalStyle } from 'styled-components';
+import { Global, css } from '@emotion/react';
 import UserAuthProvider from './context/userAuthContext';
 import router from './routes';
 import { CityCourtProvider } from './context/CityCourtContext';
 function App() {
   return (
     <>
-      <GlobalStyle />
+      <Global styles={globalStyles}/>
       <UserAuthProvider>
         <CityCourtProvider>
           <RouterProvider router={router} />
@@ -18,7 +18,7 @@ function App() {
 
 export default App;
 
-const GlobalStyle = createGlobalStyle`
+const globalStyles = css`
   * {
     box-sizing: border-box;
   }
