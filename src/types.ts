@@ -93,3 +93,12 @@ export interface CalendarEvent {
   state: 'pending' | 'accept' | 'decline';
   userId: string;
 }
+
+export interface FilterState {
+  city: string;
+  court: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  level: string;
+}
