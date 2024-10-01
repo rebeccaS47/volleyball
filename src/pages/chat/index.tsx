@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { db } from '../../../firebaseConfig';
 import {
   collection,
@@ -11,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext';
 import type { TeamParticipation, Message } from '../../types';
+import { ArrowLeft } from '@mui/icons-material';
 
 interface ChatProps {}
 
@@ -18,6 +20,8 @@ const Chat: React.FC<ChatProps> = () => {
   const { user } = useUserAuth();
   const [groupChats, setgroupChats] = useState<TeamParticipation[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
+  const [showChatWindow, setShowChatWindow] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesRef = collection(db, 'messages');
@@ -61,15 +65,26 @@ const Chat: React.FC<ChatProps> = () => {
     return () => unsubscribe();
   }, [selectedEventId, messagesRef]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 600);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (newMessage === '') return;
+    if (!user) return;
     await addDoc(messagesRef, {
       text: newMessage,
       createdAt: serverTimestamp(),
-      user: user?.name,
-      userImgURL: user?.imgURL,
+      userName: user.name,
+      userId: user.id,
+      userImgURL: user.imgURL,
       roomId: selectedEventId,
     });
     setNewMessage('');
@@ -77,23 +92,19 @@ const Chat: React.FC<ChatProps> = () => {
 
   const handleGroupChatSelect = async (eventId: string) => {
     setSelectedEventId(eventId);
+    if (isMobile) {
+      setShowChatWindow(true);
+    }
   };
 
   return (
-    <>
-      <h1>Chat</h1>
-      <div style={{ display: 'flex' }}>
-        <div>
+    <ChatContainer>
+      {(!isMobile || (isMobile && !showChatWindow)) && (
+        <GroupList>
           {groupChats.map((groupChat) => (
-            <div
+            <GroupItem
               key={groupChat.eventId}
-              style={{
-                width: '300px',
-                margin: '10px',
-                cursor: 'pointer',
-                backgroundColor:
-                  selectedEventId === groupChat.eventId ? 'lightgray' : 'white',
-              }}
+              $selected={selectedEventId === groupChat.eventId}
               onClick={() => handleGroupChatSelect(groupChat.eventId)}
             >
               <p>日期: {groupChat.date}</p>
@@ -103,51 +114,181 @@ const Chat: React.FC<ChatProps> = () => {
               </p>
               <p>場地: {groupChat.courtName}</p>
               <p>eventId: {groupChat.eventId}</p>
-              <hr />
-            </div>
+            </GroupItem>
           ))}
-        </div>
-        <div>
-          {selectedEventId && (
-            <>
-              <p>Group Chat</p>
-              <div
-                style={{
-                  border: '1px solid black',
-                  height: '300px',
-                  width: '300px',
-                  borderRadius: '10px',
-                  overflowY: 'auto',
-                  display: 'flex',
-                  flexDirection: 'column',
+        </GroupList>
+      )}
+      {selectedEventId && (!isMobile || (isMobile && showChatWindow)) && (
+        <ChatWindow>
+          <ChatHeader>
+            {isMobile && (
+              <BackButton
+                onClick={() => {
+                  setShowChatWindow(false);
                 }}
               >
-                <div style={{ flexGrow: 1, padding: '10px' }}>
-                  {messages.map((message, index) => (
-                    <div key={index}>
-                      <strong>{message.user}: </strong>
-                      {message.text}
-                    </div>
-                  ))}
+                <ArrowLeft />
+              </BackButton>
+            )}
+            Group Chat
+          </ChatHeader>
+          <MessageList>
+            {messages.map((message, index) => (
+              <MessageBubble key={index} $isUser={message.userId === user?.id}>
+                <UserImage
+                  src={message.userImgURL}
+                  alt={message.userName}
+                  $isUser={message.userId === user?.id}
+                />
+                <div>
+                  {message.userId !== user?.id && (
+                    <OthersName>{message.userName}</OthersName>
+                  )}
+                  <MessageContent $isUser={message.userId === user?.id}>
+                    {message.text}
+                  </MessageContent>
+                  <Timestamp $isUser={message.userId === user?.id}>
+                    {message.createdAt?.toDate().toLocaleTimeString()}
+                  </Timestamp>
                 </div>
-                <form onSubmit={handleSubmit} className="new-message-form">
-                  <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(event) => setNewMessage(event.target.value)}
-                    placeholder="Type your message here..."
-                  />
-                  <button type="submit" className="send-button">
-                    Send
-                  </button>
-                </form>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </>
+              </MessageBubble>
+            ))}
+          </MessageList>
+          <ChatForm onSubmit={handleSubmit}>
+            <ChatInput
+              type="text"
+              value={newMessage}
+              onChange={(event) => setNewMessage(event.target.value)}
+              placeholder="Type your message here..."
+            />
+            <SendButton type="submit">Send</SendButton>
+          </ChatForm>
+        </ChatWindow>
+      )}
+    </ChatContainer>
   );
 };
 
 export default Chat;
+
+const ChatContainer = styled.div`
+  display: flex;
+  height: 85vh;
+  min-width: 300px;
+  margin-top: 20px;
+`;
+
+const GroupList = styled.div`
+  min-width: 300px;
+  padding: 10px;
+  overflow-y: auto;
+`;
+
+const GroupItem = styled.div<{ $selected: boolean }>`
+  margin: 10px 0;
+  padding: 10px;
+  background-color: ${(props) => (props.$selected ? '#e9ebee' : 'white')};
+  cursor: pointer;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: #f5f6f7;
+  }
+`;
+
+const ChatWindow = styled.div`
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #dddfe2;
+  border-radius: 8px;
+  margin: 10px;
+`;
+
+const ChatHeader = styled.div`
+  padding: 10px;
+  background-color: #f5f6f7;
+  border-bottom: 1px solid #dddfe2;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+`;
+
+const BackButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+`;
+
+const MessageList = styled.div`
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+`;
+
+const MessageBubble = styled.div<{ $isUser: boolean }>`
+  display: flex;
+  margin-bottom: 10px;
+  flex-direction: ${(props) => (props.$isUser ? 'row-reverse' : 'row')};
+`;
+
+const OthersName = styled.div`
+  font-size: 0.8em;
+  color: #8e8e8e;
+`;
+
+const UserImage = styled.img<{ $isUser: boolean }>`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin: ${(props) => (props.$isUser ? '0 0 0 10px' : '0 10px 0 0')};
+`;
+
+const MessageContent = styled.div<{ $isUser: boolean }>`
+  margin-left: auto;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+  min-width: 85%;
+  min-height: auto;
+  padding: 8px 12px;
+  border-radius: 18px;
+  background-color: ${(props) => (props.$isUser ? '#0084ff' : '#f1f0f0')};
+  margin-left: ${(props) => (props.$isUser ? 'auto' : '0px')};
+  color: ${(props) => (props.$isUser ? 'white' : 'black')};
+`;
+
+const Timestamp = styled.div<{ $isUser: boolean }>`
+  font-size: 0.8em;
+  color: #8e8e8e;
+  margin-top: 4px;
+  text-align: ${(props) => (props.$isUser ? 'right' : 'left')};
+`;
+
+const ChatForm = styled.form`
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #dddfe2;
+`;
+
+const ChatInput = styled.input`
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #dddfe2;
+  border-radius: 20px;
+  margin-right: 10px;
+`;
+
+const SendButton = styled.button`
+  background-color: #0084ff;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0077e5;
+  }
+`;
