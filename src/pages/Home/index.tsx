@@ -13,7 +13,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import type { Event, User, Option, Court, FilterState } from '../../types';
-import Select from 'react-select';
+import Select, { SingleValue } from 'react-select';
 import { findUserById } from '../../firebase';
 
 interface EventProps {}
@@ -27,10 +27,18 @@ const Event: React.FC<EventProps> = () => {
   const [selectedCity, setSelectedCity] = useState<Option | null>(null);
   const [selectedCourt, setSelectedCourt] = useState<Option | null>(null);
 
+  const levelOptions: Option[] = [
+    { value: 'A', label: 'A' },
+    { value: 'B', label: 'B' },
+    { value: 'C', label: 'C' },
+    { value: 'D', label: 'D' },
+    { value: 'E', label: 'E' },
+  ];
+
   const [filteredEventList, setFilteredEventList] = useState<Event[]>([]);
   const [filterState, setFilterState] = useState<FilterState>({
     city: '',
-    court:'',
+    court: '',
     date: '',
     startTime: '',
     endTime: '',
@@ -111,13 +119,21 @@ const Event: React.FC<EventProps> = () => {
     }
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFilterState((prevData) => ({
       ...prevData,
       [name]: value,
+    }));
+  };
+
+  const handleSelectChange = (
+    selectedOption: SingleValue<Option>,
+    { name }: { name: string }
+  ) => {
+    setFilterState((prevData) => ({
+      ...prevData,
+      [name]: selectedOption ? selectedOption.value : '',
     }));
   };
 
@@ -182,35 +198,30 @@ const Event: React.FC<EventProps> = () => {
   return (
     <div>
       <h1>Hi, {userData === null ? 'there' : userData.name}</h1>
-      <div style={{ display: 'flex' }}>
-      <div>
-          <div>
-            <label>城市</label>
-            <Select
-              value={selectedCity}
-              onChange={handleCityChange}
-              options={cities}
-              isClearable
-              placeholder="請選擇城市"
-              // styles={{
-              //   container: (provided) => ({
-              //     ...provided,
-              //   }),
-              // }}
-            />
-          </div>
-          <div>
-            <label>球場</label>
-            <Select
-              value={selectedCourt}
-              onChange={handleCourtChange}
-              options={courts}
-              isDisabled={!selectedCity}
-              isClearable
-              placeholder="請選擇球場"
-            />
-          </div>
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div>
+          <label>城市</label>
+          <Select
+            value={selectedCity}
+            onChange={handleCityChange}
+            options={cities}
+            isClearable
+            placeholder="請選擇城市"
+          />
         </div>
+        <div>
+          <label>球場</label>
+          <Select
+            value={selectedCourt}
+            onChange={handleCourtChange}
+            options={courts}
+            isDisabled={!selectedCity}
+            isClearable
+            placeholder="請選擇球場"
+          />
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
         <div>
           <label>日期</label>
           <input
@@ -218,10 +229,8 @@ const Event: React.FC<EventProps> = () => {
             name="date"
             value={filterState.date}
             onChange={handleInputChange}
-            required
           />
         </div>
-
         <div>
           <label>時間</label>
           <input
@@ -229,7 +238,6 @@ const Event: React.FC<EventProps> = () => {
             name="startTime"
             value={filterState.startTime}
             onChange={handleInputChange}
-            required
           />
           <span> ~ </span>
           <input
@@ -237,25 +245,25 @@ const Event: React.FC<EventProps> = () => {
             name="endTime"
             value={filterState.endTime}
             onChange={handleInputChange}
-            required
           />
         </div>
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <label>分級</label>
-          <select
+          <Select
             name="level"
-            value={filterState.level}
-            onChange={handleInputChange}
-          >
-            <option value="">請選擇分級</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-            <option value="E">E</option>
-          </select>
+            value={levelOptions.find(
+              (option) => option.value === filterState.level
+            )}
+            onChange={(option, actionMeta) =>
+              handleSelectChange(option, actionMeta as { name: string })
+            }
+            options={levelOptions}
+            isClearable
+            placeholder="請選擇分級"
+          ></Select>
         </div>
       </div>
+
       <br />
       <br />
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
