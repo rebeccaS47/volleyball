@@ -82,7 +82,9 @@ export interface Message {
   roomId: string;
   text: string;
   createdAt: Timestamp;
-  user: string;
+  userName: string;
+  userId: string;
+  userImgURL: string;
 }
 
 export interface CalendarEvent {

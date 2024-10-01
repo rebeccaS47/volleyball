@@ -9,8 +9,10 @@ import {
   Menu,
   MenuItem,
   ListItemIcon,
+  Badge,
 } from '@mui/material';
 import { Logout } from '@mui/icons-material';
+import MailIcon from '@mui/icons-material/Mail';
 
 const UserStatus: React.FC = () => {
   const { user, logOut } = useUserAuth();
@@ -26,14 +28,6 @@ const UserStatus: React.FC = () => {
     setAnchorEl(null);
   };
 
-  const handleClickProfile = () => {
-    navigate('/user');
-  };
-
-  const handleToLoginPage = () => {
-    navigate('/login');
-  };
-
   return (
     <Box
       sx={{
@@ -46,8 +40,20 @@ const UserStatus: React.FC = () => {
       }}
     >
       {user ? (
-        <>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Typography variant="subtitle1">Hi, {user.name}</Typography>
+          <IconButton
+            size="large"
+            aria-label="show 4 new mails"
+            color="inherit"
+            onClick={() => {
+              navigate('/chat');
+            }}
+          >
+            <Badge badgeContent={0} color="error">
+              <MailIcon />
+            </Badge>
+          </IconButton>
           <IconButton
             onClick={handleClick}
             size="small"
@@ -58,6 +64,7 @@ const UserStatus: React.FC = () => {
           >
             <Avatar src={user.imgURL} alt={user.name} />
           </IconButton>
+
           <Menu
             anchorEl={anchorEl}
             id="account-menu"
@@ -96,7 +103,11 @@ const UserStatus: React.FC = () => {
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
-            <MenuItem onClick={handleClickProfile}>
+            <MenuItem
+              onClick={() => {
+                navigate('/user');
+              }}
+            >
               <Avatar /> &nbsp;&nbsp;Profile
             </MenuItem>
             <MenuItem onClick={logOut}>
@@ -106,11 +117,15 @@ const UserStatus: React.FC = () => {
               &nbsp;&nbsp;Logout
             </MenuItem>
           </Menu>
-        </>
+        </Box>
       ) : (
         <>
           <Typography variant="subtitle1">Hi, there</Typography>
-          <Avatar onClick={handleToLoginPage} />
+          <Avatar
+            onClick={() => {
+              navigate('/login');
+            }}
+          />
         </>
       )}
     </Box>
