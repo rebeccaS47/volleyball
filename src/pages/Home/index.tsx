@@ -4,35 +4,41 @@ import { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../firebaseConfig';
 import {
   collection,
+  doc,
+  getDoc,
   getDocs,
   query,
   orderBy,
   where,
   Timestamp,
 } from 'firebase/firestore';
-import type { Event, User } from '../../types';
-import { CitySelector } from '../../components/CitySelector';
-import { useCityCourtContext } from '../../context/useCityCourtContext';
+import type { Event, User, Option, Court, FilterState } from '../../types';
+import Select, { SingleValue } from 'react-select';
 import { findUserById } from '../../firebase';
 
 interface EventProps {}
 
-interface FilterState {
-  city: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  level: string;
-}
-
 const Event: React.FC<EventProps> = () => {
   const { user } = useUserAuth();
-  const { cities } = useCityCourtContext();
   const navigate = useNavigate();
   const [eventList, setEventList] = useState<Event[]>([]);
+  const [cities, setCities] = useState<Option[]>([]);
+  const [courts, setCourts] = useState<Option[]>([]);
+  const [selectedCity, setSelectedCity] = useState<Option | null>(null);
+  const [selectedCourt, setSelectedCourt] = useState<Option | null>(null);
+
+  const levelOptions: Option[] = [
+    { value: 'A', label: 'A' },
+    { value: 'B', label: 'B' },
+    { value: 'C', label: 'C' },
+    { value: 'D', label: 'D' },
+    { value: 'E', label: 'E' },
+  ];
+
   const [filteredEventList, setFilteredEventList] = useState<Event[]>([]);
   const [filterState, setFilterState] = useState<FilterState>({
     city: '',
+    court: '',
     date: '',
     startTime: '',
     endTime: '',
@@ -40,13 +46,94 @@ const Event: React.FC<EventProps> = () => {
   });
   const [userData, setUserData] = useState<User | null>(null);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  useEffect(() => {
+    const fetchCities = async () => {
+      const courtsRef = collection(db, 'courts');
+      const snapshot = await getDocs(courtsRef);
+      const allCourts: Court[] = snapshot.docs.map(
+        (doc) => ({ id: doc.id, ...doc.data() } as Court)
+      );
+
+      const uniqueCities = Array.from(
+        new Set(allCourts.map((court) => court.city))
+      );
+      setCities(uniqueCities.map((city) => ({ value: city, label: city })));
+    };
+
+    fetchCities();
+  }, []);
+
+  useEffect(() => {
+    const fetchCourts = async () => {
+      if (selectedCity) {
+        const courtsRef = collection(db, 'courts');
+        const snapshot = await getDocs(courtsRef);
+        const allCourts: Court[] = snapshot.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() } as Court)
+        );
+
+        const filteredCourts = allCourts.filter(
+          (court) => court.city === selectedCity.value
+        );
+        setCourts(
+          filteredCourts.map((court) => ({
+            value: court.id,
+            label: court.name,
+          }))
+        );
+      } else {
+        setCourts([]);
+      }
+    };
+
+    fetchCourts();
+  }, [selectedCity]);
+
+  const handleCityChange = (selectedOption: Option | null) => {
+    setSelectedCity(selectedOption);
+    setSelectedCourt(null);
+    setFilterState((prevData) => ({
+      ...prevData,
+      city: selectedOption ? selectedOption.value : '',
+      court: '',
+    }));
+  };
+
+  const handleCourtChange = async (selectedOption: Option | null) => {
+    setSelectedCourt(selectedOption);
+    if (selectedOption) {
+      const courtRef = doc(db, 'courts', selectedOption.value);
+      const courtDoc = await getDoc(courtRef);
+      if (courtDoc.exists()) {
+        const courtData = { id: courtDoc.id, ...courtDoc.data() } as Court;
+        setFilterState((prevData) => ({
+          ...prevData,
+          court: courtData.name,
+        }));
+      }
+    } else {
+      setFilterState((prevData) => ({
+        ...prevData,
+        court: '',
+      }));
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFilterState((prevData) => ({
       ...prevData,
       [name]: value,
+    }));
+  };
+
+  const handleSelectChange = (
+    selectedOption: SingleValue<Option>,
+    { name }: { name: string }
+  ) => {
+    setFilterState((prevData) => ({
+      ...prevData,
+      [name]: selectedOption ? selectedOption.value : '',
     }));
   };
 
@@ -80,6 +167,7 @@ const Event: React.FC<EventProps> = () => {
       const formattedTime = `${hours}:${minutes}`;
       return (
         (!filterState.city || event.court.city === filterState.city) &&
+        (!filterState.court || event.court.name === filterState.court) &&
         (!filterState.date || event.date === filterState.date) &&
         (!filterState.startTime || event.startTime >= filterState.startTime) &&
         (!filterState.endTime || formattedTime <= filterState.endTime) &&
@@ -110,12 +198,30 @@ const Event: React.FC<EventProps> = () => {
   return (
     <div>
       <h1>Hi, {userData === null ? 'there' : userData.name}</h1>
-      <div style={{ display: 'flex' }}>
-        <CitySelector
-          cities={cities}
-          selectedCity={filterState.city}
-          onChange={handleInputChange}
-        />
+      <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div>
+          <label>城市</label>
+          <Select
+            value={selectedCity}
+            onChange={handleCityChange}
+            options={cities}
+            isClearable
+            placeholder="請選擇城市"
+          />
+        </div>
+        <div>
+          <label>球場</label>
+          <Select
+            value={selectedCourt}
+            onChange={handleCourtChange}
+            options={courts}
+            isDisabled={!selectedCity}
+            isClearable
+            placeholder="請選擇球場"
+          />
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
         <div>
           <label>日期</label>
           <input
@@ -123,10 +229,8 @@ const Event: React.FC<EventProps> = () => {
             name="date"
             value={filterState.date}
             onChange={handleInputChange}
-            required
           />
         </div>
-
         <div>
           <label>時間</label>
           <input
@@ -134,7 +238,6 @@ const Event: React.FC<EventProps> = () => {
             name="startTime"
             value={filterState.startTime}
             onChange={handleInputChange}
-            required
           />
           <span> ~ </span>
           <input
@@ -142,25 +245,25 @@ const Event: React.FC<EventProps> = () => {
             name="endTime"
             value={filterState.endTime}
             onChange={handleInputChange}
-            required
           />
         </div>
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <label>分級</label>
-          <select
+          <Select
             name="level"
-            value={filterState.level}
-            onChange={handleInputChange}
-          >
-            <option value="">請選擇分級</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-            <option value="E">E</option>
-          </select>
+            value={levelOptions.find(
+              (option) => option.value === filterState.level
+            )}
+            onChange={(option, actionMeta) =>
+              handleSelectChange(option, actionMeta as { name: string })
+            }
+            options={levelOptions}
+            isClearable
+            placeholder="請選擇分級"
+          ></Select>
         </div>
       </div>
+
       <br />
       <br />
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
