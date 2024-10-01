@@ -282,6 +282,13 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             />
           </FormField>
         </FormSection>
+        {formData.court && (
+          <div
+            style={{ color: 'gray', fontSize: '0.9rem', marginBottom: '5px' }}
+          >
+            {formData.court.city + formData.court.address}
+          </div>
+        )}
         <div
           style={{
             display: 'flex',
@@ -323,7 +330,6 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             />
           </FormField>
         </FormSection>
-
         <FormSection>
           <div>
             <LabelText>網高</LabelText>
@@ -360,7 +366,6 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             </label>
           </FormField>
         </FormSection>
-
         <FormSection>
           <FormField>
             <LabelText>友善程度</LabelText>
@@ -401,7 +406,6 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             />
           </FormField>
         </FormSection>
-
         <div
           style={{
             display: 'flex',
@@ -436,7 +440,6 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             />
           </FormField>
         </FormSection>
-
         <div
           style={{
             display: 'flex',
