@@ -30,7 +30,7 @@ interface UserProps {}
 
 const User: React.FC<UserProps> = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const { user } = useUserAuth();
+  const { user, updateUser } = useUserAuth();
   const localizer = momentLocalizer(moment);
   const [eventDeatil, setEventDeatil] = useState<Event | null>(null);
 
@@ -56,7 +56,6 @@ const User: React.FC<UserProps> = () => {
         if (userDoc.exists()) {
           const data = userDoc.data() as User;
           setUserData(data);
-          console.log('抓取到的user ', data);
           setNewDisplayName(data.name);
           setImgURL(data.imgURL);
         } else {
@@ -156,6 +155,7 @@ const User: React.FC<UserProps> = () => {
 
       if (Object.keys(updates).length > 0) {
         await updateDoc(doc(db, 'users', user.id), updates);
+        updateUser(updates);
         setUserData((prev) => (prev ? { ...prev, ...updates } : null));
       }
 
