@@ -304,7 +304,7 @@ const User: React.FC<UserProps> = () => {
             </div>
             <div>
               {user && (
-                <HistoryDetail userHistory={historyData[user.uid] || []} />
+                <HistoryDetail userHistory={historyData[user.id] || []} />
               )}
             </div>
           </>
