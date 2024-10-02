@@ -29,6 +29,8 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
   const [selectedCity, setSelectedCity] = useState<Option | null>(null);
   const [selectedCourt, setSelectedCourt] = useState<Option | null>(null);
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   const levelOptions: Option[] = [
     { value: 'A', label: 'A' },
     { value: 'B', label: 'B' },
@@ -36,6 +38,34 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     { value: 'D', label: 'D' },
     { value: 'E', label: 'E' },
   ];
+
+  const [formData, setFormData] = useState<Event>({
+    id: '',
+    court: {
+      id: '',
+      name: '',
+      city: '',
+      address: '',
+      isInDoor: false,
+      hasAC: false,
+    },
+    createUserId: user?.id || '',
+    date: '',
+    startTime: '',
+    duration: 0,
+    netHeight: '',
+    friendlinessLevel: '',
+    level: '',
+    isAC: false,
+    findNum: 0,
+    totalCost: 0,
+    notes: '',
+    playerList: [],
+    createdEventAt: Timestamp.now(),
+    applicationList: [],
+    endTimeStamp: Timestamp.now(),
+    startTimeStamp: Timestamp.now(),
+  });
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -80,6 +110,32 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     fetchCourts();
   }, [selectedCity]);
 
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    if (!selectedCity) newErrors.city = '城市為必填項';
+    if (!selectedCourt) newErrors.court = '球場為必填項';
+    if (!formData.date) {
+      newErrors.date = '日期為必填項';
+    } else {
+      const selectedDate = new Date(formData.date);
+      if (selectedDate <= tomorrow) {
+        newErrors.date = '日期必須在明天之後';
+      }
+    }
+    if (!formData.startTime) newErrors.startTime = '時間為必填項';
+    if (formData.duration === 0) newErrors.duration = '活動時長為必填項';
+    if (!formData.netHeight) newErrors.netHeight = '網高為必填項';
+    if (formData.findNum === 0) newErrors.findNum = '找尋人數為必填項';
+    if (formData.totalCost === 0) newErrors.totalCost = '總金額為必填項';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleCityChange = (selectedOption: Option | null) => {
     setSelectedCity(selectedOption);
     setSelectedCourt(null);
@@ -87,6 +143,9 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
       ...prevData,
       city: selectedOption ? selectedOption.value : '',
     }));
+    if (selectedOption) {
+      setErrors((prev) => ({ ...prev, city: '' }));
+    }
   };
 
   const handleCourtChange = async (selectedOption: Option | null) => {
@@ -100,6 +159,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           ...prevData,
           court: courtData,
         }));
+        setErrors((prev) => ({ ...prev, court: '' }));
       }
     } else {
       setFormData((prevData) => ({
@@ -116,34 +176,6 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     }
   };
 
-  const [formData, setFormData] = useState<Event>({
-    id: '',
-    court: {
-      id: '',
-      name: '',
-      city: '',
-      address: '',
-      isInDoor: false,
-      hasAC: false,
-    },
-    createUserId: user?.id || '',
-    date: '',
-    startTime: '',
-    duration: 0,
-    netHeight: '',
-    friendlinessLevel: '',
-    level: '',
-    isAC: false,
-    findNum: 0,
-    totalCost: 0,
-    notes: '',
-    playerList: [],
-    createdEventAt: Timestamp.now(),
-    applicationList: [],
-    endTimeStamp: Timestamp.now(),
-    startTimeStamp: Timestamp.now(),
-  });
-
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -155,6 +187,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
       [name]:
         type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const handleSelectChange = (
@@ -165,68 +198,71 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
       ...prevData,
       [name]: selectedOption ? selectedOption.value : '',
     }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log('Form Data Submitted:', formData);
-    try {
-      const [year, month, day] = formData.date.split('-').map(Number);
+    if (validateForm()) {
+      try {
+        const [year, month, day] = formData.date.split('-').map(Number);
 
-      const [startHours, startMinutes] = formData.startTime
-        .split(':')
-        .map(Number);
+        const [startHours, startMinutes] = formData.startTime
+          .split(':')
+          .map(Number);
 
-      const startDate = new Date(
-        year,
-        month - 1,
-        day,
-        startHours,
-        startMinutes
-      );
-      const startTimeStamp = Timestamp.fromDate(startDate);
+        const startDate = new Date(
+          year,
+          month - 1,
+          day,
+          startHours,
+          startMinutes
+        );
+        const startTimeStamp = Timestamp.fromDate(startDate);
 
-      const endDate = new Date(
-        startDate.getTime() + formData.duration * 60 * 60 * 1000
-      );
-      const endTimeStamp = Timestamp.fromDate(endDate);
+        const endDate = new Date(
+          startDate.getTime() + formData.duration * 60 * 60 * 1000
+        );
+        const endTimeStamp = Timestamp.fromDate(endDate);
 
-      const eventCollectionRef = collection(db, 'events');
-      const docRef = await addDoc(eventCollectionRef, {
-        ...formData,
-        createdEventAt: serverTimestamp(),
-        applicationList: [],
-        playerList: [formData.createUserId, ...formData.playerList],
-        startTimeStamp,
-        endTimeStamp,
-      });
-      await updateDoc(docRef, { id: docRef.id });
+        const eventCollectionRef = collection(db, 'events');
+        const docRef = await addDoc(eventCollectionRef, {
+          ...formData,
+          createdEventAt: serverTimestamp(),
+          applicationList: [],
+          playerList: [formData.createUserId, ...formData.playerList],
+          startTimeStamp,
+          endTimeStamp,
+        });
+        await updateDoc(docRef, { id: docRef.id });
 
-      await Promise.all(
-        [formData.createUserId, ...formData.playerList].map(
-          async (playerId) => {
-            const participationRef = doc(
-              db,
-              'teamParticipation',
-              `${docRef.id}_${playerId}`
-            );
-            await setDoc(participationRef, {
-              eventId: docRef.id,
-              userId: playerId,
-              courtName: formData.court.name,
-              state: 'accept',
-              date: formData.date,
-              startTimeStamp,
-              endTimeStamp,
-            });
-          }
-        )
-      );
+        await Promise.all(
+          [formData.createUserId, ...formData.playerList].map(
+            async (playerId) => {
+              const participationRef = doc(
+                db,
+                'teamParticipation',
+                `${docRef.id}_${playerId}`
+              );
+              await setDoc(participationRef, {
+                eventId: docRef.id,
+                userId: playerId,
+                courtName: formData.court.name,
+                state: 'accept',
+                date: formData.date,
+                startTimeStamp,
+                endTimeStamp,
+              });
+            }
+          )
+        );
 
-      alert('活動建立成功');
-      navigate('/');
-    } catch (error) {
-      console.log(error);
+        alert('活動建立成功');
+        navigate('/');
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -256,7 +292,10 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
       >
         <FormSection>
           <FormField>
-            <LabelText>城市</LabelText>
+            <LabelText>
+              城市
+              {errors.city && <ErrorText>{errors.city}</ErrorText>}
+            </LabelText>
             <Select
               value={selectedCity}
               onChange={handleCityChange}
@@ -271,7 +310,9 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             />
           </FormField>
           <FormField>
-            <LabelText>球場</LabelText>
+            <LabelText>
+              球場{errors.court && <ErrorText>{errors.court}</ErrorText>}
+            </LabelText>
             <Select
               value={selectedCourt}
               onChange={handleCourtChange}
@@ -296,28 +337,35 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             marginBottom: '10px',
           }}
         >
-          <LabelText>日期</LabelText>
+          <LabelText>
+            日期
+            {errors.date && <ErrorText>{errors.date}</ErrorText>}
+          </LabelText>
           <InputText
             type="date"
             name="date"
             value={formData.date}
             onChange={handleInputChange}
-            required
           />
         </div>
         <FormSection>
           <FormField>
-            <LabelText>時間</LabelText>
+            <LabelText>
+              時間
+              {errors.startTime && <ErrorText>{errors.startTime}</ErrorText>}
+            </LabelText>
             <InputText
               type="time"
               name="startTime"
               value={formData.startTime}
               onChange={handleInputChange}
-              required
             />
           </FormField>
           <FormField>
-            <label htmlFor="duration">活動時長(hr): {formData.duration}</label>
+            <LabelText htmlFor="duration">
+              活動時長(hr): {formData.duration}
+              {errors.duration && <ErrorText>{errors.duration}</ErrorText>}
+            </LabelText>
             <input
               id="duration"
               type="range"
@@ -353,6 +401,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
               />
               男網
             </label>
+            {errors.netHeight && <ErrorText>{errors.netHeight}</ErrorText>}
           </div>
           <FormField>
             <label>
@@ -421,7 +470,10 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
         </div>
         <FormSection>
           <FormField>
-            <LabelText>找尋人數</LabelText>
+            <LabelText>
+              找尋人數
+              {errors.findNum && <ErrorText>{errors.findNum}</ErrorText>}
+            </LabelText>
             <InputText
               type="number"
               name="findNum"
@@ -431,7 +483,10 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             />
           </FormField>
           <FormField>
-            <LabelText>總金額</LabelText>
+            <LabelText>
+              總金額
+              {errors.totalCost && <ErrorText>{errors.totalCost}</ErrorText>}
+            </LabelText>
             <InputText
               type="number"
               name="totalCost"
@@ -494,4 +549,10 @@ const TextArea = styled.textarea`
 
 const LabelText = styled.label`
   font-size: 15px;
+`;
+
+const ErrorText = styled.span`
+  color: red;
+  font-size: 12px;
+  padding-left: 5px;
 `;
