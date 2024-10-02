@@ -31,7 +31,8 @@ const Chat: React.FC<ChatProps> = () => {
     const q = query(
       collection(db, 'teamParticipation'),
       where('userId', '==', user.id),
-      where('state', '==', 'accept')
+      where('state', '==', 'accept'),
+      orderBy('startTimeStamp')
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
