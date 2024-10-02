@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 interface InfoProps {}
 
 const Info: React.FC<InfoProps> = () => {
-  const { user } = useUserAuth();
+  const { firebaseUser, updateUser } = useUserAuth();
   const [name, setName] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -22,23 +22,27 @@ const Info: React.FC<InfoProps> = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !file || !user) {
+    if (!name || !file || !firebaseUser || !firebaseUser.email) {
       alert('Please fill all fields');
       return;
     }
 
     try {
       setUploading(true);
-      const fileRef = ref(storage, `userPhotos/${user.id}}`);
+      const fileRef = ref(storage, `userPhotos/${firebaseUser.uid}}`);
       await uploadBytes(fileRef, file);
       const imgURL = await getDownloadURL(fileRef);
 
-      await setDoc(doc(db, 'users', user.id), {
+      const userData = {
         name: name,
         imgURL: imgURL,
-        id: user.id,
-        email: user.email,
-      });
+        id: firebaseUser.uid,
+        email: firebaseUser.email,
+      };
+
+      await setDoc(doc(db, 'users', firebaseUser.uid), userData);
+      updateUser(userData);
+
       alert('成功上傳!');
       navigate('/');
     } catch (error) {
