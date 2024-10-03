@@ -13,6 +13,23 @@ import {
 } from 'firebase/firestore';
 import { findUserById } from '../../firebase.ts';
 import type { Event, Feedback } from '../../types.ts';
+import {
+  Stepper,
+  Step,
+  StepLabel,
+  StepContent,
+  Button,
+  Typography,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Box,
+  SelectChangeEvent,
+  ThemeProvider,
+  createTheme,
+} from '@mui/material';
 
 interface FeedbackProps {}
 
@@ -21,6 +38,7 @@ interface UserName {
   name: string;
 }
 const Feedback: React.FC<FeedbackProps> = () => {
+  const [activeStep, setActiveStep] = useState(0);
   const [closedEvents, setClosedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,13 +52,13 @@ const Feedback: React.FC<FeedbackProps> = () => {
     courtName: '',
     friendlinessLevel: '',
     level: '',
-    grade: 0,
+    grade: '',
     note: '',
     date: '',
     startTimeStamp: null,
     endTimeStamp: null,
   });
-  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  // const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [userNames, setUserNames] = useState<UserName[]>([]);
   const [loadingNames, setLoadingNames] = useState(false);
 
@@ -104,6 +122,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
     setSelectedEvent(event);
     setSelectedPlayer(null);
     resetFeedbackForm(event);
+    setActiveStep(1);
   };
 
   const handlePlayerClick = (player: string) => {
@@ -111,6 +130,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
     if (selectedEvent) {
       resetFeedbackForm(selectedEvent, player);
     }
+    setActiveStep(2);
   };
 
   const resetFeedbackForm = async (event: Event, player: string = '') => {
@@ -120,15 +140,15 @@ const Feedback: React.FC<FeedbackProps> = () => {
       courtName: event.court.name,
       friendlinessLevel: '',
       level: '',
-      grade: 0,
+      grade: '',
       note: '',
       date: event.date,
       startTimeStamp: event.startTimeStamp,
       endTimeStamp: event.endTimeStamp,
     };
 
-    setFeedback(initialFeedback);
-    setFormErrors({});
+    setFeedback(initialFeedback as Feedback);
+    // setFormErrors({});
 
     if (player) {
       try {
@@ -141,7 +161,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
             ...initialFeedback,
             friendlinessLevel: data.friendlinessLevel || '',
             level: data.level || '',
-            grade: data.grade || 0,
+            grade: data.grade || '',
             note: data.note || '',
           });
         }
@@ -152,34 +172,23 @@ const Feedback: React.FC<FeedbackProps> = () => {
   };
 
   const handleFeedbackChange = (
-    e: React.ChangeEvent<
-      HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement
-    >
+    e:
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | SelectChangeEvent<string>
   ) => {
     const { name, value } = e.target;
+
     setFeedback((prev) => ({
       ...prev,
-      [name]: name === 'grade' ? (value === '' ? 0 : parseInt(value)) : value,
+      [name]: name === 'grade' ? (value === '' ? '' : parseInt(value)) : value,
     }));
-    if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const validateForm = (): boolean => {
-    const errors: { [key: string]: string } = {};
-    if (!feedback.friendlinessLevel)
-      errors.friendlinessLevel = '請選擇友善程度';
-    if (!feedback.level) errors.level = '請選擇分級';
-    if (feedback.grade === 0) errors.grade = '請輸入分數';
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    // if (formErrors[name]) {
+    //   setFormErrors((prev) => ({ ...prev, [name]: '' }));
+    // }
   };
 
   const handleSubmitFeedback = async () => {
-    if (!validateForm()) return;
     if (!selectedEvent || !selectedPlayer) return;
-
     try {
       const feedbackDocRef = doc(
         db,
@@ -190,6 +199,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
 
       alert('回饋提交成功！');
       setSelectedPlayer(null);
+      setActiveStep(0);
       if (selectedEvent) {
         resetFeedbackForm(selectedEvent);
       }
@@ -199,130 +209,230 @@ const Feedback: React.FC<FeedbackProps> = () => {
     }
   };
 
+  const steps = [
+    {
+      label: '選擇其中一場次',
+      content: (
+        <Box>
+          {closedEvents.length > 0
+            ? closedEvents.map((event) => (
+                <Button
+                  key={event.id}
+                  variant="outlined"
+                  onClick={() => handleEventClick(event)}
+                  sx={{
+                    margin: '5px',
+                    backgroundColor:
+                      selectedEvent?.id === event.id
+                        ? 'rgba(31, 72, 54, 0.1)'
+                        : 'transparent',
+                    '&:hover': {
+                      backgroundColor:
+                        selectedEvent?.id === event.id
+                          ? 'rgba(31, 72, 54, 0.2)'
+                          : 'rgba(31, 72, 54, 0.05)',
+                    },
+                  }}
+                >
+                  {event.date} {event.court.name}
+                </Button>
+              ))
+            : '目前還無任何已結束的活動'}
+        </Box>
+      ),
+    },
+    {
+      label: '選擇其中一隊員',
+      content: (
+        <Box>
+          {loadingNames ? (
+            <Typography>正在加載用戶名稱...</Typography>
+          ) : (
+            userNames
+              .filter((item) => item.id !== user?.id)
+              .map((user) => (
+                <Button
+                  key={user.id}
+                  variant="outlined"
+                  onClick={() => handlePlayerClick(user.id)}
+                  sx={{
+                    margin: '5px',
+                    backgroundColor:
+                      selectedPlayer === user.id
+                        ? 'rgba(31, 72, 54, 0.1)'
+                        : 'transparent',
+                    '&:hover': {
+                      backgroundColor:
+                        selectedPlayer === user.id
+                          ? 'rgba(31, 72, 54, 0.2)'
+                          : 'rgba(31, 72, 54, 0.05)',
+                    },
+                  }}
+                >
+                  {user.name}
+                </Button>
+              ))
+          )}
+        </Box>
+      ),
+    },
+    {
+      label: '填寫回饋',
+      content: (
+        <Box component="form" onSubmit={(e) => e.preventDefault()}>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>友善程度 *</InputLabel>
+            <Select
+              name="friendlinessLevel"
+              label="友善程度 *"
+              value={feedback.friendlinessLevel}
+              onChange={handleFeedbackChange}
+              // error={!!formErrors.friendlinessLevel}
+            >
+              {['A', 'B', 'C', 'D', 'E'].map((level) => (
+                <MenuItem key={level} value={level}>
+                  {level}
+                </MenuItem>
+              ))}
+            </Select>
+            {/* {formErrors.friendlinessLevel && (
+              <Typography color="error">
+                {formErrors.friendlinessLevel}
+              </Typography>
+            )} */}
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>技術水平 *</InputLabel>
+            <Select
+              name="level"
+              label="技術水平 *"
+              value={feedback.level}
+              onChange={handleFeedbackChange}
+              // error={!!formErrors.level}
+            >
+              {['A', 'B', 'C', 'D', 'E'].map((level) => (
+                <MenuItem key={level} value={level}>
+                  {level}
+                </MenuItem>
+              ))}
+            </Select>
+            {/* {formErrors.level && (
+              <Typography color="error">{formErrors.level}</Typography>
+            )} */}
+          </FormControl>
+          <TextField
+            fullWidth
+            margin="normal"
+            label="分數 *"
+            name="grade"
+            type="number"
+            value={feedback.grade}
+            onChange={(e) => {
+              const { value } = e.target;
+              const regex = /^(100|[1-9][0-9]?|0)$/;
+              if (regex.test(value) || value === '') {
+                handleFeedbackChange(e);
+              }
+            }}
+            // error={!!formErrors.grade}
+            // helperText={formErrors.grade}
+          />
+          <TextField
+            fullWidth
+            margin="normal"
+            label="備註"
+            name="note"
+            multiline
+            rows={4}
+            value={feedback.note}
+            onChange={handleFeedbackChange}
+          />
+        </Box>
+      ),
+    },
+  ];
+
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: 'rgb(31, 72, 54)',
+      },
+    },
+    components: {
+      MuiStepIcon: {
+        styleOverrides: {
+          root: {
+            '&.Mui-active': {
+              color: 'rgb(31, 72, 54)',
+            },
+          },
+        },
+      },
+      MuiStepLabel: {
+        styleOverrides: {
+          label: {
+            '&.Mui-active': {
+              color: 'rgb(31, 72, 54)',
+            },
+          },
+        },
+      },
+    },
+  });
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div>
-      <h1>Feedback</h1>
-      {closedEvents.length === 0 ? (
-        <p>沒有找到已結束的活動。</p>
-      ) : (
-        <ul>
-          {closedEvents.map((event) => (
-            <li key={event.id} onClick={() => handleEventClick(event)}>
-              {event.date}&nbsp;&nbsp;&nbsp;{' '}
-              {event.startTimeStamp.toDate().toLocaleTimeString()}~
-              {event.endTimeStamp.toDate().toLocaleTimeString()}
-              &nbsp;&nbsp;&nbsp;&nbsp;{event.court.name}
-            </li>
+    <ThemeProvider theme={theme}>
+      <Box sx={{ maxWidth: 400 }}>
+        <Typography variant="h4" gutterBottom>
+          Feedback
+        </Typography>
+        <Stepper activeStep={activeStep} orientation="vertical">
+          {steps.map((step, index) => (
+            <Step key={step.label}>
+              <StepLabel>{step.label}</StepLabel>
+              <StepContent>
+                {step.content}
+                <Box sx={{ mb: 2 }}>
+                  <div>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        if (index === steps.length - 1) {
+                          handleSubmitFeedback();
+                        } else {
+                          setActiveStep(index + 1);
+                        }
+                      }}
+                      sx={{ mt: 1, mr: 1, ml: 0.5 }}
+                      disabled={
+                        (index === 0 && !selectedEvent) ||
+                        (index === 1 && !selectedPlayer) ||
+                        (index === steps.length - 1 &&
+                          (!feedback.friendlinessLevel ||
+                            !feedback.level ||
+                            feedback.grade === ''))
+                      }
+                    >
+                      {index === steps.length - 1 ? '提交回饋' : '繼續'}
+                    </Button>
+                    <Button
+                      disabled={index === 0}
+                      onClick={() => setActiveStep(index - 1)}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      返回
+                    </Button>
+                  </div>
+                </Box>
+              </StepContent>
+            </Step>
           ))}
-        </ul>
-      )}
-
-      {selectedEvent && (
-        <div>
-          <h3>{selectedEvent.date} 活動的參與者名單</h3>
-          {loadingNames ? (
-            <p>正在加載用戶名稱...</p>
-          ) : (
-            <ul>
-              {userNames
-                //.filter((item) => item.id !== user?.uid)
-                .map((user) => (
-                  <li key={user.id} onClick={() => handlePlayerClick(user.id)}>
-                    {user.name}
-                  </li>
-                ))}
-            </ul>
-          )}
-        </div>
-      )}
-      {selectedPlayer && (
-        <div>
-          <h3>回饋表單</h3>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSubmitFeedback();
-            }}
-            style={{
-              opacity: user?.id === selectedPlayer ? 0.5 : 1,
-              pointerEvents: user?.id === selectedPlayer ? 'none' : 'auto',
-            }}
-          >
-            <div style={{ marginBottom: '10px' }}>
-              <label>友善程度：</label>
-              <select
-                name="friendlinessLevel"
-                value={feedback.friendlinessLevel}
-                onChange={handleFeedbackChange}
-              >
-                <option value="">請選擇友善程度</option>
-                {['A', 'B', 'C', 'D', 'E'].map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </select>
-              {formErrors.friendlinessLevel && (
-                <span style={{ color: 'red', fontSize: '12px' }}>
-                  {' '}
-                  {formErrors.friendlinessLevel}
-                </span>
-              )}
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-              <label>技術水平：</label>
-              <select
-                name="level"
-                value={feedback.level}
-                onChange={handleFeedbackChange}
-              >
-                <option value="">請選擇技術水平</option>
-                {['A', 'B', 'C', 'D', 'E'].map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </select>
-              {formErrors.level && (
-                <span style={{ color: 'red', fontSize: '12px' }}>
-                  {' '}
-                  {formErrors.level}
-                </span>
-              )}
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-              <label>分數：</label>
-              <input
-                type="number"
-                name="grade"
-                value={feedback.grade}
-                onChange={handleFeedbackChange}
-                min="0"
-                max="100"
-              />
-              {formErrors.grade && (
-                <span style={{ color: 'red', fontSize: '12px' }}>
-                  {' '}
-                  {formErrors.grade}
-                </span>
-              )}
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-              <label>備註：</label>
-              <textarea
-                name="note"
-                value={feedback.note}
-                onChange={handleFeedbackChange}
-              />
-            </div>
-            <button type="submit">提交回饋</button>
-          </form>
-        </div>
-      )}
-    </div>
+        </Stepper>
+      </Box>
+    </ThemeProvider>
   );
 };
 

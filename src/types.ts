@@ -66,7 +66,7 @@ export interface Feedback {
   courtName: string;
   friendlinessLevel: string;
   level: string;
-  grade: number;
+  grade: number | '';
   note: string;
   date: string;
   startTimeStamp: Timestamp | null;
