@@ -385,7 +385,15 @@ const Feedback: React.FC<FeedbackProps> = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ maxWidth: 400 }}>
+      <Box
+        sx={{
+          maxWidth: 400,
+          m: '20px auto',
+          border: '1px solid rgb(204, 204, 204)',
+          borderRadius: '4px',
+          padding: '20px',
+        }}
+      >
         <Typography variant="h4" gutterBottom>
           Feedback
         </Typography>
