@@ -12,7 +12,6 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import type { Event, Option, Court, FilterState } from '../../types';
-import Select, { SingleValue, StylesConfig } from 'react-select';
 import styled from 'styled-components';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 
@@ -25,15 +24,6 @@ const Event: React.FC<EventProps> = () => {
   const [courts, setCourts] = useState<Option[]>([]);
   const [selectedCity, setSelectedCity] = useState<Option | null>(null);
   const [selectedCourt, setSelectedCourt] = useState<Option | null>(null);
-
-  const levelOptions: Option[] = [
-    { value: 'A', label: 'A' },
-    { value: 'B', label: 'B' },
-    { value: 'C', label: 'C' },
-    { value: 'D', label: 'D' },
-    { value: 'E', label: 'E' },
-  ];
-
   const [filteredEventList, setFilteredEventList] = useState<Event[]>([]);
   const [filterState, setFilterState] = useState<FilterState>({
     city: '',
@@ -43,6 +33,14 @@ const Event: React.FC<EventProps> = () => {
     endTime: '',
     level: '',
   });
+
+  const levelOptions: Option[] = [
+    { value: 'A', label: 'A' },
+    { value: 'B', label: 'B' },
+    { value: 'C', label: 'C' },
+    { value: 'D', label: 'D' },
+    { value: 'E', label: 'E' },
+  ];
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -87,20 +85,25 @@ const Event: React.FC<EventProps> = () => {
     fetchCourts();
   }, [selectedCity]);
 
-  const handleCityChange = (selectedOption: Option | null) => {
-    setSelectedCity(selectedOption);
+  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const cityValue = e.target.value;
+    const cityOption = cities.find((city) => city.value === cityValue) || null;
+    setSelectedCity(cityOption);
     setSelectedCourt(null);
     setFilterState((prevData) => ({
       ...prevData,
-      city: selectedOption ? selectedOption.value : '',
+      city: cityValue,
       court: '',
     }));
   };
 
-  const handleCourtChange = async (selectedOption: Option | null) => {
-    setSelectedCourt(selectedOption);
-    if (selectedOption) {
-      const courtRef = doc(db, 'courts', selectedOption.value);
+  const handleCourtChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const courtValue = e.target.value;
+    const courtOption =
+      courts.find((court) => court.value === courtValue) || null;
+    setSelectedCourt(courtOption);
+    if (courtOption) {
+      const courtRef = doc(db, 'courts', courtOption.value);
       const courtDoc = await getDoc(courtRef);
       if (courtDoc.exists()) {
         const courtData = { id: courtDoc.id, ...courtDoc.data() } as Court;
@@ -125,13 +128,11 @@ const Event: React.FC<EventProps> = () => {
     }));
   };
 
-  const handleSelectChange = (
-    selectedOption: SingleValue<Option>,
-    { name }: { name: string }
-  ) => {
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
     setFilterState((prevData) => ({
       ...prevData,
-      [name]: selectedOption ? selectedOption.value : '',
+      [name]: value,
     }));
   };
 
@@ -186,36 +187,41 @@ const Event: React.FC<EventProps> = () => {
   return (
     <>
       <FilterContainer>
-        <Select
-          value={selectedCity}
+        <StyledSelect
+          value={selectedCity ? selectedCity.value : ''}
           onChange={handleCityChange}
-          options={cities}
-          isClearable
-          placeholder="請選擇城市"
-          styles={customStyles}
-        />
-        <Select
-          value={selectedCourt}
+        >
+          <option value="">請選擇城市</option>
+          {cities.map((city) => (
+            <option key={city.value} value={city.value}>
+              {city.label}
+            </option>
+          ))}
+        </StyledSelect>
+        <StyledSelect
+          value={selectedCourt ? selectedCourt.value : ''}
           onChange={handleCourtChange}
-          options={courts}
-          isDisabled={!selectedCity}
-          isClearable
-          placeholder="請選擇球場"
-          styles={customStyles}
-        />
-        <Select
+          disabled={!selectedCity}
+        >
+          <option value="">請選擇球場</option>
+          {courts.map((court) => (
+            <option key={court.value} value={court.value}>
+              {court.label}
+            </option>
+          ))}
+        </StyledSelect>
+        <StyledSelect
           name="level"
-          value={levelOptions.find(
-            (option) => option.value === filterState.level
-          )}
-          onChange={(option, actionMeta) =>
-            handleSelectChange(option, actionMeta as { name: string })
-          }
-          options={levelOptions}
-          isClearable
-          placeholder="請選擇分級"
-          styles={customStyles}
-        />
+          value={filterState.level}
+          onChange={handleSelectChange}
+        >
+          <option value="">請選擇分級</option>
+          {levelOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </StyledSelect>
       </FilterContainer>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <FilterInput
@@ -362,29 +368,21 @@ const FilterInput = styled.input`
 
 const FilterContainer = styled.div`
   display: flex;
-  justify-content: center;
-  background-color: #e0f2f1;
-  border-radius: 4px;
-  width: fit-content;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
 `;
 
-const customStyles: StylesConfig<Option, false> = {
-  control: (provided, state) => ({
-    ...provided,
-    width: '200px',
-    height: '40px',
-    borderColor: state.isFocused ? '#007bff' : '#cccccc',
-    '&:hover': {
-      borderColor: '#007bff',
-    },
-  }),
-  option: (provided, state) => ({
-    ...provided,
-    backgroundColor: state.isFocused ? '#f0f0f0' : 'white',
-    color: state.isFocused ? '#007bff' : 'black',
-    '&:hover': {
-      backgroundColor: '#e6e6e6',
-      color: '#007bff',
-    },
-  }),
-};
+const StyledSelect = styled.select`
+  padding: 5px;
+  margin-right: 10px;
+  border: none;
+  background-color: transparent;
+
+  &:focus {
+    outline: none;
+    border-color: #a0a0a0;
+    box-shadow: 0 0 0 1px #a0a0a0;
+  }
+`;
