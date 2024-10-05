@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { useUserAuth } from '../../context/userAuthContext.tsx';
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../firebaseConfig';
 import {
@@ -12,14 +11,14 @@ import {
   where,
   Timestamp,
 } from 'firebase/firestore';
-import type { Event, User, Option, Court, FilterState } from '../../types';
-import Select, { SingleValue } from 'react-select';
-import { findUserById } from '../../firebase';
+import type { Event, Option, Court, FilterState } from '../../types';
+import Select, { SingleValue, StylesConfig } from 'react-select';
+import styled from 'styled-components';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 interface EventProps {}
 
 const Event: React.FC<EventProps> = () => {
-  const { user } = useUserAuth();
   const navigate = useNavigate();
   const [eventList, setEventList] = useState<Event[]>([]);
   const [cities, setCities] = useState<Option[]>([]);
@@ -44,7 +43,6 @@ const Event: React.FC<EventProps> = () => {
     endTime: '',
     level: '',
   });
-  const [userData, setUserData] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -177,126 +175,216 @@ const Event: React.FC<EventProps> = () => {
     setFilteredEventList(filteredList);
   }, [filterState, eventList]);
 
-  const fetchUserData = useCallback(async () => {
-    if (user) {
-      const data = await findUserById(user.id);
-      setUserData(data);
-    } else {
-      setUserData(null);
-    }
-  }, [user]);
-
   useEffect(() => {
     getEventList();
-    fetchUserData();
-  }, [getEventList, fetchUserData]);
+  }, [getEventList]);
 
   useEffect(() => {
     filterEvents();
   }, [filterState, eventList, filterEvents]);
 
   return (
-    <div>
-      <h1>Hi, {userData === null ? 'there' : userData.name}</h1>
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <div>
-          <label>城市</label>
-          <Select
-            value={selectedCity}
-            onChange={handleCityChange}
-            options={cities}
-            isClearable
-            placeholder="請選擇城市"
-          />
-        </div>
-        <div>
-          <label>球場</label>
-          <Select
-            value={selectedCourt}
-            onChange={handleCourtChange}
-            options={courts}
-            isDisabled={!selectedCity}
-            isClearable
-            placeholder="請選擇球場"
-          />
-        </div>
-      </div>
+    <>
+      <FilterContainer>
+        <Select
+          value={selectedCity}
+          onChange={handleCityChange}
+          options={cities}
+          isClearable
+          placeholder="請選擇城市"
+          styles={customStyles}
+        />
+        <Select
+          value={selectedCourt}
+          onChange={handleCourtChange}
+          options={courts}
+          isDisabled={!selectedCity}
+          isClearable
+          placeholder="請選擇球場"
+          styles={customStyles}
+        />
+        <Select
+          name="level"
+          value={levelOptions.find(
+            (option) => option.value === filterState.level
+          )}
+          onChange={(option, actionMeta) =>
+            handleSelectChange(option, actionMeta as { name: string })
+          }
+          options={levelOptions}
+          isClearable
+          placeholder="請選擇分級"
+          styles={customStyles}
+        />
+      </FilterContainer>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <div>
-          <label>日期</label>
-          <input
-            type="date"
-            name="date"
-            value={filterState.date}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          <label>時間</label>
-          <input
-            type="time"
-            name="startTime"
-            value={filterState.startTime}
-            onChange={handleInputChange}
-          />
-          <span> ~ </span>
-          <input
-            type="time"
-            name="endTime"
-            value={filterState.endTime}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <label>分級</label>
-          <Select
-            name="level"
-            value={levelOptions.find(
-              (option) => option.value === filterState.level
-            )}
-            onChange={(option, actionMeta) =>
-              handleSelectChange(option, actionMeta as { name: string })
-            }
-            options={levelOptions}
-            isClearable
-            placeholder="請選擇分級"
-          ></Select>
-        </div>
+        <FilterInput
+          type="date"
+          name="date"
+          value={filterState.date}
+          onChange={handleInputChange}
+        />
+        <FilterInput
+          type="time"
+          name="startTime"
+          value={filterState.startTime}
+          onChange={handleInputChange}
+        />
+        <span> ~ </span>
+        <FilterInput
+          type="time"
+          name="endTime"
+          value={filterState.endTime}
+          onChange={handleInputChange}
+        />
       </div>
-
       <br />
-      <br />
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {filteredEventList.map((event) => (
-          <div
-            data-eventid={event.id}
-            key={event.id}
-            onClick={() => navigate(`/eventdetail/${event.id}`)}
-            style={{
-              border: '1px solid black',
-              padding: '10px',
-              width: '350px',
-              margin: '10px',
-            }}
-          >
-            <p>
-              {event.date} {event.startTimeStamp.toDate().toLocaleTimeString()}~
-              {event.endTimeStamp.toDate().toLocaleTimeString()} {event.level}
-            </p>
-            <p>場地:{event.court.name}</p>
-            <p>
-              地址:{event.court.city}
-              {event.court.address}
-            </p>
-            <p>
-              價格/人:
-              {Math.round(event.totalCost / event.findNum)}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
+      <EventListContainer>
+        {filteredEventList.length === 0
+          ? '暫無相關活動'
+          : filteredEventList.map((event) => (
+              <EventCard
+                data-eventid={event.id}
+                key={event.id}
+                onClick={() => navigate(`/eventdetail/${event.id}`)}
+              >
+                <EventTitle>{event.court.name}</EventTitle>
+                <EventInfo>{event.date}</EventInfo>
+                <EventInfo>
+                  {event.startTimeStamp.toDate().toLocaleTimeString()} ~{' '}
+                  {event.endTimeStamp.toDate().toLocaleTimeString()}
+                </EventInfo>
+                <EventInfo>
+                  <LocationOnIcon />
+                  {event.court.city}
+                  {event.court.address}
+                </EventInfo>
+                <EventInfo>
+                  價格/人：${Math.round(event.totalCost / event.findNum)}
+                </EventInfo>
+              </EventCard>
+            ))}
+      </EventListContainer>
+    </>
   );
 };
 
 export default Event;
+
+const EventListContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 15px;
+  background-color: var(--color-light);
+  @media (max-width: 768px) {
+    gap: 0px;
+  }
+`;
+
+const EventCard = styled.div`
+  background-color: var(--color-light);
+  box-sizing: content-box;
+  border: 3px dashed var(--color-primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+
+  width: calc(33.333% - 70px);
+  transition: transform 0.3s ease;
+  position: relative;
+  overflow: visible;
+  cursor: pointer;
+
+  &::before,
+  &::after,
+  & > ::before,
+  & > ::after {
+    content: '';
+    position: absolute;
+    width: 2rem;
+    height: 2rem;
+    background-color: var(--color-primary);
+    /* border: 5px solid var(--color-primary); */
+  }
+
+  &::before {
+    top: 0;
+    left: 0;
+    border-bottom-right-radius: 100%;
+  }
+
+  &::after {
+    top: 0;
+    right: 0;
+    border-bottom-left-radius: 100%;
+  }
+
+  & > ::before {
+    bottom: 0;
+    left: 0;
+    border-top-right-radius: 100%;
+  }
+
+  & > ::after {
+    bottom: 0;
+    right: 0;
+    border-top-left-radius: 100%;
+  }
+
+  @media (max-width: 1024px) {
+    width: calc(50% - 70px);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+const EventInfo = styled.p`
+  margin: 10px 0;
+  font-size: 1.2rem;
+  /* color: var(--color-dark); */
+  color: var(--color-darkblue);
+`;
+
+const EventTitle = styled.h3`
+  margin: 0 0 15px;
+  font-size: 2rem;
+  text-align: center;
+  color: var(--color-primary);
+`;
+
+const FilterInput = styled.input`
+  min-height: 38px;
+  min-width: 139px;
+`;
+
+const FilterContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  background-color: #e0f2f1;
+  border-radius: 4px;
+  width: fit-content;
+`;
+
+const customStyles: StylesConfig<Option, false> = {
+  control: (provided, state) => ({
+    ...provided,
+    width: '200px',
+    height: '40px',
+    borderColor: state.isFocused ? '#007bff' : '#cccccc',
+    '&:hover': {
+      borderColor: '#007bff',
+    },
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isFocused ? '#f0f0f0' : 'white',
+    color: state.isFocused ? '#007bff' : 'black',
+    '&:hover': {
+      backgroundColor: '#e6e6e6',
+      color: '#007bff',
+    },
+  }),
+};
