@@ -4,10 +4,10 @@ import UserAuthProvider from './context/userAuthContext';
 import router from './routes';
 function App() {
   return (
-    <>      
-    <GlobalStyle />
+    <>
+      <GlobalStyle />
       <UserAuthProvider>
-          <RouterProvider router={router} />
+        <RouterProvider router={router} />
       </UserAuthProvider>
     </>
   );
@@ -23,11 +23,18 @@ const GlobalStyle = createGlobalStyle`
   body {
     padding: 0;
     margin: 0;
-    /* font-family: 'Noto Sans TC', sans-serif; */
+    /* background-color: var(--color-primary); */
+    font-family: 'SweiGothicCJK', sans-serif;
+    font-weight: 400;
   }
   
     :root{
-    /* --primary-color: rgba(244, 67, 54, 1); */
+    --color-primary: #c95933;
+    --color-secondary: #ffa704;
+    --color-tertiary: #36678c;
+    --color-light: #faf3e7;
+    --color-dark: #262626;
+    --color-darkblue: #104265;
   }
 
   p {
@@ -47,4 +54,17 @@ const GlobalStyle = createGlobalStyle`
   padding: 15px;
 }
 
+@font-face {
+  font-family: 'SweiGothicCJK';
+  src: url('/SweiGothicCJKsc-Bold.ttf') format('truetype');
+  font-weight: 700; 
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SweiGothicCJK';
+  src: url('/SweiGothicCJKsc-Regular.ttf') format('truetype');
+  font-weight: 400; 
+  font-style: normal;
+}
 `;

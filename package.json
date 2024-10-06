@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@mui/icons-material": "^6.1.1",
-    "@mui/material": "^6.1.1",
+    "@mui/material": "^6.1.2",
     "@types/react-big-calendar": "^1.8.11",
     "@types/react-select": "^5.0.0",
     "@types/styled-components": "^5.1.34",

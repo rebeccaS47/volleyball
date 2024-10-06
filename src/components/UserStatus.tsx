@@ -33,7 +33,7 @@ const UserStatus: React.FC = () => {
       sx={{
         position: 'absolute',
         top: 16,
-        right: 20,
+        right: '2vw',
         display: 'flex',
         alignItems: 'center',
         gap: 2,
@@ -41,11 +41,13 @@ const UserStatus: React.FC = () => {
     >
       {user ? (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="subtitle1">Hi, {user.name}</Typography>
+          <Typography variant="subtitle1" sx={{ color: 'var(--color-light)' }}>
+            Hi, {user.name}
+          </Typography>
           <IconButton
             size="large"
             aria-label="show 4 new mails"
-            color="inherit"
+            sx={{ color: 'var(--color-light)' }}
             onClick={() => {
               navigate('/chat');
             }}
