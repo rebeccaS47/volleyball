@@ -1,14 +1,11 @@
 import { Outlet } from 'react-router-dom';
-import NavBar from './components/NavBar';
-import UserStatus from './components/UserStatus';
+import Header from './components/Header';
 
 const Layout: React.FC = () => {
   return (
-    <div style={{ display: 'flex' }}>
-      <NavBar />
-      <UserStatus />
-      {/* marginLeft: '280px', */}
-      <main style={{  flexGrow: 1, padding: '50px' }}>
+    <div>
+      <Header />
+      <main style={{ padding: '20px' }}>
         <Outlet />
       </main>
     </div>
