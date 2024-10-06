@@ -15,6 +15,7 @@ import { useUserAuth } from '../../context/userAuthContext.tsx';
 import type { Event, History } from '../../types.ts';
 import { findUserById } from '../../firebase.ts';
 import HistoryDetail from '../../components/HistoryDetail.tsx';
+import styled from 'styled-components';
 
 interface ApplicantData {
   name: string;
@@ -160,70 +161,163 @@ const Approval: React.FC<ApprovalProps> = () => {
   };
 
   return (
-    <div>
+    <>
       <h1>Approval</h1>
-      <table border={1}>
-        <thead>
-          <tr>
-            <th>Event 時間</th>
-            <th>Event 地點</th>
-            <th>申請人</th>
-            <th>平均分數</th>
-            <th>接受</th>
-            <th>拒絕</th>
-          </tr>
-        </thead>
-        <tbody>
-          {eventList.flatMap((event) =>
-            event.applicationList.length > 0
-              ? event.applicationList.map((applicantId, index) => (
-                  <tr key={`${event.id}-${index}`}>
-                    {index === 0 && (
-                      <>
-                        <td rowSpan={event.applicationList.length}>
-                          {event.date +
-                            ' ' +
-                            event.startTimeStamp.toDate().toLocaleTimeString() +
-                            '~' +
-                            event.endTimeStamp.toDate().toLocaleTimeString()}
-                        </td>
-                        <td rowSpan={event.applicationList.length}>
-                          {event.court.name}
-                        </td>
-                      </>
-                    )}
-                    <td>{applicantData[applicantId]?.name || 'Loading...'}</td>
-                    <td>
-                      {calculateAverageGrade(
-                        historyData[applicantId] || []
-                      ).toFixed(2)}
-                      <br />
-                      <HistoryDetail
-                        userHistory={historyData[applicantId] || []}
-                      />
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => handleAccept(applicantId, event.id)}
-                      >
-                        接受
-                      </button>
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => handleDecline(applicantId, event.id)}
-                      >
-                        拒絕
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              : []
-          )}
-        </tbody>
-      </table>
-    </div>
+      <TableWrapper>
+        <StyledTable>
+          <thead>
+            <StyledTr>
+              <StyledTh>Event 時間</StyledTh>
+              <StyledTh>Event 地點</StyledTh>
+              <StyledTh>申請人</StyledTh>
+              <StyledTh>平均分數</StyledTh>
+              <StyledTh>決定</StyledTh>
+              {/* <StyledTh>拒絕</StyledTh> */}
+            </StyledTr>
+          </thead>
+          <tbody>
+            {eventList.flatMap((event) =>
+              event.applicationList.length > 0
+                ? event.applicationList.map((applicantId, index) => (
+                    <StyledTr key={`${event.id}-${index}`}>
+                      {index === 0 && (
+                        <>
+                          <StyledTd rowSpan={event.applicationList.length}>
+                            {event.date} <br />
+                            {event.startTimeStamp
+                              .toDate()
+                              .toLocaleTimeString() +
+                              '~' +
+                              event.endTimeStamp.toDate().toLocaleTimeString()}
+                          </StyledTd>
+                          <StyledTd rowSpan={event.applicationList.length}>
+                            {event.court.name}
+                          </StyledTd>
+                        </>
+                      )}
+                      <StyledTd>
+                        {applicantData[applicantId]?.name || 'Loading...'}
+                      </StyledTd>
+                      <StyledTd>
+                        {calculateAverageGrade(
+                          historyData[applicantId] || []
+                        ).toFixed(2)}
+                        <br />
+                        <HistoryDetail
+                          userHistory={historyData[applicantId] || []}
+                        />
+                      </StyledTd>
+                      <StyledTd>
+                        <AcceptButton
+                          onClick={() => handleAccept(applicantId, event.id)}
+                        >
+                          接受
+                        </AcceptButton>
+                        {/* </StyledTd>
+                    <StyledTd> */}
+                        <DeclineButton
+                          onClick={() => handleDecline(applicantId, event.id)}
+                        >
+                          拒絕
+                        </DeclineButton>
+                      </StyledTd>
+                    </StyledTr>
+                  ))
+                : []
+            )}
+          </tbody>
+        </StyledTable>
+      </TableWrapper>
+    </>
   );
 };
 
 export default Approval;
+
+const TableWrapper = styled.div`
+  width: 90%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+`;
+
+const StyledTable = styled.table`
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  min-width: 800px;
+`;
+
+const StyledTh = styled.th`
+  text-align: left;
+  padding: 8px;
+  /* background-color: #f2f2f2; */
+  /* border-bottom: 2px dashed #ffc100; */
+  border-bottom: 2px dashed;
+  border-image: repeating-linear-gradient(
+      to right,
+      #ffc100 0,
+      #ffc100 8px,
+      transparent 8px,
+      transparent 25px
+    )
+    1 20;
+  white-space: nowrap;
+  font-size: 24px;
+`;
+
+const StyledTd = styled.td`
+  text-align: left;
+  padding: 8px;
+  position: relative;
+  white-space: nowrap;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-image: linear-gradient(
+      to bottom,
+      #ffc100 50%,
+      rgba(255, 255, 255, 0) 50%
+    );
+    background-position: center;
+    background-size: 2px 25px;
+    background-repeat: repeat-y;
+  }
+`;
+
+const StyledTr = styled.tr`
+  ${StyledTd} {
+    border-bottom: 2px dashed;
+    border-image: repeating-linear-gradient(
+        to right,
+        #ffc100 0,
+        #ffc100 8px,
+        transparent 8px,
+        transparent 25px
+      )
+      1 20;
+  }
+`;
+
+const Button = styled.button`
+  padding: 5px 10px;
+  margin: 2px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+`;
+
+const AcceptButton = styled(Button)`
+  background-color: #ffc100;
+  color: white;
+`;
+
+const DeclineButton = styled(Button)`
+  /* background-color: #0086d6; */
+  background-color: #ffc100;
+  color: white;
+`;
