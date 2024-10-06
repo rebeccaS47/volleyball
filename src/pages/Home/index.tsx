@@ -14,6 +14,9 @@ import {
 import type { Event, Option, Court, FilterState } from '../../types';
 import styled from 'styled-components';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 interface EventProps {}
 
@@ -246,30 +249,37 @@ const Event: React.FC<EventProps> = () => {
       </div>
       <br />
       <EventListContainer>
-        {filteredEventList.length === 0
-          ? '暫無相關活動'
-          : filteredEventList.map((event) => (
-              <EventCard
-                data-eventid={event.id}
-                key={event.id}
-                onClick={() => navigate(`/eventdetail/${event.id}`)}
-              >
-                <EventTitle>{event.court.name}</EventTitle>
-                <EventInfo>{event.date}</EventInfo>
-                <EventInfo>
-                  {event.startTimeStamp.toDate().toLocaleTimeString()} ~{' '}
-                  {event.endTimeStamp.toDate().toLocaleTimeString()}
-                </EventInfo>
-                <EventInfo>
-                  <LocationOnIcon />
-                  {event.court.city}
-                  {event.court.address}
-                </EventInfo>
-                <EventInfo>
-                  價格/人：${Math.round(event.totalCost / event.findNum)}
-                </EventInfo>
-              </EventCard>
-            ))}
+        {filteredEventList.length === 0 ? (
+          <div style={{ color: 'white' }}>暫無相關活動</div>
+        ) : (
+          filteredEventList.map((event) => (
+            <EventCard
+              data-eventid={event.id}
+              key={event.id}
+              onClick={() => navigate(`/eventdetail/${event.id}`)}
+            >
+              <EventTitle>{event.court.name}</EventTitle>
+              <EventInfo>
+                <CalendarMonthIcon />
+                {event.date}
+              </EventInfo>
+              <EventInfo>
+                <AccessTimeIcon />
+                {event.startTimeStamp.toDate().toLocaleTimeString()} ~{' '}
+                {event.endTimeStamp.toDate().toLocaleTimeString()}
+              </EventInfo>
+              <EventInfo>
+                <LocationOnIcon />
+                {event.court.city}
+                {event.court.address}
+              </EventInfo>
+              <EventInfo>
+                <AttachMoneyIcon />
+                {Math.round(event.totalCost / event.findNum)} /人
+              </EventInfo>
+            </EventCard>
+          ))
+        )}
       </EventListContainer>
     </>
   );
@@ -283,14 +293,14 @@ const EventListContainer = styled.div`
   gap: 20px;
   padding: 20px;
   border-radius: 15px;
-  background-color: var(--color-light);
+  background-color: var(--color-secondary);
   @media (max-width: 768px) {
     gap: 0px;
   }
 `;
 
 const EventCard = styled.div`
-  background-color: var(--color-light);
+  background-color: white;
   box-sizing: content-box;
   border: 3px dashed var(--color-primary);
   border-radius: 12px;
@@ -350,8 +360,11 @@ const EventCard = styled.div`
 const EventInfo = styled.p`
   margin: 10px 0;
   font-size: 1.2rem;
-  /* color: var(--color-dark); */
-  color: var(--color-darkblue);
+  color: var(--color-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 20px;
 `;
 
 const EventTitle = styled.h3`

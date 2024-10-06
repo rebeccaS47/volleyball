@@ -41,13 +41,13 @@ const UserStatus: React.FC = () => {
     >
       {user ? (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="subtitle1" sx={{ color: 'var(--color-light)' }}>
+          <Typography variant="subtitle1" sx={{ color: 'var(--color-primary)' }}>
             Hi, {user.name}
           </Typography>
           <IconButton
             size="large"
             aria-label="show 4 new mails"
-            sx={{ color: 'var(--color-light)' }}
+            sx={{ color: 'var(--color-primary)' }}
             onClick={() => {
               navigate('/chat');
             }}
