@@ -32,22 +32,23 @@ const UserStatus: React.FC = () => {
     <Box
       sx={{
         position: 'absolute',
-        top: 16,
+        top: 10,
         right: '2vw',
         display: 'flex',
         alignItems: 'center',
-        gap: 2,
       }}
     >
       {user ? (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="subtitle1" sx={{ color: 'var(--color-primary)' }}>
+          <Typography
+            sx={{ fontSize: 'large', color: 'var(--color-secondary)' }}
+          >
             Hi, {user.name}
           </Typography>
           <IconButton
             size="large"
             aria-label="show 4 new mails"
-            sx={{ color: 'var(--color-primary)' }}
+            sx={{ color: 'var(--color-secondary)'}}
             onClick={() => {
               navigate('/chat');
             }}
@@ -110,25 +111,29 @@ const UserStatus: React.FC = () => {
                 navigate('/user');
               }}
             >
-              <Avatar /> &nbsp;&nbsp;Profile
+              <Avatar /> &nbsp;&nbsp;個人頁面
             </MenuItem>
             <MenuItem onClick={logOut}>
               <ListItemIcon>
                 <Logout />
               </ListItemIcon>
-              &nbsp;&nbsp;Logout
+              &nbsp;&nbsp;登出
             </MenuItem>
           </Menu>
         </Box>
       ) : (
-        <>
-          <Typography variant="subtitle1">Hi, there</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
+          <Typography
+            sx={{ fontSize: 'large', color: 'var(--color-secondary)', padding: '12px'}}
+          >
+            Hi, there
+          </Typography>
           <Avatar
             onClick={() => {
               navigate('/login');
             }}
           />
-        </>
+        </Box>
       )}
     </Box>
   );
