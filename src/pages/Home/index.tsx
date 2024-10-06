@@ -372,6 +372,7 @@ const FilterContainer = styled.div`
   background-color: #f0f0f0;
   padding: 10px;
   border-radius: 5px;
+  width: fit-content;
 `;
 
 const StyledSelect = styled.select`

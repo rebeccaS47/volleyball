@@ -23,7 +23,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     padding: 0;
     margin: 0;
-    background-color: var(--color-primary);
+    /* background-color: var(--color-primary); */
     font-family: 'SweiGothicCJK', sans-serif;
     font-weight: 400;
   }
