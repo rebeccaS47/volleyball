@@ -54,7 +54,13 @@ export default Header;
 
 const HeaderContainer = styled.header`
   background-color: #f8f8f8;
-  height: 70px;
+  border: 2px solid #f8f8f8;
+  /* padding: 10px 0px; */
+  border-radius: 15px;
+  @media (max-width: 768px) {
+    display: flex;
+    height: 70px;
+  }
 `;
 
 const LogoContainer = styled.div`
@@ -63,7 +69,7 @@ const LogoContainer = styled.div`
   margin: 0 20px;
   order: 1;
 
-  @media (max-width: 720px) {
+  @media (max-width: 768px) {
     order: 2;
   }
 `;
@@ -71,7 +77,7 @@ const LogoContainer = styled.div`
 const Nav = styled.nav`
   display: flex;
   align-items: center;
-  height: 70px;
+  /* height: 70px; */
 `;
 
 const Logo = styled.div`
@@ -87,13 +93,13 @@ const MenuItems = styled.ul<{ $isOpen: boolean }>`
   padding: 0;
   order: 2;
 
-  @media (max-width: 720px) {
+  @media (max-width: 768px) {
     flex-direction: column;
     position: absolute;
-    top: 60px;
+    top: 90px;
     left: 0;
     width: 100%;
-    background-color: #f8f8f8;
+    background-color: var(--color-light);
     display: ${({ $isOpen }) => ($isOpen ? 'flex' : 'none')};
     order: 3;
     z-index: 2;
@@ -117,7 +123,7 @@ const MenuItem = styled.div<{ $isActive: boolean }>`
     background-color: var(--color-secondary);
   }
 
-  @media (max-width: 720px) {
+  @media (max-width: 768px) {
     margin: 0;
     padding: 1rem;
     text-align: center;
@@ -133,7 +139,7 @@ const HamburgerButton = styled.button`
   margin-left: 10px;
   order: 1;
 
-  @media (max-width: 720px) {
+  @media (max-width: 768px) {
     display: block;
   }
 `;

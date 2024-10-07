@@ -188,65 +188,67 @@ const Event: React.FC<EventProps> = () => {
   }, [filterState, eventList, filterEvents]);
 
   return (
-    <>
+    <IndexContainer>
       <FilterContainer>
-        <StyledSelect
-          value={selectedCity ? selectedCity.value : ''}
-          onChange={handleCityChange}
-        >
-          <option value="">請選擇城市</option>
-          {cities.map((city) => (
-            <option key={city.value} value={city.value}>
-              {city.label}
-            </option>
-          ))}
-        </StyledSelect>
-        <StyledSelect
-          value={selectedCourt ? selectedCourt.value : ''}
-          onChange={handleCourtChange}
-          disabled={!selectedCity}
-        >
-          <option value="">請選擇球場</option>
-          {courts.map((court) => (
-            <option key={court.value} value={court.value}>
-              {court.label}
-            </option>
-          ))}
-        </StyledSelect>
-        <StyledSelect
-          name="level"
-          value={filterState.level}
-          onChange={handleSelectChange}
-        >
-          <option value="">請選擇分級</option>
-          {levelOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </StyledSelect>
+        <div>
+          <StyledSelect
+            value={selectedCity ? selectedCity.value : ''}
+            onChange={handleCityChange}
+          >
+            <option value="">請選擇城市</option>
+            {cities.map((city) => (
+              <option key={city.value} value={city.value}>
+                {city.label}
+              </option>
+            ))}
+          </StyledSelect>
+          <StyledSelect
+            value={selectedCourt ? selectedCourt.value : ''}
+            onChange={handleCourtChange}
+            disabled={!selectedCity}
+          >
+            <option value="">請選擇球場</option>
+            {courts.map((court) => (
+              <option key={court.value} value={court.value}>
+                {court.label}
+              </option>
+            ))}
+          </StyledSelect>
+          <StyledSelect
+            name="level"
+            value={filterState.level}
+            onChange={handleSelectChange}
+          >
+            <option value="">請選擇分級</option>
+            {levelOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </StyledSelect>
+        </div>
+        <div>
+          <FilterInput
+            type="date"
+            name="date"
+            value={filterState.date}
+            onChange={handleInputChange}
+          />
+          <FilterInput
+            type="time"
+            name="startTime"
+            value={filterState.startTime}
+            onChange={handleInputChange}
+          />
+          <span> ~ </span>
+          <FilterInput
+            type="time"
+            name="endTime"
+            value={filterState.endTime}
+            onChange={handleInputChange}
+          />
+        </div>
       </FilterContainer>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <FilterInput
-          type="date"
-          name="date"
-          value={filterState.date}
-          onChange={handleInputChange}
-        />
-        <FilterInput
-          type="time"
-          name="startTime"
-          value={filterState.startTime}
-          onChange={handleInputChange}
-        />
-        <span> ~ </span>
-        <FilterInput
-          type="time"
-          name="endTime"
-          value={filterState.endTime}
-          onChange={handleInputChange}
-        />
-      </div>
       <br />
       <EventListContainer>
         {filteredEventList.length === 0 ? (
@@ -281,28 +283,35 @@ const Event: React.FC<EventProps> = () => {
           ))
         )}
       </EventListContainer>
-    </>
+    </IndexContainer>
   );
 };
 
 export default Event;
 
+const IndexContainer = styled.div`
+  padding: 20px 0px;
+  @media (max-width: 480px) {
+    paddingx: 10px;
+  }
+`;
+
 const EventListContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  padding: 20px;
   border-radius: 15px;
-  background-color: var(--color-secondary);
+  justify-content: space-between;
+  /* background-color: var(--color-secondary); */
   @media (max-width: 768px) {
-    gap: 0px;
+    gap: 5px;
   }
 `;
 
 const EventCard = styled.div`
-  background-color: white;
+  background-color: #f8f8f8;
   box-sizing: content-box;
-  border: 3px dashed var(--color-primary);
+  /* border: 3px dashed var(--color-dark); */
   border-radius: 12px;
   padding: 1.5rem;
 
@@ -321,13 +330,14 @@ const EventCard = styled.div`
     width: 2rem;
     height: 2rem;
     background-color: var(--color-primary);
-    /* border: 5px solid var(--color-primary); */
+    border-radius: 12px;
   }
 
   &::before {
     top: 0;
     left: 0;
     border-bottom-right-radius: 100%;
+    background-color: var(--color-secondary);
   }
 
   &::after {
@@ -346,6 +356,7 @@ const EventCard = styled.div`
     bottom: 0;
     right: 0;
     border-top-left-radius: 100%;
+    background-color: var(--color-secondary);
   }
 
   @media (max-width: 1024px) {
@@ -360,11 +371,10 @@ const EventCard = styled.div`
 const EventInfo = styled.p`
   margin: 10px 0;
   font-size: 1.2rem;
-  color: var(--color-secondary);
+  color: var(--color-dark);
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  height: 20px;
 `;
 
 const EventTitle = styled.h3`
@@ -375,22 +385,24 @@ const EventTitle = styled.h3`
 `;
 
 const FilterInput = styled.input`
-  min-height: 38px;
-  min-width: 139px;
+  min-height: 40px;
+  min-width: 70px;
+  max-width: 100px;
 `;
 
 const FilterContainer = styled.div`
   display: flex;
   align-items: center;
-  background-color: #f0f0f0;
+  background-color: #f8f8f8;
   padding: 10px;
   border-radius: 5px;
   width: fit-content;
+  margin: auto;
 `;
 
 const StyledSelect = styled.select`
   padding: 5px;
-  margin-right: 10px;
+  margin-right: 5px;
   border: none;
   background-color: transparent;
 

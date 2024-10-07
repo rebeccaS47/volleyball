@@ -302,10 +302,10 @@ const Feedback: React.FC<FeedbackProps> = () => {
             )} */}
           </FormControl>
           <FormControl fullWidth margin="normal">
-            <InputLabel>技術水平 *</InputLabel>
+            <InputLabel>技術能力 *</InputLabel>
             <Select
               name="level"
-              label="技術水平 *"
+              label="技術能力 *"
               value={feedback.level}
               onChange={handleFeedbackChange}
               // error={!!formErrors.level}
@@ -355,7 +355,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
   const theme = createTheme({
     palette: {
       primary: {
-        main: 'rgb(31, 72, 54)',
+        main: '#ffc100',
       },
     },
     components: {
@@ -363,7 +363,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
         styleOverrides: {
           root: {
             '&.Mui-active': {
-              color: 'rgb(31, 72, 54)',
+              color: '#ffc100',
             },
           },
         },
@@ -372,7 +372,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
         styleOverrides: {
           label: {
             '&.Mui-active': {
-              color: 'rgb(31, 72, 54)',
+              color: '#ffc100',
             },
           },
         },
@@ -387,16 +387,13 @@ const Feedback: React.FC<FeedbackProps> = () => {
     <ThemeProvider theme={theme}>
       <Box
         sx={{
-          maxWidth: 400,
-          m: '20px auto',
-          border: '1px solid rgb(204, 204, 204)',
-          borderRadius: '4px',
+          maxWidth: 800,
+          m: '32px auto',
+          // border: '1px solid rgb(204, 204, 204)',
+          // borderRadius: '4px',
           padding: '20px',
         }}
       >
-        <Typography variant="h4" gutterBottom>
-          Feedback
-        </Typography>
         <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => (
             <Step key={step.label}>

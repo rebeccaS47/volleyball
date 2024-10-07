@@ -21,18 +21,22 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    padding: 0;
+    padding: 20px 30px;
     margin: 0;
-    /* background-color: var(--color-primary); */
+    /* background-color: var(--color-secondary); */
     font-family: 'SweiGothicCJK', sans-serif;
     font-weight: 400;
+
+    @media (max-width: 768px) {
+      padding: 20px 15px;
+    }
   }
   
     :root{
     --color-primary: #0080cc;
     --color-secondary: #ffc100;
     --color-tertiary: #36678c;
-    --color-light: #faf3e7;
+    --color-light: #f8f8f8;
     --color-dark: #262626;
     --color-darkblue: #104265;
   }

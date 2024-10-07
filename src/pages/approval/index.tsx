@@ -161,83 +161,78 @@ const Approval: React.FC<ApprovalProps> = () => {
   };
 
   return (
-    <>
-      <h1>Approval</h1>
-      <TableWrapper>
-        <StyledTable>
-          <thead>
-            <StyledTr>
-              <StyledTh>Event 時間</StyledTh>
-              <StyledTh>Event 地點</StyledTh>
-              <StyledTh>申請人</StyledTh>
-              <StyledTh>平均分數</StyledTh>
-              <StyledTh>決定</StyledTh>
-              {/* <StyledTh>拒絕</StyledTh> */}
-            </StyledTr>
-          </thead>
-          <tbody>
-            {eventList.flatMap((event) =>
-              event.applicationList.length > 0
-                ? event.applicationList.map((applicantId, index) => (
-                    <StyledTr key={`${event.id}-${index}`}>
-                      {index === 0 && (
-                        <>
-                          <StyledTd rowSpan={event.applicationList.length}>
-                            {event.date} <br />
-                            {event.startTimeStamp
-                              .toDate()
-                              .toLocaleTimeString() +
-                              '~' +
-                              event.endTimeStamp.toDate().toLocaleTimeString()}
-                          </StyledTd>
-                          <StyledTd rowSpan={event.applicationList.length}>
-                            {event.court.name}
-                          </StyledTd>
-                        </>
-                      )}
-                      <StyledTd>
-                        {applicantData[applicantId]?.name || 'Loading...'}
-                      </StyledTd>
-                      <StyledTd>
-                        {calculateAverageGrade(
-                          historyData[applicantId] || []
-                        ).toFixed(2)}
-                        <br />
-                        <HistoryDetail
-                          userHistory={historyData[applicantId] || []}
-                        />
-                      </StyledTd>
-                      <StyledTd>
-                        <AcceptButton
-                          onClick={() => handleAccept(applicantId, event.id)}
-                        >
-                          接受
-                        </AcceptButton>
-                        {/* </StyledTd>
-                    <StyledTd> */}
-                        <DeclineButton
-                          onClick={() => handleDecline(applicantId, event.id)}
-                        >
-                          拒絕
-                        </DeclineButton>
-                      </StyledTd>
-                    </StyledTr>
-                  ))
-                : []
-            )}
-          </tbody>
-        </StyledTable>
-      </TableWrapper>
-    </>
+    <TableWrapper>
+      <StyledTable>
+        <thead>
+          <StyledTr>
+            <StyledTh>活動時間</StyledTh>
+            <StyledTh>活動地點</StyledTh>
+            <StyledTh>申請人</StyledTh>
+            <StyledTh>平均分數</StyledTh>
+            <StyledTh>決定</StyledTh>
+          </StyledTr>
+        </thead>
+        <tbody>
+          {eventList.flatMap((event) =>
+            event.applicationList.length > 0
+              ? event.applicationList.map((applicantId, index) => (
+                  <StyledTr key={`${event.id}-${index}`}>
+                    {index === 0 && (
+                      <>
+                        <StyledTd rowSpan={event.applicationList.length}>
+                          {event.date}{" "}
+                          {event.startTimeStamp.toDate().toLocaleTimeString() }
+                            {/* '~' +
+                            event.endTimeStamp.toDate().toLocaleTimeString()} */}
+                        </StyledTd>
+                        <StyledTd rowSpan={event.applicationList.length}>
+                          {event.court.name}
+                        </StyledTd>
+                      </>
+                    )}
+                    <StyledTd>
+                      {applicantData[applicantId]?.name || 'Loading...'}
+                    </StyledTd>
+                    <StyledTd>
+                      {calculateAverageGrade(
+                        historyData[applicantId] || []
+                      ).toFixed(2)}
+                      <HistoryDetail
+                        userHistory={historyData[applicantId] || []}
+                      />
+                    </StyledTd>
+                    <StyledTd>
+                      <AcceptButton
+                        onClick={() => handleAccept(applicantId, event.id)}
+                      >
+                        接受
+                      </AcceptButton>
+                      <DeclineButton
+                        onClick={() => handleDecline(applicantId, event.id)}
+                      >
+                        拒絕
+                      </DeclineButton>
+                    </StyledTd>
+                  </StyledTr>
+                ))
+              : []
+          )}
+        </tbody>
+      </StyledTable>
+    </TableWrapper>
   );
 };
 
 export default Approval;
 
 const TableWrapper = styled.div`
-  width: 90%;
+  padding: 32px 0px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+
+  @media (max-width: 600px) {
+    padding: 10px 0px;
+  }
 `;
 
 const StyledTable = styled.table`
@@ -255,8 +250,8 @@ const StyledTh = styled.th`
   border-bottom: 2px dashed;
   border-image: repeating-linear-gradient(
       to right,
-      #ffc100 0,
-      #ffc100 8px,
+      #0080cc 0,
+      #0080cc 8px,
       transparent 8px,
       transparent 25px
     )
@@ -280,7 +275,7 @@ const StyledTd = styled.td`
     width: 2px;
     background-image: linear-gradient(
       to bottom,
-      #ffc100 50%,
+      #0080cc 50%,
       rgba(255, 255, 255, 0) 50%
     );
     background-position: center;
@@ -294,8 +289,8 @@ const StyledTr = styled.tr`
     border-bottom: 2px dashed;
     border-image: repeating-linear-gradient(
         to right,
-        #ffc100 0,
-        #ffc100 8px,
+        #0080cc 0,
+        #0080cc 8px,
         transparent 8px,
         transparent 25px
       )

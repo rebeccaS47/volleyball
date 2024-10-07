@@ -32,23 +32,18 @@ const UserStatus: React.FC = () => {
     <Box
       sx={{
         position: 'absolute',
-        top: 10,
-        right: '2vw',
+        top: 34,
+        right: 40,
         display: 'flex',
         alignItems: 'center',
       }}
     >
       {user ? (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography
-            sx={{ fontSize: 'large', color: 'var(--color-secondary)' }}
-          >
-            Hi, {user.name}
-          </Typography>
+          <Typography sx={{ fontSize: 'large' }}>Hi, {user.name}</Typography>
           <IconButton
             size="large"
             aria-label="show 4 new mails"
-            sx={{ color: 'var(--color-secondary)'}}
             onClick={() => {
               navigate('/chat');
             }}
@@ -65,7 +60,11 @@ const UserStatus: React.FC = () => {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar src={user.imgURL} alt={user.name} />
+            <Avatar
+              src={user.imgURL}
+              alt={user.name}
+              sx={{ border: '3px solid white' }}
+            />
           </IconButton>
 
           <Menu
@@ -124,7 +123,11 @@ const UserStatus: React.FC = () => {
       ) : (
         <Box sx={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
           <Typography
-            sx={{ fontSize: 'large', color: 'var(--color-secondary)', padding: '12px'}}
+            sx={{
+              fontSize: 'large',
+              color: 'var(--color-secondary)',
+              padding: '12px',
+            }}
           >
             Hi, there
           </Typography>

@@ -274,28 +274,16 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
   };
 
   return (
-    <>
-      <center>
-        <h1>HoldEvent</h1>
-      </center>
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          marginTop: '30px',
-          border: '1px solid #ccc',
-          borderRadius: '8px',
-          padding: '20px',
-          maxWidth: '600px',
-          margin: '0px auto',
-          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-        }}
-      >
+    <HoldEventContainer>
+      <Form onSubmit={handleSubmit}>
+        <center>
+          <h1 style={{marginTop:0}}>活動表單</h1>
+        </center>
         <FormSection>
           <FormField>
-            <LabelText>
-              城市
-              {errors.city && <ErrorText>{errors.city}</ErrorText>}
-            </LabelText>
+            <SelectLabelText>
+              城市 *{errors.city && <ErrorText>{errors.city}</ErrorText>}
+            </SelectLabelText>
             <Select
               value={selectedCity}
               onChange={handleCityChange}
@@ -310,9 +298,9 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             />
           </FormField>
           <FormField>
-            <LabelText>
-              球場{errors.court && <ErrorText>{errors.court}</ErrorText>}
-            </LabelText>
+            <SelectLabelText>
+              球場 *{errors.court && <ErrorText>{errors.court}</ErrorText>}
+            </SelectLabelText>
             <Select
               value={selectedCourt}
               onChange={handleCourtChange}
@@ -338,8 +326,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           }}
         >
           <LabelText>
-            日期
-            {errors.date && <ErrorText>{errors.date}</ErrorText>}
+            日期 *{errors.date && <ErrorText>{errors.date}</ErrorText>}
           </LabelText>
           <InputText
             type="date"
@@ -351,7 +338,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
         <FormSection>
           <FormField>
             <LabelText>
-              時間
+              時間 *
               {errors.startTime && <ErrorText>{errors.startTime}</ErrorText>}
             </LabelText>
             <InputText
@@ -363,7 +350,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           </FormField>
           <FormField>
             <LabelText htmlFor="duration">
-              活動時長(hr): {formData.duration}
+              活動時長(hr) *: {formData.duration}
               {errors.duration && <ErrorText>{errors.duration}</ErrorText>}
             </LabelText>
             <input
@@ -378,10 +365,10 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             />
           </FormField>
         </FormSection>
-        <FormSection>
+        <FormSectionRow>
           <div>
-            <LabelText>網高</LabelText>
-            <label>
+            <LabelText>網高 *</LabelText>
+            <LabelText>
               <input
                 type="radio"
                 name="netHeight"
@@ -390,8 +377,8 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
                 onChange={handleInputChange}
               />
               女網
-            </label>
-            <label>
+            </LabelText>
+            <LabelText>
               <input
                 type="radio"
                 name="netHeight"
@@ -400,11 +387,11 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
                 onChange={handleInputChange}
               />
               男網
-            </label>
+            </LabelText>
             {errors.netHeight && <ErrorText>{errors.netHeight}</ErrorText>}
           </div>
-          <FormField>
-            <label>
+          <FormFieldRow>
+            <LabelText>
               <input
                 type="checkbox"
                 name="isAC"
@@ -412,12 +399,12 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
                 onChange={handleInputChange}
               />
               是否有開冷氣
-            </label>
-          </FormField>
-        </FormSection>
+            </LabelText>
+          </FormFieldRow>
+        </FormSectionRow>
         <FormSection>
           <FormField>
-            <LabelText>友善程度</LabelText>
+            <SelectLabelText>友善程度</SelectLabelText>
             <Select
               name="friendlinessLevel"
               value={levelOptions.find(
@@ -440,7 +427,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             />
           </FormField>
           <FormField>
-            <LabelText>分級</LabelText>
+            <SelectLabelText>分級</SelectLabelText>
             <Select
               name="level"
               value={levelOptions.find(
@@ -462,7 +449,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             marginBottom: '10px',
           }}
         >
-          <LabelText>內建名單</LabelText>
+          <SelectLabelText>內建名單</SelectLabelText>
           <UserSelector
             onSelect={handleUserSelect}
             currentUserId={formData.createUserId}
@@ -471,7 +458,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
         <FormSection>
           <FormField>
             <LabelText>
-              找尋人數
+              找尋人數 *
               {errors.findNum && <ErrorText>{errors.findNum}</ErrorText>}
             </LabelText>
             <InputText
@@ -484,7 +471,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           </FormField>
           <FormField>
             <LabelText>
-              總金額
+              總金額 *
               {errors.totalCost && <ErrorText>{errors.totalCost}</ErrorText>}
             </LabelText>
             <InputText
@@ -510,15 +497,48 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           />
         </div>
 
-        <button type="submit">建立活動</button>
-      </form>
-    </>
+        <Button type="submit">建立活動</Button>
+      </Form>
+    </HoldEventContainer>
   );
 };
 
 export default HoldEvent;
 
+const HoldEventContainer = styled.div`
+  margin: 32px 0px;
+  background-color: var(--color-light);
+  border-radius: 15px;
+  @media (max-width: 600px) {
+    padding: 10px 0px;
+  }
+`;
+
+const Form = styled.form`
+  /* background-color: white; */
+  /* border-radius: 15px; */
+  padding: 30px 30px;
+  max-width: 800px;
+  margin: 0px auto;
+  /* box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); */
+
+  @media (max-width: 600px) {
+    padding: 20px 20px;
+  }
+`;
+
 const FormSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    margin-bottom: 8px;
+  }
+`;
+
+const FormSectionRow = styled.div`
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
@@ -529,6 +549,20 @@ const FormField = styled.div`
   flex-direction: column;
   justify-content: center;
   width: 49%;
+  margin-bottom: 5px;
+
+  @media (max-width: 600px) {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+`;
+
+const FormFieldRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 49%;
+  margin-bottom: 5px;
 `;
 
 const InputText = styled.input`
@@ -537,18 +571,63 @@ const InputText = styled.input`
   border-radius: 4px;
   height: 38px;
   padding: 0 10px;
+  @media (max-width: 600px) {
+    margin-bottom: 8px;
+  }
 `;
 
 const TextArea = styled.textarea`
   box-sizing: border-box;
   border: 1px solid rgb(204, 204, 204);
   border-radius: 4px;
-  height: 100px;
+  height: 200px;
   padding: 0 10px;
+
+  @media (max-width: 600px) {
+    height: 100px;
+  }
 `;
 
 const LabelText = styled.label`
   font-size: 15px;
+  margin-bottom: 5px;
+  @media (max-width: 600px) {
+    margin-bottom: 2px;
+  }
+`;
+
+const SelectLabelText = styled.label`
+  font-size: 15px;
+  margin-bottom: 5px;
+  @media (max-width: 600px) {
+    display: none;
+  }
+`;
+
+const Button = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px 16px;
+  background-color: var(--color-secondary);
+  color: var(--color-light);
+  font-size: 24px;
+  line-height: 24px;
+  border: 2px solid var(--color-dark);
+  border-radius: 14px;
+  box-shadow: -4px 3px 0 0 var(--color-dark);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: -2px 1px 0 0 var(--color-dark);
+    transform: translateY(2px);
+  }
+
+  &:active {
+    box-shadow: 0 0 0 0 var(--color-dark);
+    transform: translateY(4px);
+  }
 `;
 
 const ErrorText = styled.span`

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Select, { MultiValue } from 'react-select';
+import Select, { MultiValue, StylesConfig } from 'react-select';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import type { Option, User } from '../types';
@@ -17,7 +17,7 @@ const UserSelect: React.FC<{
       const userOptions: Option[] = userSnapshot.docs
         .map((doc) => {
           const userData = doc.data() as User;
-          return { value: userData.id, label: userData.name };
+          return { value: userData.id, label: `${userData.name} (${userData.email})` };
         })
         .filter((option) => option.value !== currentUserId);
       setOptions(userOptions);
@@ -37,8 +37,16 @@ const UserSelect: React.FC<{
       onChange={handleChange}
       isMulti={true}
       placeholder="請選擇內建隊員"
+      styles={customStyles}
     />
   );
 };
 
 export default UserSelect;
+
+const customStyles: StylesConfig<Option, true> = {
+  option: (provided) => ({
+    ...provided,
+    padding: 12,
+  }),
+};

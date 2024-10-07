@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { History } from '../types';
 import Modal from 'react-modal';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 
 const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
   userHistory,
@@ -10,7 +11,10 @@ const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
   const hasHistory = Object.keys(userHistory).length > 0;
   return (
     <>
-      <button onClick={() => setModalIsOpen(true)}>過往詳細記錄</button>
+      <button onClick={() => setModalIsOpen(true)} style={{display: 'flex', alignItems: 'flex-end'
+      }}>點擊看更多
+        <ManageSearchIcon />
+      </button>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
@@ -24,7 +28,7 @@ const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
               <tr>
                 <th>日期</th>
                 <th>地點</th>
-                <th>時間</th>
+                {/* <th>時間</th> */}
                 <th>友善度</th>
                 <th>等級</th>
                 <th>評分</th>
@@ -37,10 +41,10 @@ const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
                 <tr key={key}>
                   <td>{item.date}</td>
                   <td>{item.courtName}</td>
-                  <td>
+                  {/* <td>
                     {item.startTimeStamp.toDate().toLocaleTimeString()}
                     {item.endTimeStamp.toDate().toLocaleTimeString()}
-                  </td>
+                  </td> */}
                   <td>{item.friendlinessLevel}</td>
                   <td>{item.level}</td>
                   <td>{item.grade}</td>
