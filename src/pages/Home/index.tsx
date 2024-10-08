@@ -16,7 +16,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import EventDetail from '../../components/EventDetail'
+import EventDetail from '../../components/EventDetail';
 
 interface EventProps {}
 
@@ -64,7 +64,7 @@ const Event: React.FC<EventProps> = () => {
       const allCourts: Court[] = snapshot.docs.map(
         (doc) => ({ id: doc.id, ...doc.data() } as Court)
       );
-      
+
       const uniqueCities = Array.from(
         new Set(allCourts.map((court) => court.city))
       );
@@ -245,15 +245,13 @@ const Event: React.FC<EventProps> = () => {
             name="date"
             value={filterState.date}
             onChange={handleInputChange}
-          />
-          {" "}
+          />{' '}
           <FilterInput
             type="time"
             name="startTime"
             value={filterState.startTime}
             onChange={handleInputChange}
-          />
-          {" "}
+          />{' '}
           {/* <span> ~ </span> */}
           <FilterInput
             type="time"
@@ -266,7 +264,15 @@ const Event: React.FC<EventProps> = () => {
       <br />
       <EventListContainer>
         {filteredEventList.length === 0 ? (
-          <div style={{ color: 'white' }}>暫無相關活動</div>
+          <div
+            style={{
+              color: 'var(--color-dark)',
+              backgroundColor: 'var(--color-light)',
+              display: 'flex',
+            }}
+          >
+            暫無相關活動
+          </div>
         ) : (
           filteredEventList.map((event) => (
             <EventCard
@@ -402,7 +408,7 @@ const EventTitle = styled.h3`
   margin: 0 0 15px;
   font-size: 2rem;
   text-align: center;
-  color: var(--color-primary);
+  color: var(--color-dark);
 `;
 
 const FilterInput = styled.input`

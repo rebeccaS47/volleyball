@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import UserStatus from './UserStatus';
-
+import volleyBall from '../assets/volleyball.png';
+import volleyBall2 from '../assets/volleyball2.png';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -24,7 +25,14 @@ const Header = () => {
     <HeaderContainer>
       <Nav>
         <LogoContainer>
-          <Logo onClick={() => navigate('/')}>Logo</Logo>
+          <Logo onClick={() => navigate('/')}>
+            揪排球
+            {/* <img
+              src={volleyBall}
+              style={{ width: '40px'}}
+            /> */}
+            <img src={volleyBall2} style={{ width: '40px' }} />
+          </Logo>
         </LogoContainer>
 
         <HamburgerButton onClick={toggleMenu}>
@@ -66,7 +74,7 @@ const HeaderContainer = styled.header`
 const LogoContainer = styled.div`
   display: flex;
   align-items: center;
-  margin: 0 20px;
+  margin: 0 15px 0 20px;
   order: 1;
 
   @media (max-width: 768px) {
@@ -84,6 +92,8 @@ const Logo = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 `;
 
 const MenuItems = styled.ul<{ $isOpen: boolean }>`
@@ -118,6 +128,8 @@ const MenuItem = styled.div<{ $isActive: boolean }>`
   background-color: ${({ $isActive }) =>
     $isActive ? 'var(--color-secondary)' : 'var(--color-light)'};
   color: ${({ $isActive }) => ($isActive ? 'white' : 'var(--color-dark)')};
+  /* text-shadow: ${({ $isActive }) =>
+    $isActive ? '1px 1px 2px #aaa, -1px -1px 2px #aaa' : ''}; */
 
   &:hover {
     background-color: var(--color-secondary);

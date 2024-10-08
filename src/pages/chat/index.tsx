@@ -201,6 +201,11 @@ const ChatWindow = styled.div`
   border: 1px solid #dddfe2;
   border-radius: 8px;
   margin: 10px;
+
+  @media (max-width: 600px) {
+    margin: 0px;
+    border-radius: 15px;
+  }
 `;
 
 const ChatHeader = styled.div`
@@ -210,6 +215,13 @@ const ChatHeader = styled.div`
   font-weight: bold;
   display: flex;
   align-items: center;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+
+  @media (max-width: 600px) {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+  }
 `;
 
 const BackButton = styled.button`
@@ -252,7 +264,8 @@ const MessageContent = styled.div<{ $isUser: boolean }>`
   min-height: auto;
   padding: 8px 12px;
   border-radius: 18px;
-  background-color: ${(props) => (props.$isUser ? 'var(--color-secondary)' : '#f1f0f0')};
+  background-color: ${(props) =>
+    props.$isUser ? 'var(--color-secondary)' : '#f1f0f0'};
   margin-left: ${(props) => (props.$isUser ? 'auto' : '0px')};
   color: ${(props) => (props.$isUser ? 'white' : 'black')};
 `;
