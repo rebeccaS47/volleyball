@@ -180,8 +180,8 @@ const Approval: React.FC<ApprovalProps> = () => {
                     {index === 0 && (
                       <>
                         <StyledTd rowSpan={event.applicationList.length}>
-                          {event.date}{" "}
-                          {event.startTimeStamp.toDate().toLocaleTimeString() }
+                          {event.date}
+                          {/* {" "}{event.startTimeStamp.toDate().toLocaleTimeString() } */}
                             {/* '~' +
                             event.endTimeStamp.toDate().toLocaleTimeString()} */}
                         </StyledTd>

@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../firebaseConfig';
 import {
@@ -17,11 +16,11 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import EventDetail from '../../components/EventDetail'
 
 interface EventProps {}
 
 const Event: React.FC<EventProps> = () => {
-  const navigate = useNavigate();
   const [eventList, setEventList] = useState<Event[]>([]);
   const [cities, setCities] = useState<Option[]>([]);
   const [courts, setCourts] = useState<Option[]>([]);
@@ -45,6 +44,19 @@ const Event: React.FC<EventProps> = () => {
     { value: 'E', label: 'E' },
   ];
 
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleEventClick = (event: Event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  };
+
   useEffect(() => {
     const fetchCities = async () => {
       const courtsRef = collection(db, 'courts');
@@ -52,7 +64,7 @@ const Event: React.FC<EventProps> = () => {
       const allCourts: Court[] = snapshot.docs.map(
         (doc) => ({ id: doc.id, ...doc.data() } as Court)
       );
-
+      
       const uniqueCities = Array.from(
         new Set(allCourts.map((court) => court.city))
       );
@@ -258,7 +270,7 @@ const Event: React.FC<EventProps> = () => {
             <EventCard
               data-eventid={event.id}
               key={event.id}
-              onClick={() => navigate(`/eventdetail/${event.id}`)}
+              onClick={() => handleEventClick(event)}
             >
               <EventTitle>{event.court.name}</EventTitle>
               <EventInfo>
@@ -283,6 +295,11 @@ const Event: React.FC<EventProps> = () => {
           ))
         )}
       </EventListContainer>
+      <EventDetail
+        isOpen={isModalOpen}
+        onRequestClose={handleCloseModal}
+        event={selectedEvent}
+      />
     </IndexContainer>
   );
 };
@@ -388,6 +405,8 @@ const FilterInput = styled.input`
   min-height: 40px;
   min-width: 70px;
   max-width: 100px;
+  border: none;
+  /* background-color: transparent; */
 `;
 
 const FilterContainer = styled.div`

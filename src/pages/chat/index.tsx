@@ -24,7 +24,6 @@ const Chat: React.FC<ChatProps> = () => {
   const [showChatWindow, setShowChatWindow] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const messagesRef = collection(db, 'messages');
 
   useEffect(() => {
     if (!user) return;
@@ -42,7 +41,6 @@ const Chat: React.FC<ChatProps> = () => {
       });
       setgroupChats(participationsData);
     });
-
     return () => unsubscribe();
   }, [user]);
 
@@ -50,7 +48,7 @@ const Chat: React.FC<ChatProps> = () => {
     if (!selectedEventId) return;
 
     const queryMessages = query(
-      messagesRef,
+      collection(db, 'messages'),
       where('roomId', '==', selectedEventId),
       orderBy('createdAt')
     );
@@ -62,9 +60,8 @@ const Chat: React.FC<ChatProps> = () => {
       });
       setMessages(messages);
     });
-
     return () => unsubscribe();
-  }, [selectedEventId, messagesRef]);
+  }, [selectedEventId]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -80,7 +77,7 @@ const Chat: React.FC<ChatProps> = () => {
 
     if (newMessage === '') return;
     if (!user) return;
-    await addDoc(messagesRef, {
+    await addDoc(collection(db, 'messages'), {
       text: newMessage,
       createdAt: serverTimestamp(),
       userName: user.name,
@@ -114,7 +111,7 @@ const Chat: React.FC<ChatProps> = () => {
                 {groupChat.endTimeStamp.toDate().toLocaleTimeString()}
               </p>
               <p>場地: {groupChat.courtName}</p>
-              <p>eventId: {groupChat.eventId}</p>
+              {/* <p>eventId: {groupChat.eventId}</p> */}
             </GroupItem>
           ))}
         </GroupList>
@@ -251,11 +248,11 @@ const MessageContent = styled.div<{ $isUser: boolean }>`
   word-wrap: break-word;
   word-break: break-all;
   white-space: normal;
-  min-width: 85%;
+  width: fit-content;
   min-height: auto;
   padding: 8px 12px;
   border-radius: 18px;
-  background-color: ${(props) => (props.$isUser ? '#0084ff' : '#f1f0f0')};
+  background-color: ${(props) => (props.$isUser ? 'var(--color-secondary)' : '#f1f0f0')};
   margin-left: ${(props) => (props.$isUser ? 'auto' : '0px')};
   color: ${(props) => (props.$isUser ? 'white' : 'black')};
 `;
@@ -282,7 +279,7 @@ const ChatInput = styled.input`
 `;
 
 const SendButton = styled.button`
-  background-color: #0084ff;
+  background-color: var(--color-secondary);
   color: white;
   border: none;
   border-radius: 20px;

@@ -99,7 +99,7 @@ const MenuItems = styled.ul<{ $isOpen: boolean }>`
     top: 90px;
     left: 0;
     width: 100%;
-    background-color: var(--color-light);
+    /* background-color: var(--color-light); */
     display: ${({ $isOpen }) => ($isOpen ? 'flex' : 'none')};
     order: 3;
     z-index: 2;
@@ -116,7 +116,7 @@ const MenuItem = styled.div<{ $isActive: boolean }>`
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
   background-color: ${({ $isActive }) =>
-    $isActive ? 'var(--color-secondary)' : 'transparent'};
+    $isActive ? 'var(--color-secondary)' : 'var(--color-light)'};
   color: ${({ $isActive }) => ($isActive ? 'white' : 'var(--color-dark)')};
 
   &:hover {
@@ -124,10 +124,10 @@ const MenuItem = styled.div<{ $isActive: boolean }>`
   }
 
   @media (max-width: 768px) {
-    margin: 0;
+    margin: 0px 15px;
     padding: 1rem;
     text-align: center;
-    border-top: 1px solid #eaeaea;
+    border: 1px solid #eaeaea;
   }
 `;
 

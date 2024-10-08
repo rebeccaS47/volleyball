@@ -277,7 +277,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     <HoldEventContainer>
       <Form onSubmit={handleSubmit}>
         <center>
-          <h1 style={{marginTop:0}}>活動表單</h1>
+          <h1 style={{ marginTop: 0 }}>活動表單</h1>
         </center>
         <FormSection>
           <FormField>
@@ -509,6 +509,7 @@ const HoldEventContainer = styled.div`
   margin: 32px 0px;
   background-color: var(--color-light);
   border-radius: 15px;
+
   @media (max-width: 600px) {
     padding: 10px 0px;
   }
@@ -611,7 +612,8 @@ const Button = styled.button`
   width: 100%;
   padding: 10px 16px;
   background-color: var(--color-secondary);
-  color: var(--color-light);
+  color: var(--color-dark);
+  font-weight: 500;
   font-size: 24px;
   line-height: 24px;
   border: 2px solid var(--color-dark);
@@ -621,12 +623,9 @@ const Button = styled.button`
 
   &:hover {
     box-shadow: -2px 1px 0 0 var(--color-dark);
-    transform: translateY(2px);
-  }
-
-  &:active {
-    box-shadow: 0 0 0 0 var(--color-dark);
-    transform: translateY(4px);
+    background-color: var(--color-light);
+    transform: translateY(-2px);
+    transform: translateX(-1px);
   }
 `;
 
