@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { History } from '../types';
 import Modal from 'react-modal';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import styled from 'styled-components';
 
 const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
   userHistory,
@@ -11,10 +12,10 @@ const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
   const hasHistory = Object.keys(userHistory).length > 0;
   return (
     <>
-      <button onClick={() => setModalIsOpen(true)} style={{display: 'flex', alignItems: 'flex-end'
-      }}>點擊看更多
-        <ManageSearchIcon />
-      </button>
+      <Button onClick={() => setModalIsOpen(true)} 
+      >
+        <ManageSearchIcon />點擊看更多
+      </Button>
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}
@@ -86,3 +87,13 @@ const customModalStyles = {
     overflow: 'auto',
   },
 };
+
+
+const Button = styled.button`
+  display: flex; 
+  align-items: center;
+  /* background: transparent; */
+  margin-top: 5px;;
+  padding: 5px 10px;
+  border-radius: 15px;
+`;

@@ -53,8 +53,8 @@ const Header = () => {
 export default Header;
 
 const HeaderContainer = styled.header`
-  background-color: #f8f8f8;
-  border: 2px solid #f8f8f8;
+  background-color: var(--color-light);
+  border: 2px solid var(--color-light);
   /* padding: 10px 0px; */
   border-radius: 15px;
   @media (max-width: 768px) {

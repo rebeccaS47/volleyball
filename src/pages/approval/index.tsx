@@ -172,7 +172,7 @@ const Approval: React.FC<ApprovalProps> = () => {
             <StyledTh>決定</StyledTh>
           </StyledTr>
         </thead>
-        <tbody>
+        <Tbody>
           {eventList.flatMap((event) =>
             event.applicationList.length > 0
               ? event.applicationList.map((applicantId, index) => (
@@ -217,7 +217,7 @@ const Approval: React.FC<ApprovalProps> = () => {
                 ))
               : []
           )}
-        </tbody>
+        </Tbody>
       </StyledTable>
     </TableWrapper>
   );
@@ -237,9 +237,16 @@ const TableWrapper = styled.div`
 
 const StyledTable = styled.table`
   border-collapse: separate;
-  border-spacing: 0;
   width: 100%;
   min-width: 800px;
+`;
+
+const Tbody = styled.tbody`
+  font-size: 24px;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 `;
 
 const StyledTh = styled.th`
@@ -262,7 +269,7 @@ const StyledTh = styled.th`
 
 const StyledTd = styled.td`
   text-align: left;
-  padding: 8px;
+  padding: 8px 15px;
   position: relative;
   white-space: nowrap;
 
@@ -275,7 +282,7 @@ const StyledTd = styled.td`
     width: 2px;
     background-image: linear-gradient(
       to bottom,
-      #0080cc 50%,
+      #262626 50%,
       rgba(255, 255, 255, 0) 50%
     );
     background-position: center;
@@ -289,8 +296,8 @@ const StyledTr = styled.tr`
     border-bottom: 2px dashed;
     border-image: repeating-linear-gradient(
         to right,
-        #0080cc 0,
-        #0080cc 8px,
+        #262626 0,
+        #262626 8px,
         transparent 8px,
         transparent 25px
       )
@@ -307,12 +314,51 @@ const Button = styled.button`
 `;
 
 const AcceptButton = styled(Button)`
-  background-color: #ffc100;
-  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  padding: 10px 16px;
+  background-color: var(--color-secondary);
+  color: var(--color-dark);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  border: 2px solid var(--color-dark);
+  border-radius: 14px;
+  box-shadow: -4px 3px 0 0 var(--color-dark);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: -2px 1px 0 0 var(--color-dark);
+    background-color: var(--color-light);
+    transform: translateY(-2px);
+    transform: translateX(-1px);
+  }
 `;
 
 const DeclineButton = styled(Button)`
-  /* background-color: #0086d6; */
-  background-color: #ffc100;
-  color: white;
+  margin-top: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  padding: 10px 16px;
+  background-color: var(--color-primary);
+  color: var(--color-light);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  border: 2px solid var(--color-dark);
+  border-radius: 14px;
+  box-shadow: -4px 3px 0 0 var(--color-dark);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: -2px 1px 0 0 var(--color-dark);
+    background-color: var(--color-light);
+    color: var(--color-dark);
+    transform: translateY(-2px);
+    transform: translateX(-1px);
+  }
 `;

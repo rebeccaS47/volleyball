@@ -516,7 +516,6 @@ const HoldEventContainer = styled.div`
 `;
 
 const Form = styled.form`
-  /* background-color: white; */
   /* border-radius: 15px; */
   padding: 30px 30px;
   max-width: 800px;
@@ -582,7 +581,7 @@ const TextArea = styled.textarea`
   border: 1px solid rgb(204, 204, 204);
   border-radius: 4px;
   height: 200px;
-  padding: 0 10px;
+  padding: 10px;
 
   @media (max-width: 600px) {
     height: 100px;

@@ -246,13 +246,15 @@ const Event: React.FC<EventProps> = () => {
             value={filterState.date}
             onChange={handleInputChange}
           />
+          {" "}
           <FilterInput
             type="time"
             name="startTime"
             value={filterState.startTime}
             onChange={handleInputChange}
           />
-          <span> ~ </span>
+          {" "}
+          {/* <span> ~ </span> */}
           <FilterInput
             type="time"
             name="endTime"
@@ -378,10 +380,12 @@ const EventCard = styled.div`
 
   @media (max-width: 1024px) {
     width: calc(50% - 70px);
+    padding: 1.5rem 1.8rem;
   }
 
   @media (max-width: 768px) {
     width: 100%;
+    padding: 2rem 4rem;
   }
 `;
 
@@ -406,7 +410,7 @@ const FilterInput = styled.input`
   min-width: 70px;
   max-width: 100px;
   border: none;
-  /* background-color: transparent; */
+  background-color: transparent;
 `;
 
 const FilterContainer = styled.div`
