@@ -132,8 +132,15 @@ const EventDetail: React.FC<EventDetailProps> = ({
             <EventInfo>
               <Label>時間</Label>
               <Value>
-                {event.startTimeStamp.toDate().toLocaleTimeString()} ~{' '}
-                {event.endTimeStamp.toDate().toLocaleTimeString()}
+                {event.startTimeStamp.toDate().toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}{' '}
+                ~{' '}
+                {event.endTimeStamp.toDate().toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </Value>
             </EventInfo>
             <EventInfo>
@@ -144,25 +151,28 @@ const EventDetail: React.FC<EventDetailProps> = ({
               </Value>
             </EventInfo>
             <EventInfo>
+              <Label>場地</Label>
+              <Value>
+                {event.court.isInDoor ? '室內' : '室外'}場{' '}
+                {event.isAC ? '有' : '沒有'}冷氣
+              </Value>
+            </EventInfo>
+            <EventInfo>
               <Label>費用</Label>
               <Value>{Math.round(event.totalCost / event.findNum)} /人</Value>
             </EventInfo>
             <Divider />
             <EventInfo>
               <Label>友善程度</Label>
-              <Value>{event.friendlinessLevel}</Value>
+              <Value>
+                {event.friendlinessLevel
+                  ? event.friendlinessLevel
+                  : '無特別規定'}
+              </Value>
             </EventInfo>
             <EventInfo>
               <Label>分級</Label>
-              <Value>{event.level}</Value>
-            </EventInfo>
-            <Divider />
-            <EventInfo>
-              <Label>場地</Label>
-              <Value>
-                {event.court.isInDoor ? '室內' : '室外'}場{' '}
-                {event.isAC ? '有' : '沒有'}冷氣
-              </Value>
+              <Value>{event.level ? event.level : '無特別規定'}</Value>
             </EventInfo>
             <Divider />
             <EventInfo>

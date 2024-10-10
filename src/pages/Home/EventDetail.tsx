@@ -121,8 +121,15 @@ const EventDetail: React.FC<EventDetailProps> = () => {
           <p>
             時間:{event.date}
             {'  '}
-            {event.startTimeStamp.toDate().toLocaleTimeString()}~
-            {event.endTimeStamp.toDate().toLocaleTimeString()}
+            {event.startTimeStamp.toDate().toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+            ~
+            {event.endTimeStamp.toDate().toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </p>
           <p>網高:{event.netHeight}</p>
           <p>友善程度:{event.friendlinessLevel}</p>

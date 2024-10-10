@@ -105,13 +105,19 @@ const Chat: React.FC<ChatProps> = () => {
               $selected={selectedEventId === groupChat.eventId}
               onClick={() => handleGroupChatSelect(groupChat.eventId)}
             >
-              <p>日期: {groupChat.date}</p>
+              <p>{groupChat.date}</p>
               <p>
-                時間: {groupChat.startTimeStamp.toDate().toLocaleTimeString()} -{' '}
-                {groupChat.endTimeStamp.toDate().toLocaleTimeString()}
+                {groupChat.startTimeStamp.toDate().toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}{' '}
+                -{' '}
+                {groupChat.endTimeStamp.toDate().toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </p>
-              <p>場地: {groupChat.courtName}</p>
-              {/* <p>eventId: {groupChat.eventId}</p> */}
+              <p>{groupChat.courtName}</p>
             </GroupItem>
           ))}
         </GroupList>
@@ -146,7 +152,10 @@ const Chat: React.FC<ChatProps> = () => {
                     {message.text}
                   </MessageContent>
                   <Timestamp $isUser={message.userId === user?.id}>
-                    {message.createdAt?.toDate().toLocaleTimeString()}
+                    {message.createdAt?.toDate().toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </Timestamp>
                 </div>
               </MessageBubble>

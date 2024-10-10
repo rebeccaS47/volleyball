@@ -287,8 +287,15 @@ const Event: React.FC<EventProps> = () => {
               </EventInfo>
               <EventInfo>
                 <AccessTimeIcon />
-                {event.startTimeStamp.toDate().toLocaleTimeString()} ~{' '}
-                {event.endTimeStamp.toDate().toLocaleTimeString()}
+                {event.startTimeStamp.toDate().toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}{' '}
+                ~{' '}
+                {event.endTimeStamp.toDate().toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </EventInfo>
               <EventInfo>
                 <LocationOnIcon />
