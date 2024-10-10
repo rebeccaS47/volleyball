@@ -182,7 +182,7 @@ const Approval: React.FC<ApprovalProps> = () => {
                         <StyledTd rowSpan={event.applicationList.length}>
                           {event.date}
                           {/* {" "}{event.startTimeStamp.toDate().toLocaleTimeString() } */}
-                            {/* '~' +
+                          {/* '~' +
                             event.endTimeStamp.toDate().toLocaleTimeString()} */}
                         </StyledTd>
                         <StyledTd rowSpan={event.applicationList.length}>
@@ -242,7 +242,7 @@ const StyledTable = styled.table`
 `;
 
 const Tbody = styled.tbody`
-  font-size: 24px;
+  font-size: 1.2rem;
 
   @media (max-width: 768px) {
     font-size: 16px;

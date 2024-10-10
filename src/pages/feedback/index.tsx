@@ -29,7 +29,9 @@ import {
   SelectChangeEvent,
   ThemeProvider,
   createTheme,
+  Snackbar,
 } from '@mui/material';
+import styled from 'styled-components';
 
 interface FeedbackProps {}
 
@@ -58,9 +60,11 @@ const Feedback: React.FC<FeedbackProps> = () => {
     startTimeStamp: null,
     endTimeStamp: null,
   });
-  // const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+
   const [userNames, setUserNames] = useState<UserName[]>([]);
   const [loadingNames, setLoadingNames] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchClosedEvents = async () => {
@@ -148,7 +152,6 @@ const Feedback: React.FC<FeedbackProps> = () => {
     };
 
     setFeedback(initialFeedback as Feedback);
-    // setFormErrors({});
 
     if (player) {
       try {
@@ -182,9 +185,6 @@ const Feedback: React.FC<FeedbackProps> = () => {
       ...prev,
       [name]: name === 'grade' ? (value === '' ? '' : parseInt(value)) : value,
     }));
-    // if (formErrors[name]) {
-    //   setFormErrors((prev) => ({ ...prev, [name]: '' }));
-    // }
   };
 
   const handleSubmitFeedback = async () => {
@@ -197,7 +197,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
       );
       await setDoc(feedbackDocRef, { ...feedback });
 
-      alert('回饋提交成功！');
+      showSnackbar('回饋提交成功！');
       setSelectedPlayer(null);
       setActiveStep(0);
       if (selectedEvent) {
@@ -205,7 +205,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
       }
     } catch (error) {
       console.error('提交回饋時出錯:', error);
-      alert('提交回饋失敗。請再試一次。');
+      showSnackbar('提交回饋失敗。請再試一次。');
     }
   };
 
@@ -224,13 +224,14 @@ const Feedback: React.FC<FeedbackProps> = () => {
                     margin: '5px',
                     backgroundColor:
                       selectedEvent?.id === event.id
-                        ? 'rgba(31, 72, 54, 0.1)'
+                        ? 'rgba(241, 183, 9, 0.3)'
                         : 'transparent',
+                    color: 'var(--color-dark)',
                     '&:hover': {
                       backgroundColor:
                         selectedEvent?.id === event.id
-                          ? 'rgba(31, 72, 54, 0.2)'
-                          : 'rgba(31, 72, 54, 0.05)',
+                          ? 'transparent'
+                          : 'rgba(241, 183, 9, 0.3)',
                     },
                   }}
                 >
@@ -259,13 +260,13 @@ const Feedback: React.FC<FeedbackProps> = () => {
                     margin: '5px',
                     backgroundColor:
                       selectedPlayer === user.id
-                        ? 'rgba(31, 72, 54, 0.1)'
+                        ? 'rgba(241, 183, 9, 0.3)'
                         : 'transparent',
                     '&:hover': {
                       backgroundColor:
                         selectedPlayer === user.id
-                          ? 'rgba(31, 72, 54, 0.2)'
-                          : 'rgba(31, 72, 54, 0.05)',
+                          ? 'gba(241, 183, 9, 0.3r)'
+                          : 'transparent',
                     },
                   }}
                 >
@@ -287,7 +288,6 @@ const Feedback: React.FC<FeedbackProps> = () => {
               label="友善程度 *"
               value={feedback.friendlinessLevel}
               onChange={handleFeedbackChange}
-              // error={!!formErrors.friendlinessLevel}
             >
               {['A', 'B', 'C', 'D', 'E'].map((level) => (
                 <MenuItem key={level} value={level}>
@@ -295,11 +295,6 @@ const Feedback: React.FC<FeedbackProps> = () => {
                 </MenuItem>
               ))}
             </Select>
-            {/* {formErrors.friendlinessLevel && (
-              <Typography color="error">
-                {formErrors.friendlinessLevel}
-              </Typography>
-            )} */}
           </FormControl>
           <FormControl fullWidth margin="normal">
             <InputLabel>技術能力 *</InputLabel>
@@ -308,7 +303,6 @@ const Feedback: React.FC<FeedbackProps> = () => {
               label="技術能力 *"
               value={feedback.level}
               onChange={handleFeedbackChange}
-              // error={!!formErrors.level}
             >
               {['A', 'B', 'C', 'D', 'E'].map((level) => (
                 <MenuItem key={level} value={level}>
@@ -316,9 +310,6 @@ const Feedback: React.FC<FeedbackProps> = () => {
                 </MenuItem>
               ))}
             </Select>
-            {/* {formErrors.level && (
-              <Typography color="error">{formErrors.level}</Typography>
-            )} */}
           </FormControl>
           <TextField
             fullWidth
@@ -334,8 +325,6 @@ const Feedback: React.FC<FeedbackProps> = () => {
                 handleFeedbackChange(e);
               }
             }}
-            // error={!!formErrors.grade}
-            // helperText={formErrors.grade}
           />
           <TextField
             fullWidth
@@ -355,7 +344,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
   const theme = createTheme({
     palette: {
       primary: {
-        main: '#ffc100',
+        main: '#f1b709',
       },
     },
     components: {
@@ -363,8 +352,11 @@ const Feedback: React.FC<FeedbackProps> = () => {
         styleOverrides: {
           root: {
             '&.Mui-active': {
-              color: '#ffc100',
+              color: '#f1b709',
             },
+          },
+          text: {
+            fill: 'var(--color-light)',
           },
         },
       },
@@ -372,73 +364,163 @@ const Feedback: React.FC<FeedbackProps> = () => {
         styleOverrides: {
           label: {
             '&.Mui-active': {
-              color: '#ffc100',
+              color: '#f1b709',
             },
+            fontSize: '1.2rem',
           },
         },
       },
     },
   });
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const showSnackbar = (msg: string) => {
+    setMessage(msg);
+    setOpen(true);
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <ThemeProvider theme={theme}>
-      <Box
-        sx={{
-          maxWidth: 800,
-          m: '32px auto',
-          // border: '1px solid rgb(204, 204, 204)',
-          // borderRadius: '4px',
-          padding: '20px',
-        }}
-      >
-        <Stepper activeStep={activeStep} orientation="vertical">
-          {steps.map((step, index) => (
-            <Step key={step.label}>
-              <StepLabel>{step.label}</StepLabel>
-              <StepContent>
-                {step.content}
-                <Box sx={{ mb: 2 }}>
-                  <div>
-                    <Button
-                      variant="contained"
-                      onClick={() => {
-                        if (index === steps.length - 1) {
-                          handleSubmitFeedback();
-                        } else {
-                          setActiveStep(index + 1);
+    <>
+      <ThemeProvider theme={theme}>
+        <Box
+          sx={{
+            maxWidth: 800,
+            m: '32px auto',
+            // border: '1px solid rgb(204, 204, 204)',
+            // borderRadius: '4px',
+            padding: '20px',
+          }}
+        >
+          <Stepper activeStep={activeStep} orientation="vertical">
+            {steps.map((step, index) => (
+              <Step key={step.label}>
+                <StepLabel>{step.label}</StepLabel>
+                <StepContent>
+                  {step.content}
+                  <Box sx={{ mb: 2 }}>
+                    <div style={{ display: 'flex' }}>
+                      <ContinueButton
+                        variant="contained"
+                        onClick={() => {
+                          if (index === steps.length - 1) {
+                            handleSubmitFeedback();
+                          } else {
+                            setActiveStep(index + 1);
+                          }
+                        }}
+                        sx={{ mt: 1, mr: 1, ml: 0.5 }}
+                        disabled={
+                          (index === 0 && !selectedEvent) ||
+                          (index === 1 && !selectedPlayer) ||
+                          (index === steps.length - 1 &&
+                            (!feedback.friendlinessLevel ||
+                              !feedback.level ||
+                              feedback.grade === ''))
                         }
-                      }}
-                      sx={{ mt: 1, mr: 1, ml: 0.5 }}
-                      disabled={
-                        (index === 0 && !selectedEvent) ||
-                        (index === 1 && !selectedPlayer) ||
-                        (index === steps.length - 1 &&
-                          (!feedback.friendlinessLevel ||
-                            !feedback.level ||
-                            feedback.grade === ''))
-                      }
-                    >
-                      {index === steps.length - 1 ? '提交回饋' : '繼續'}
-                    </Button>
-                    <Button
-                      disabled={index === 0}
-                      onClick={() => setActiveStep(index - 1)}
-                      sx={{ mt: 1, mr: 1 }}
-                    >
-                      返回
-                    </Button>
-                  </div>
-                </Box>
-              </StepContent>
-            </Step>
-          ))}
-        </Stepper>
-      </Box>
-    </ThemeProvider>
+                      >
+                        {index === steps.length - 1 ? '提交回饋' : '繼續'}
+                      </ContinueButton>
+                      <ReturnButton
+                        disabled={index === 0}
+                        onClick={() => setActiveStep(index - 1)}
+                        sx={{ mt: 1, mr: 1 }}
+                      >
+                        返回
+                      </ReturnButton>
+                    </div>
+                  </Box>
+                </StepContent>
+              </Step>
+            ))}
+          </Stepper>
+        </Box>
+      </ThemeProvider>
+      <StyledSnackbar
+        open={open}
+        autoHideDuration={800}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <SnackbarContent>{message}</SnackbarContent>
+      </StyledSnackbar>
+    </>
   );
 };
 
 export default Feedback;
+
+const ContinueButton = styled(Button)`
+  &.MuiButton-root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 120px;
+    height: 50px;
+    padding: 10px 16px;
+    background-color: var(--color-secondary);
+    color: var(--color-dark);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    border: 2px solid var(--color-dark);
+    border-radius: 14px;
+    box-shadow: -4px 3px 0 0 var(--color-dark);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      box-shadow: -2px 1px 0 0 var(--color-dark);
+      background-color: var(--color-light);
+      transform: translateY(-2px);
+      transform: translateX(-1px);
+    }
+  }
+`;
+
+const ReturnButton = styled(Button)`
+  &.MuiButton-root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 120px;
+    height: 50px;
+    padding: 10px 16px;
+    background-color: var(--color-primary);
+    color: var(--color-light);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    border: 2px solid var(--color-dark);
+    border-radius: 14px;
+    box-shadow: -4px 3px 0 0 var(--color-dark);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      box-shadow: -2px 1px 0 0 var(--color-dark);
+      background-color: var(--color-light);
+      color: var(--color-dark);
+      transform: translateY(-2px);
+      transform: translateX(-1px);
+    }
+  }
+`;
+
+const StyledSnackbar = styled(Snackbar)`
+  &.MuiSnackbar-root {
+    z-index: 1400;
+  }
+`;
+
+const SnackbarContent = styled.div`
+  padding: 10px 16px;
+  width: 200px;
+  border-radius: 4px;
+  font-weight: 500;
+  color: var(--color-light);
+  background-color: rgb(0 0 0 / 65%);
+`;

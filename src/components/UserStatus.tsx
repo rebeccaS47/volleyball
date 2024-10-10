@@ -32,7 +32,7 @@ const UserStatus: React.FC = () => {
     <Box
       sx={{
         position: 'absolute',
-        top: 34,
+        top: 32,
         right: 40,
         display: 'flex',
         alignItems: 'center',
@@ -125,7 +125,6 @@ const UserStatus: React.FC = () => {
           <Typography
             sx={{
               fontSize: 'large',
-              color: 'var(--color-secondary)',
               padding: '12px',
             }}
           >

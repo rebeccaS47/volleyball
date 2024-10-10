@@ -25,6 +25,8 @@ import type {
   CalendarEvent,
 } from '../../types.ts';
 import HistoryDetail from '../../components/HistoryDetail.tsx';
+import SettingsIcon from '@mui/icons-material/Settings';
+// import styled from 'styled-components';
 
 interface UserProps {}
 
@@ -256,9 +258,10 @@ const User: React.FC<UserProps> = () => {
           alt="User profile"
           style={{
             borderRadius: '50%',
+            // border: '5px solid white',
             width: '100px',
             height: '100px',
-            marginRight: '20px',
+            margin: '20px',
           }}
         />
         {isEditing ? (
@@ -293,20 +296,22 @@ const User: React.FC<UserProps> = () => {
           </div>
         ) : (
           <>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <h1 style={{ marginRight: '10px' }}> {userData.name}</h1>
-              <button
-                style={{ marginRight: '10px' }}
-                onClick={() => setIsEditing(true)}
-              >
-                編輯
-              </button>
-            </div>
-            <div>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <h1 style={{ marginRight: '10px', marginBottom: '5px' }}>
+                {' '}
+                {userData.name}
+              </h1>
               {user && (
                 <HistoryDetail userHistory={historyData[user.id] || []} />
               )}
             </div>
+            <SettingsIcon onClick={() => setIsEditing(true)} />
           </>
         )}
       </div>

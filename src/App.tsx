@@ -34,7 +34,8 @@ const GlobalStyle = createGlobalStyle`
   
     :root{
     --color-primary: #0080cc;
-    --color-secondary: #ffc100;
+    --color-secondary: rgb(255, 190, 0);
+    /* --color-secondary: rgb(255, 193, 0); */
     --color-tertiary: #36678c;
     --color-light: #f8f8f8;
     --color-dark: #262626;
