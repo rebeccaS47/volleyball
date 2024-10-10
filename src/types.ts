@@ -20,8 +20,8 @@ export interface Event {
   friendlinessLevel: string;
   level: string;
   isAC: boolean;
-  findNum: number;
-  totalCost: number;
+  findNum: number | '';
+  totalCost: number | '';
   notes: string;
   playerList: string[];
   createdEventAt: Timestamp;

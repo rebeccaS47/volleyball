@@ -58,8 +58,8 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     friendlinessLevel: '',
     level: '',
     isAC: false,
-    findNum: 0,
-    totalCost: 0,
+    findNum: '',
+    totalCost: '',
     notes: '',
     playerList: [],
     createdEventAt: Timestamp.now(),
@@ -133,8 +133,8 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     if (!formData.startTime) newErrors.startTime = '時間為必填項';
     if (formData.duration === 0) newErrors.duration = '活動時長為必填項';
     if (!formData.netHeight) newErrors.netHeight = '網高為必填項';
-    if (formData.findNum === 0) newErrors.findNum = '找尋人數為必填項';
-    if (formData.totalCost === 0) newErrors.totalCost = '總金額為必填項';
+    if (formData.findNum === '') newErrors.findNum = '找尋人數為必填項';
+    if (formData.totalCost === '') newErrors.totalCost = '總金額為必填項';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -186,6 +186,19 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     >
   ) => {
     const { name, value, type } = e.target;
+
+    let isValidNumber = false;
+
+    if (name === 'findNum') {
+      isValidNumber = /^(1[0-9]|20|[1-9])$/.test(value);
+      if (!isValidNumber && value !== '') return;
+    }
+
+    if (name === 'totalCost') {
+      isValidNumber = /^(0|[1-9]\d*)$/.test(value);
+      if (!isValidNumber && value !== '') return;
+    }
+
     setFormData((prevData) => ({
       ...prevData,
       [name]:
@@ -412,7 +425,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
                   checked={formData.isAC}
                   onChange={handleInputChange}
                 />
-                是否有開冷氣
+                有開冷氣
               </LabelText>
             </FormFieldRow>
           </FormSectionRow>
@@ -472,15 +485,14 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           <FormSection>
             <FormField>
               <LabelText>
-                找尋人數 *
+                找尋人數(1~20) *
                 {errors.findNum && <ErrorText>{errors.findNum}</ErrorText>}
               </LabelText>
               <InputText
-                type="number"
+                type="text"
                 name="findNum"
                 value={formData.findNum}
                 onChange={handleInputChange}
-                required
               />
             </FormField>
             <FormField>
@@ -489,7 +501,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
                 {errors.totalCost && <ErrorText>{errors.totalCost}</ErrorText>}
               </LabelText>
               <InputText
-                type="number"
+                type="text"
                 name="totalCost"
                 value={formData.totalCost}
                 onChange={handleInputChange}
@@ -605,6 +617,7 @@ const TextArea = styled.textarea`
   border-radius: 4px;
   height: 200px;
   padding: 10px;
+  resize: none;
 
   @media (max-width: 600px) {
     height: 100px;
