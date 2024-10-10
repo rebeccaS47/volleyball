@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Court, Event, Option } from '../../types';
 import Select, { SingleValue } from 'react-select';
 import UserSelector from '../../components/UserSelector';
+import { Snackbar } from '@mui/material';
 
 interface HoldEventProps {}
 
@@ -66,6 +67,9 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     endTimeStamp: Timestamp.now(),
     startTimeStamp: Timestamp.now(),
   });
+
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -258,8 +262,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           )
         );
 
-        alert('活動建立成功');
-        navigate('/');
+        showSnackbar('活動建立成功！');
       } catch (error) {
         console.log(error);
       }
@@ -273,233 +276,253 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     }));
   };
 
-  return (
-    <HoldEventContainer>
-      <Form onSubmit={handleSubmit}>
-        <center>
-          <h1 style={{ marginTop: 0 }}>活動表單</h1>
-        </center>
-        <FormSection>
-          <FormField>
-            <SelectLabelText>
-              城市 *{errors.city && <ErrorText>{errors.city}</ErrorText>}
-            </SelectLabelText>
-            <Select
-              value={selectedCity}
-              onChange={handleCityChange}
-              options={cities}
-              isClearable
-              placeholder="請選擇城市"
-              // styles={{
-              //   container: (provided) => ({
-              //     ...provided,
-              //   }),
-              // }}
-            />
-          </FormField>
-          <FormField>
-            <SelectLabelText>
-              球場 *{errors.court && <ErrorText>{errors.court}</ErrorText>}
-            </SelectLabelText>
-            <Select
-              value={selectedCourt}
-              onChange={handleCourtChange}
-              options={courts}
-              isDisabled={!selectedCity}
-              isClearable
-              placeholder="請選擇球場"
-            />
-          </FormField>
-        </FormSection>
-        {formData.court && (
-          <div
-            style={{ color: 'gray', fontSize: '0.9rem', marginBottom: '5px' }}
-          >
-            {formData.court.city + formData.court.address}
-          </div>
-        )}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            marginBottom: '10px',
-          }}
-        >
-          <LabelText>
-            日期 *{errors.date && <ErrorText>{errors.date}</ErrorText>}
-          </LabelText>
-          <InputText
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleInputChange}
-          />
-        </div>
-        <FormSection>
-          <FormField>
-            <LabelText>
-              時間 *
-              {errors.startTime && <ErrorText>{errors.startTime}</ErrorText>}
-            </LabelText>
-            <InputText
-              type="time"
-              name="startTime"
-              value={formData.startTime}
-              onChange={handleInputChange}
-            />
-          </FormField>
-          <FormField>
-            <LabelText htmlFor="duration">
-              活動時長(hr) *: {formData.duration}
-              {errors.duration && <ErrorText>{errors.duration}</ErrorText>}
-            </LabelText>
-            <input
-              id="duration"
-              type="range"
-              name="duration"
-              value={formData.duration}
-              onChange={handleInputChange}
-              min="1"
-              max="12"
-              // step="0.5"
-            />
-          </FormField>
-        </FormSection>
-        <FormSectionRow>
-          <div>
-            <LabelText>網高 *</LabelText>
-            <LabelText>
-              <input
-                type="radio"
-                name="netHeight"
-                value="女網"
-                checked={formData.netHeight === '女網'}
-                onChange={handleInputChange}
-              />
-              女網
-            </LabelText>
-            <LabelText>
-              <input
-                type="radio"
-                name="netHeight"
-                value="男網"
-                checked={formData.netHeight === '男網'}
-                onChange={handleInputChange}
-              />
-              男網
-            </LabelText>
-            {errors.netHeight && <ErrorText>{errors.netHeight}</ErrorText>}
-          </div>
-          <FormFieldRow>
-            <LabelText>
-              <input
-                type="checkbox"
-                name="isAC"
-                checked={formData.isAC}
-                onChange={handleInputChange}
-              />
-              是否有開冷氣
-            </LabelText>
-          </FormFieldRow>
-        </FormSectionRow>
-        <FormSection>
-          <FormField>
-            <SelectLabelText>友善程度</SelectLabelText>
-            <Select
-              name="friendlinessLevel"
-              value={levelOptions.find(
-                (option) => option.value === formData.friendlinessLevel
-              )}
-              onChange={(option, actionMeta) =>
-                handleSelectChange(option, actionMeta as { name: string })
-              }
-              options={levelOptions}
-              isClearable
-              placeholder="請選擇友善程度"
-              styles={{
-                placeholder: (provided) => ({
-                  ...provided,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }),
-              }}
-            />
-          </FormField>
-          <FormField>
-            <SelectLabelText>分級</SelectLabelText>
-            <Select
-              name="level"
-              value={levelOptions.find(
-                (option) => option.value === formData.level
-              )}
-              onChange={(option, actionMeta) =>
-                handleSelectChange(option, actionMeta as { name: string })
-              }
-              options={levelOptions}
-              isClearable
-              placeholder="請選擇分級"
-            />
-          </FormField>
-        </FormSection>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            marginBottom: '10px',
-          }}
-        >
-          <SelectLabelText>內建名單</SelectLabelText>
-          <UserSelector
-            onSelect={handleUserSelect}
-            currentUserId={formData.createUserId}
-          />
-        </div>
-        <FormSection>
-          <FormField>
-            <LabelText>
-              找尋人數 *
-              {errors.findNum && <ErrorText>{errors.findNum}</ErrorText>}
-            </LabelText>
-            <InputText
-              type="number"
-              name="findNum"
-              value={formData.findNum}
-              onChange={handleInputChange}
-              required
-            />
-          </FormField>
-          <FormField>
-            <LabelText>
-              總金額 *
-              {errors.totalCost && <ErrorText>{errors.totalCost}</ErrorText>}
-            </LabelText>
-            <InputText
-              type="number"
-              name="totalCost"
-              value={formData.totalCost}
-              onChange={handleInputChange}
-            />
-          </FormField>
-        </FormSection>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            marginBottom: '10px',
-          }}
-        >
-          <LabelText>備註</LabelText>
-          <TextArea
-            name="notes"
-            value={formData.notes}
-            onChange={handleInputChange}
-          />
-        </div>
+  const handleClose = () => {
+    setOpen(false);
+    navigate('/');
+  };
 
-        <Button type="submit">建立活動</Button>
-      </Form>
-    </HoldEventContainer>
+  const showSnackbar = (msg: string) => {
+    setMessage(msg);
+    setOpen(true);
+  };
+
+  return (
+    <>
+      <HoldEventContainer>
+        <Form onSubmit={handleSubmit}>
+          <center>
+            <h1 style={{ marginTop: 0 }}>活動表單</h1>
+          </center>
+          <FormSection>
+            <FormField>
+              <SelectLabelText>
+                城市 *{errors.city && <ErrorText>{errors.city}</ErrorText>}
+              </SelectLabelText>
+              <Select
+                value={selectedCity}
+                onChange={handleCityChange}
+                options={cities}
+                isClearable
+                placeholder="請選擇城市"
+                // styles={{
+                //   container: (provided) => ({
+                //     ...provided,
+                //   }),
+                // }}
+              />
+            </FormField>
+            <FormField>
+              <SelectLabelText>
+                球場 *{errors.court && <ErrorText>{errors.court}</ErrorText>}
+              </SelectLabelText>
+              <Select
+                value={selectedCourt}
+                onChange={handleCourtChange}
+                options={courts}
+                isDisabled={!selectedCity}
+                isClearable
+                placeholder="請選擇球場"
+              />
+            </FormField>
+          </FormSection>
+          {formData.court && (
+            <div
+              style={{ color: 'gray', fontSize: '0.9rem', marginBottom: '5px' }}
+            >
+              {formData.court.city + formData.court.address}
+            </div>
+          )}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              marginBottom: '10px',
+            }}
+          >
+            <LabelText>
+              日期 *{errors.date && <ErrorText>{errors.date}</ErrorText>}
+            </LabelText>
+            <InputText
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
+            />
+          </div>
+          <FormSection>
+            <FormField>
+              <LabelText>
+                時間 *
+                {errors.startTime && <ErrorText>{errors.startTime}</ErrorText>}
+              </LabelText>
+              <InputText
+                type="time"
+                name="startTime"
+                value={formData.startTime}
+                onChange={handleInputChange}
+              />
+            </FormField>
+            <FormField>
+              <LabelText htmlFor="duration">
+                活動時長(hr) *: {formData.duration}
+                {errors.duration && <ErrorText>{errors.duration}</ErrorText>}
+              </LabelText>
+              <input
+                id="duration"
+                type="range"
+                name="duration"
+                value={formData.duration}
+                onChange={handleInputChange}
+                min="1"
+                max="12"
+                // step="0.5"
+              />
+            </FormField>
+          </FormSection>
+          <FormSectionRow>
+            <div>
+              <LabelText>網高 *</LabelText>
+              <LabelText>
+                <input
+                  type="radio"
+                  name="netHeight"
+                  value="女網"
+                  checked={formData.netHeight === '女網'}
+                  onChange={handleInputChange}
+                />
+                女網
+              </LabelText>
+              <LabelText>
+                <input
+                  type="radio"
+                  name="netHeight"
+                  value="男網"
+                  checked={formData.netHeight === '男網'}
+                  onChange={handleInputChange}
+                />
+                男網
+              </LabelText>
+              {errors.netHeight && <ErrorText>{errors.netHeight}</ErrorText>}
+            </div>
+            <FormFieldRow>
+              <LabelText>
+                <input
+                  type="checkbox"
+                  name="isAC"
+                  checked={formData.isAC}
+                  onChange={handleInputChange}
+                />
+                是否有開冷氣
+              </LabelText>
+            </FormFieldRow>
+          </FormSectionRow>
+          <FormSection>
+            <FormField>
+              <SelectLabelText>友善程度</SelectLabelText>
+              <Select
+                name="friendlinessLevel"
+                value={levelOptions.find(
+                  (option) => option.value === formData.friendlinessLevel
+                )}
+                onChange={(option, actionMeta) =>
+                  handleSelectChange(option, actionMeta as { name: string })
+                }
+                options={levelOptions}
+                isClearable
+                placeholder="請選擇友善程度"
+                styles={{
+                  placeholder: (provided) => ({
+                    ...provided,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }),
+                }}
+              />
+            </FormField>
+            <FormField>
+              <SelectLabelText>分級</SelectLabelText>
+              <Select
+                name="level"
+                value={levelOptions.find(
+                  (option) => option.value === formData.level
+                )}
+                onChange={(option, actionMeta) =>
+                  handleSelectChange(option, actionMeta as { name: string })
+                }
+                options={levelOptions}
+                isClearable
+                placeholder="請選擇分級"
+              />
+            </FormField>
+          </FormSection>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              marginBottom: '10px',
+            }}
+          >
+            <SelectLabelText>內建名單</SelectLabelText>
+            <UserSelector
+              onSelect={handleUserSelect}
+              currentUserId={formData.createUserId}
+            />
+          </div>
+          <FormSection>
+            <FormField>
+              <LabelText>
+                找尋人數 *
+                {errors.findNum && <ErrorText>{errors.findNum}</ErrorText>}
+              </LabelText>
+              <InputText
+                type="number"
+                name="findNum"
+                value={formData.findNum}
+                onChange={handleInputChange}
+                required
+              />
+            </FormField>
+            <FormField>
+              <LabelText>
+                總金額 *
+                {errors.totalCost && <ErrorText>{errors.totalCost}</ErrorText>}
+              </LabelText>
+              <InputText
+                type="number"
+                name="totalCost"
+                value={formData.totalCost}
+                onChange={handleInputChange}
+              />
+            </FormField>
+          </FormSection>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              marginBottom: '10px',
+            }}
+          >
+            <LabelText>備註</LabelText>
+            <TextArea
+              name="notes"
+              value={formData.notes}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <Button type="submit">建立活動</Button>
+        </Form>
+      </HoldEventContainer>
+      <StyledSnackbar
+        open={open}
+        autoHideDuration={1000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <SnackbarContent>{message}</SnackbarContent>
+      </StyledSnackbar>
+    </>
   );
 };
 
@@ -632,4 +655,19 @@ const ErrorText = styled.span`
   color: red;
   font-size: 12px;
   padding-left: 5px;
+`;
+
+const StyledSnackbar = styled(Snackbar)`
+  &.MuiSnackbar-root {
+    z-index: 1400;
+  }
+`;
+
+const SnackbarContent = styled.div`
+  padding: 10px 16px;
+  width: 200px;
+  border-radius: 4px;
+  font-weight: 500;
+  color: var(--color-light);
+  background-color: var(--color-dark);
 `;
