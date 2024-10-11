@@ -164,7 +164,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
             ...initialFeedback,
             friendlinessLevel: data.friendlinessLevel || '',
             level: data.level || '',
-            grade: data.grade || '',
+            grade: data.grade ?? '',
             note: data.note || '',
           });
         }
@@ -230,8 +230,8 @@ const Feedback: React.FC<FeedbackProps> = () => {
                     '&:hover': {
                       backgroundColor:
                         selectedEvent?.id === event.id
-                          ? 'transparent'
-                          : 'rgba(241, 183, 9, 0.3)',
+                          ? 'rgba(241, 183, 9, 0.3)'
+                          : 'transparent',
                     },
                   }}
                 >
@@ -265,7 +265,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
                     '&:hover': {
                       backgroundColor:
                         selectedPlayer === user.id
-                          ? 'gba(241, 183, 9, 0.3r)'
+                          ? 'rgba(241, 183, 9, 0.3)'
                           : 'transparent',
                     },
                   }}
@@ -314,9 +314,9 @@ const Feedback: React.FC<FeedbackProps> = () => {
           <TextField
             fullWidth
             margin="normal"
-            label="分數 *"
+            label="分數(0-100) *"
             name="grade"
-            type="number"
+            type="text"
             value={feedback.grade}
             onChange={(e) => {
               const { value } = e.target;
