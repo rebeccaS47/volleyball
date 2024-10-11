@@ -245,6 +245,7 @@ const Event: React.FC<EventProps> = () => {
             name="date"
             value={filterState.date}
             onChange={handleInputChange}
+            min={new Date().toISOString().split('T')[0]}
           />{' '}
           <FilterInput
             type="time"
