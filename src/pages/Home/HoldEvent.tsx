@@ -60,6 +60,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     isAC: false,
     findNum: '',
     totalCost: '',
+    averageCost: 0,
     notes: '',
     playerList: [],
     createdEventAt: Timestamp.now(),
@@ -243,6 +244,13 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
         );
         const endTimeStamp = Timestamp.fromDate(endDate);
 
+        const totalParticipants =
+          Number(formData.findNum) + formData.playerList.length + 1;
+        const averageCost =
+          totalParticipants > 0
+            ? Math.round(Number(formData.totalCost) / totalParticipants)
+            : 0;
+
         const eventCollectionRef = collection(db, 'events');
         const docRef = await addDoc(eventCollectionRef, {
           ...formData,
@@ -251,6 +259,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
           playerList: [formData.createUserId, ...formData.playerList],
           startTimeStamp,
           endTimeStamp,
+          averageCost,
         });
         await updateDoc(docRef, { id: docRef.id });
 

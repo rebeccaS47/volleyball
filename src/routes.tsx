@@ -3,7 +3,6 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Error from './pages/Error';
 import Home from './pages/Home';
-import EventDetail from './pages/Home/EventDetail';
 import Court from './pages/Court';
 import CourtDetail from './pages/Court/CourtDetail';
 import HoldEvent from './pages/Home/HoldEvent';
@@ -48,10 +47,6 @@ const router = createBrowserRouter([
       {
         path: '/',
         element: <Home />,
-      },
-      {
-        path: '/eventdetail/:eventId',
-        element: <EventDetail />,
       },
       {
         path: '/court',

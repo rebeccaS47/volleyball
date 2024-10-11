@@ -159,7 +159,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
             </EventInfo>
             <EventInfo>
               <Label>費用</Label>
-              <Value>{Math.round(event.totalCost / event.findNum)} /人</Value>
+              <Value>{event.averageCost}/人</Value>
             </EventInfo>
             <Divider />
             <EventInfo>
@@ -181,7 +181,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
             </EventInfo>
             <EventInfo>
               <Label>剩餘名額</Label>
-              <Value>{event.findNum - event.playerList.length}</Value>
+              <Value>{event.findNum}</Value>
             </EventInfo>
             <ApplyButton onClick={handleApply}>申請加入</ApplyButton>
           </>

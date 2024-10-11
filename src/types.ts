@@ -22,6 +22,7 @@ export interface Event {
   isAC: boolean;
   findNum: number | '';
   totalCost: number | '';
+  averageCost: number;
   notes: string;
   playerList: string[];
   createdEventAt: Timestamp;

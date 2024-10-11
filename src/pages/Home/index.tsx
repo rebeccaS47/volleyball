@@ -304,7 +304,7 @@ const Event: React.FC<EventProps> = () => {
               </EventInfo>
               <EventInfo>
                 <AttachMoneyIcon />
-                {Math.round(event.totalCost / event.findNum)} /人
+                {event.averageCost} /人
               </EventInfo>
             </EventCard>
           ))

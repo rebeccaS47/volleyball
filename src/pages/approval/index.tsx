@@ -118,12 +118,17 @@ const Approval: React.FC<ApprovalProps> = () => {
     return grades.length > 0 ? sum / grades.length : 0;
   };
 
-  const handleAccept = async (applicant: string, eventId: string) => {
+  const handleAccept = async (
+    applicant: string,
+    eventId: string,
+    findNum: number
+  ) => {
     try {
       const eventRef = doc(db, 'events', eventId);
       await updateDoc(eventRef, {
         applicationList: arrayRemove(applicant),
         playerList: arrayUnion(applicant),
+        findNum: typeof findNum === 'number' ? findNum - 1 : 0,
       });
 
       const participationRef = doc(
@@ -203,7 +208,13 @@ const Approval: React.FC<ApprovalProps> = () => {
                     </StyledTd>
                     <StyledTd>
                       <AcceptButton
-                        onClick={() => handleAccept(applicantId, event.id)}
+                        onClick={() =>
+                          handleAccept(
+                            applicantId,
+                            event.id,
+                            Number(event.findNum)
+                          )
+                        }
                       >
                         接受
                       </AcceptButton>

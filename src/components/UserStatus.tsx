@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useUserAuth } from '../context/userAuthContext.tsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Box,
   Avatar,
@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { Logout } from '@mui/icons-material';
 import MailIcon from '@mui/icons-material/Mail';
+import LoginIcon from '@mui/icons-material/Login';
 
 const UserStatus: React.FC = () => {
   const { user, logOut } = useUserAuth();
@@ -121,20 +122,29 @@ const UserStatus: React.FC = () => {
           </Menu>
         </Box>
       ) : (
-        <Box sx={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
-          <Typography
-            sx={{
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            cursor: 'pointer',
+            height: '50px',
+            marginRight: '5px',
+          }}
+        >
+          <LoginIcon />
+          <Link
+            to="/login"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginLeft: '5px',
+              height: '1.5rem',
+              color: 'black',
               fontSize: 'large',
-              padding: '12px',
             }}
           >
-            Hi, there
-          </Typography>
-          <Avatar
-            onClick={() => {
-              navigate('/login');
-            }}
-          />
+            登入
+          </Link>
         </Box>
       )}
     </Box>
