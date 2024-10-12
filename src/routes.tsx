@@ -3,8 +3,6 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Error from './pages/Error';
 import Home from './pages/Home';
-// import Court from './pages/Court';
-// import CourtDetail from './pages/Court/CourtDetail';
 import HoldEvent from './pages/Home/HoldEvent';
 import User from './pages/User';
 import ProtectedRoutes from './components/ProtectedRoutes';
@@ -47,14 +45,6 @@ const router = createBrowserRouter([
         path: '/',
         element: <Home />,
       },
-      // {
-      //   path: '/court',
-      //   element: <Court />,
-      // },
-      // {
-      //   path: '/courtdetail',
-      //   element: <CourtDetail />,
-      // },
       {
         path: '/login',
         element: <Login />,
