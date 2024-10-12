@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
+import RedirectIfLoggedIn from './RedirectIfLoggedIn';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Error from './pages/Error';
 import Home from './pages/Home';
 import HoldEvent from './pages/Home/HoldEvent';
 import User from './pages/User';
@@ -14,44 +14,34 @@ import Chat from './pages/Chat';
 const router = createBrowserRouter([
   {
     element: <Layout />,
-    errorElement: <Error />,
+    errorElement: <Home />,
     children: [
       {
         element: <ProtectedRoutes />,
         children: [
-          {
-            path: '/holdevent',
-            element: <HoldEvent />,
-          },
-          {
-            path: '/approval',
-            element: <Approval />,
-          },
-          {
-            path: '/user',
-            element: <User />,
-          },
-          {
-            path: '/feedback',
-            element: <Feedback />,
-          },
-          {
-            path: '/chat',
-            element: <Chat />,
-          },
+          { path: '/holdevent', element: <HoldEvent /> },
+          { path: '/approval', element: <Approval /> },
+          { path: '/user', element: <User /> },
+          { path: '/feedback', element: <Feedback /> },
+          { path: '/chat', element: <Chat /> },
         ],
       },
-      {
-        path: '/',
-        element: <Home />,
-      },
+      { path: '/', element: <Home /> },
       {
         path: '/login',
-        element: <Login />,
+        element: (
+          <RedirectIfLoggedIn>
+            <Login />
+          </RedirectIfLoggedIn>
+        ),
       },
       {
         path: '/signup',
-        element: <Signup />,
+        element: (
+          <RedirectIfLoggedIn>
+            <Signup />
+          </RedirectIfLoggedIn>
+        ),
       },
     ],
   },
