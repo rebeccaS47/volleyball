@@ -3,10 +3,9 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Error from './pages/Error';
 import Home from './pages/Home';
-import Court from './pages/Court';
-import CourtDetail from './pages/Court/CourtDetail';
+// import Court from './pages/Court';
+// import CourtDetail from './pages/Court/CourtDetail';
 import HoldEvent from './pages/Home/HoldEvent';
-import UserInfo from './pages/User/info';
 import User from './pages/User';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import Approval from './pages/Approval';
@@ -48,14 +47,14 @@ const router = createBrowserRouter([
         path: '/',
         element: <Home />,
       },
-      {
-        path: '/court',
-        element: <Court />,
-      },
-      {
-        path: '/courtdetail',
-        element: <CourtDetail />,
-      },
+      // {
+      //   path: '/court',
+      //   element: <Court />,
+      // },
+      // {
+      //   path: '/courtdetail',
+      //   element: <CourtDetail />,
+      // },
       {
         path: '/login',
         element: <Login />,
@@ -63,10 +62,6 @@ const router = createBrowserRouter([
       {
         path: '/signup',
         element: <Signup />,
-      },
-      {
-        path: '/info',
-        element: <UserInfo />,
       },
     ],
   },

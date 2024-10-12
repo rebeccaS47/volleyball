@@ -3,26 +3,62 @@ import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import styled from 'styled-components';
 import { Card, TextField, Button, Typography } from '@mui/material';
+import { FirebaseError } from 'firebase/app';
+import { doc, setDoc } from 'firebase/firestore';
+import { db, storage } from '../../../firebaseConfig';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import type { User } from '../../types';
+import DefaultPhoto from '../../assets/defaultPhoto.png';
 
 const Signup: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { signUp } = useUserAuth();
+  const { signUp, updateUser } = useUserAuth();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setError("Passwords don't match");
+      setError('請輸入相同密碼');
       return;
     }
     try {
-      await signUp(email, password);
-      navigate('/info');
+      const userCredential = await signUp(email, password);
+
+      const response = await fetch(DefaultPhoto);
+      const defaultPhotoBlob = await response.blob();
+      const storageRef = ref(storage, `userPhotos/${userCredential.uid}`);
+      await uploadBytes(storageRef, defaultPhotoBlob);
+      const downloadURL = await getDownloadURL(storageRef);
+
+      const userData = {
+        name: name,
+        imgURL: downloadURL,
+        id: userCredential.uid,
+        email: userCredential.email,
+      };
+
+      await setDoc(doc(db, 'users', userCredential.uid), userData);
+      updateUser(userData as User);
+      alert('成功註冊!');
+      navigate('/');
     } catch (error) {
-      setError('Failed to create an account.');
+      if (error instanceof FirebaseError) {
+        if (error.code === 'auth/weak-password') {
+          setError('密碼至少需要六位字');
+        } else if (error.code === 'auth/email-already-in-use') {
+          setError('該電子郵件已被使用');
+        } else if (error.code === 'auth/invalid-email') {
+          setError('請輸入有效的電子郵件');
+        } else {
+          setError('註冊失敗，請稍後再試');
+        }
+      } else {
+        setError('註冊失敗，請稍後再試');
+      }
       console.error(error);
     }
   };
@@ -30,7 +66,7 @@ const Signup: React.FC = () => {
   return (
     <SignupCard>
       <Typography variant="h4" gutterBottom>
-        Sign Up
+        註冊
       </Typography>
       <Form onSubmit={handleSignup}>
         <TextField
@@ -42,7 +78,15 @@ const Signup: React.FC = () => {
           required
         />
         <TextField
-          label="Password"
+          label="名稱"
+          variant="outlined"
+          fullWidth
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <TextField
+          label="密碼"
           type="password"
           variant="outlined"
           fullWidth
@@ -51,7 +95,7 @@ const Signup: React.FC = () => {
           required
         />
         <TextField
-          label="Confirm Password"
+          label="確認密碼"
           type="password"
           variant="outlined"
           fullWidth
@@ -59,9 +103,9 @@ const Signup: React.FC = () => {
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
-        {error && <Typography color="error">{error}</Typography>}
+        {error && <ErrorText>{error}</ErrorText>}
         <Button type="submit" variant="contained" fullWidth>
-          Sign Up
+          註冊
         </Button>
       </Form>
       <Divider>
@@ -70,12 +114,12 @@ const Signup: React.FC = () => {
         <Hr />
       </Divider>
       <Typography variant="body2">
-        Already have an account?{' '}
+        已經有帳號嗎?{' '}
         <a
           href="/login"
           style={{ color: 'black', textDecoration: 'underline' }}
         >
-          Log in
+          登入
         </a>
       </Typography>
     </SignupCard>
@@ -116,4 +160,8 @@ const Hr = styled.hr`
   height: 1px;
   background-color: rgb(204, 204, 204);
   margin: 0 10px;
+`;
+
+const ErrorText = styled.div`
+  color: red;
 `;

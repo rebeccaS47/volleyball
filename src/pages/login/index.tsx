@@ -56,7 +56,7 @@ const Login: React.FC = () => {
   return (
     <LoginCard>
       <Typography variant="h4" gutterBottom>
-        Sign In
+        登入
       </Typography>
       <Form onSubmit={handleLogin}>
         <TextField
@@ -68,7 +68,7 @@ const Login: React.FC = () => {
           required
         />
         <TextField
-          label="Password"
+          label="密碼"
           type="password"
           variant="outlined"
           fullWidth
@@ -78,16 +78,16 @@ const Login: React.FC = () => {
         />
         {error && <Typography color="error">{error}</Typography>}
         <Button type="submit" variant="contained" fullWidth>
-          Sign in
+          登入
         </Button>
       </Form>
       <Typography variant="body2" style={{ marginTop: '5px' }}>
-        Don't have an account?{' '}
+        還沒有帳號?{' '}
         <a
           href="/signup"
           style={{ color: 'black', textDecoration: 'underline' }}
         >
-          Sign Up
+          註冊
         </a>
       </Typography>
       <Divider>
