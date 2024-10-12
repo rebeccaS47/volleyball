@@ -3,8 +3,7 @@ import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import UserStatus from './UserStatus';
-// import volleyBall from '../assets/volleyball.png';
-import volleyBall2 from '../assets/volleyball2.png';
+import volleyBall from '../assets/volleyball.png';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -27,11 +26,7 @@ const Header = () => {
         <LogoContainer>
           <Logo onClick={() => navigate('/')}>
             揪排球
-            {/* <img
-              src={volleyBall}
-              style={{ width: '40px'}}
-            /> */}
-            <img src={volleyBall2} style={{ width: '40px' }} />
+            <img src={volleyBall} style={{ width: '40px' }} />
           </Logo>
         </LogoContainer>
 
