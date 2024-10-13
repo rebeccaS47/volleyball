@@ -17,10 +17,12 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EventDetail from '../../components/EventDetail';
+import { SyncLoader } from 'react-spinners';
 
 interface EventProps {}
 
 const Event: React.FC<EventProps> = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [eventList, setEventList] = useState<Event[]>([]);
   const [cities, setCities] = useState<Option[]>([]);
   const [courts, setCourts] = useState<Option[]>([]);
@@ -152,6 +154,7 @@ const Event: React.FC<EventProps> = () => {
   };
 
   const getEventList = useCallback(async () => {
+    setIsLoading(true);
     try {
       const eventCollectionRef = collection(db, 'events');
       const now = Timestamp.now();
@@ -170,6 +173,8 @@ const Event: React.FC<EventProps> = () => {
       setEventList(filteredData);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -196,8 +201,10 @@ const Event: React.FC<EventProps> = () => {
   }, [getEventList]);
 
   useEffect(() => {
-    filterEvents();
-  }, [filterState, eventList, filterEvents]);
+    if (!isLoading) {
+      filterEvents();
+    }
+  }, [filterState, eventList, filterEvents, isLoading]);
 
   return (
     <IndexContainer>
@@ -264,7 +271,28 @@ const Event: React.FC<EventProps> = () => {
       </FilterContainer>
       <br />
       <EventListContainer>
-        {filteredEventList.length === 0 ? (
+        {isLoading ? (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100vh',
+              width: '100vw',
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            }}
+          >
+            <SyncLoader
+              margin={10}
+              size={20}
+              speedMultiplier={0.8}
+              color="var(--color-secondary)"
+            />
+          </div>
+        ) : filteredEventList.length === 0 ? (
           <div
             style={{
               color: 'var(--color-dark)',
@@ -334,8 +362,7 @@ const EventListContainer = styled.div`
   flex-wrap: wrap;
   gap: 20px;
   border-radius: 15px;
-  justify-content: space-between;
-  /* background-color: var(--color-secondary); */
+  justify-content: flex-start;
   @media (max-width: 768px) {
     gap: 5px;
   }
@@ -348,7 +375,7 @@ const EventCard = styled.div`
   border-radius: 12px;
   padding: 1.5rem;
 
-  width: calc(33.333% - 70px);
+  width: calc(33.333% - 62px);
   transition: transform 0.3s ease;
   position: relative;
   overflow: visible;

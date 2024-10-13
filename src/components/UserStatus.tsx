@@ -4,7 +4,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import {
   Box,
   Avatar,
-  Typography,
   IconButton,
   Menu,
   MenuItem,
@@ -14,6 +13,7 @@ import {
 import { Logout } from '@mui/icons-material';
 import MailIcon from '@mui/icons-material/Mail';
 import LoginIcon from '@mui/icons-material/Login';
+// import styled from 'styled-components';
 
 const UserStatus: React.FC = () => {
   const { user, logOut } = useUserAuth();
@@ -41,7 +41,7 @@ const UserStatus: React.FC = () => {
     >
       {user ? (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography sx={{ fontSize: 'large' }}>Hi, {user.name}</Typography>
+          {/* <UserName>Hi, {user.name}</UserName> */}
           <IconButton
             size="large"
             aria-label="show 4 new mails"
@@ -152,3 +152,10 @@ const UserStatus: React.FC = () => {
 };
 
 export default UserStatus;
+
+// const UserName = styled.div`
+//   font-size: large;
+//   @media (max-width: 768px) {
+//     display: none;
+//   }
+// `;
