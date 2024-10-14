@@ -58,12 +58,9 @@ export default Header;
 const HeaderContainer = styled.header`
   background-color: var(--color-light);
   border: 2px solid var(--color-light);
-  /* padding: 10px 0px; */
+  display: flex;
+  height: 70px;
   border-radius: 15px;
-  @media (max-width: 768px) {
-    display: flex;
-    height: 70px;
-  }
 `;
 
 const LogoContainer = styled.div`
@@ -80,7 +77,6 @@ const LogoContainer = styled.div`
 const Nav = styled.nav`
   display: flex;
   align-items: center;
-  /* height: 70px; */
 `;
 
 const Logo = styled.div`
@@ -93,6 +89,7 @@ const Logo = styled.div`
 
 const MenuItems = styled.ul<{ $isOpen: boolean }>`
   display: flex;
+  align-items: center;
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -104,7 +101,7 @@ const MenuItems = styled.ul<{ $isOpen: boolean }>`
     top: 90px;
     left: 0;
     width: 100%;
-    /* background-color: var(--color-light); */
+    padding: 0px 15px;
     display: ${({ $isOpen }) => ($isOpen ? 'flex' : 'none')};
     order: 3;
     z-index: 2;
@@ -112,7 +109,7 @@ const MenuItems = styled.ul<{ $isOpen: boolean }>`
 `;
 
 const MenuItem = styled.div<{ $isActive: boolean }>`
-  height: 70px;
+  height: 50px;
   padding: 0.5rem 1.5rem;
   display: flex;
   align-items: center;
@@ -123,18 +120,16 @@ const MenuItem = styled.div<{ $isActive: boolean }>`
   background-color: ${({ $isActive }) =>
     $isActive ? 'var(--color-secondary)' : 'var(--color-light)'};
   color: ${({ $isActive }) => ($isActive ? 'white' : 'var(--color-dark)')};
-  /* text-shadow: ${({ $isActive }) =>
-    $isActive ? '1px 1px 2px #aaa, -1px -1px 2px #aaa' : ''}; */
 
   &:hover {
     background-color: var(--color-secondary);
   }
 
   @media (max-width: 768px) {
-    margin: 0px 15px;
     padding: 1rem;
     text-align: center;
     border: 1px solid #eaeaea;
+    width: 100%;
   }
 `;
 
