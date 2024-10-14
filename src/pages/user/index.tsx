@@ -26,6 +26,7 @@ import type {
 } from '../../types.ts';
 import HistoryDetail from '../../components/HistoryDetail.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { SyncLoader } from 'react-spinners';
 // import styled from 'styled-components';
 
 interface UserProps {}
@@ -246,7 +247,30 @@ const User: React.FC<UserProps> = () => {
   //   width: '100%',
   // };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          width: '100vw',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        }}
+      >
+        <SyncLoader
+          margin={10}
+          size={20}
+          speedMultiplier={0.8}
+          color="var(--color-secondary)"
+        />
+      </div>
+    );
+  }
   if (error) return <div>{error}</div>;
   if (!userData) return <div>No user data found</div>;
 
