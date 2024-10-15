@@ -16,6 +16,7 @@ import type { Event, History } from '../../types.ts';
 import { findUserById } from '../../firebase.ts';
 import HistoryDetail from '../../components/HistoryDetail.tsx';
 import styled from 'styled-components';
+import { SyncLoader } from 'react-spinners';
 
 interface ApplicantData {
   name: string;
@@ -24,6 +25,7 @@ interface ApplicantData {
 interface ApprovalProps {}
 
 const Approval: React.FC<ApprovalProps> = () => {
+  const [loading, setLoading] = useState(true);
   const [eventList, setEventList] = useState<Event[]>([]);
   const [applicantData, setApplicantData] = useState<{
     [key: string]: ApplicantData;
@@ -51,58 +53,65 @@ const Approval: React.FC<ApprovalProps> = () => {
       });
 
       setEventList(events);
-      const applicantDataPromises = Array.from(applicants).map(
-        async (applicantId) => {
-          const applicantUser = await findUserById(applicantId);
-          if (applicantUser) {
-            return {
-              id: applicantId,
-              name: applicantUser.name,
+
+      try {
+        const applicantDataPromises = Array.from(applicants).map(
+          async (applicantId) => {
+            const applicantUser = await findUserById(applicantId);
+            if (applicantUser) {
+              return {
+                id: applicantId,
+                name: applicantUser.name,
+              };
+            }
+            return null;
+          }
+        );
+
+        const historyPromises = Array.from(applicants).map(
+          async (applicantId) => {
+            const historyRef = collection(db, 'history');
+            const historyQuery = query(
+              historyRef,
+              where('userId', '==', applicantId)
+            );
+            const historySnapshot = await getDocs(historyQuery);
+            const history = historySnapshot.docs.map(
+              (doc) => doc.data() as History
+            );
+            return { id: applicantId, history };
+          }
+        );
+        const [applicantDataResults, historyResults] = await Promise.all([
+          Promise.all(applicantDataPromises),
+          Promise.all(historyPromises),
+        ]);
+
+        const newApplicantData = applicantDataResults.reduce((acc, result) => {
+          if (result) {
+            acc[result.id] = {
+              name: result.name,
             };
           }
-          return null;
-        }
-      );
+          return acc;
+        }, {} as { [key: string]: ApplicantData });
 
-      const historyPromises = Array.from(applicants).map(
-        async (applicantId) => {
-          const historyRef = collection(db, 'history');
-          const historyQuery = query(
-            historyRef,
-            where('userId', '==', applicantId)
-          );
-          const historySnapshot = await getDocs(historyQuery);
-          const history = historySnapshot.docs.map(
-            (doc) => doc.data() as History
-          );
-          return { id: applicantId, history };
-        }
-      );
-      const [applicantDataResults, historyResults] = await Promise.all([
-        Promise.all(applicantDataPromises),
-        Promise.all(historyPromises),
-      ]);
+        const newHistoryData = historyResults.reduce((acc, result) => {
+          acc[result.id] = result.history;
+          return acc;
+        }, {} as { [key: string]: History[] });
 
-      const newApplicantData = applicantDataResults.reduce((acc, result) => {
-        if (result) {
-          acc[result.id] = {
-            name: result.name,
-          };
-        }
-        return acc;
-      }, {} as { [key: string]: ApplicantData });
+        setApplicantData(newApplicantData);
+        setHistoryData(newHistoryData);
 
-      const newHistoryData = historyResults.reduce((acc, result) => {
-        acc[result.id] = result.history;
-        return acc;
-      }, {} as { [key: string]: History[] });
-
-      setApplicantData(newApplicantData);
-      setHistoryData(newHistoryData);
-
-      console.log('監聽到的 events:', events);
-      console.log('申請者資料:', newApplicantData);
-      console.log('歷史數據:', newHistoryData);
+        console.log('監聽到的 events:', events);
+        console.log('申請者資料:', newApplicantData);
+        console.log('歷史數據:', newHistoryData);
+      } catch (error) {
+        console.error('獲取資料時出錯:', error);
+      } finally {
+        setLoading(false);
+      }
     });
 
     return () => unsubscribe();
@@ -144,6 +153,7 @@ const Approval: React.FC<ApprovalProps> = () => {
       throw error;
     }
   };
+
   const handleDecline = async (applicant: string, eventId: string) => {
     try {
       const eventRef = doc(db, 'events', eventId);
@@ -165,6 +175,31 @@ const Approval: React.FC<ApprovalProps> = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          width: '100vw',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        }}
+      >
+        <SyncLoader
+          margin={10}
+          size={20}
+          speedMultiplier={0.8}
+          color="var(--color-secondary)"
+        />
+      </div>
+    );
+  }
+
   return (
     <TableWrapper>
       <StyledTable>
@@ -180,7 +215,14 @@ const Approval: React.FC<ApprovalProps> = () => {
         <Tbody>
           {Object.keys(applicantData).length === 0 ? (
             <StyledTr>
-              <StyledTd colSpan={5} style={{ textAlign: 'center', padding: '32px', fontSize: '20px' }}>
+              <StyledTd
+                colSpan={5}
+                style={{
+                  textAlign: 'center',
+                  padding: '32px',
+                  fontSize: '20px',
+                }}
+              >
                 暫無待審核資料
               </StyledTd>
             </StyledTr>

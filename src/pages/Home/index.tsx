@@ -327,14 +327,15 @@ const Event: React.FC<EventProps> = () => {
                 })}
               </EventInfo>
               <EventInfo>
-                <LocationOnIcon />
-                {event.court.city}
-                {event.court.address}
-              </EventInfo>
-              <EventInfo>
                 <AttachMoneyIcon />
                 {event.averageCost} /人
               </EventInfo>
+              <EventInfoAddress>
+                <LocationOnIcon />
+                {event.court.city}
+                {event.court.address}
+              </EventInfoAddress>
+              
             </EventCard>
           ))
         )}
@@ -436,6 +437,15 @@ const EventInfo = styled.p`
   padding: 12px 24px 0px;;
   font-size: 1.2rem;
   color: var(--color-dark);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+`;
+
+const EventInfoAddress = styled.p`
+  padding: 24px 24px 0px;;
+  font-size: 16px;
+  color: gray;
   display: flex;
   align-items: center;
   justify-content: flex-start;

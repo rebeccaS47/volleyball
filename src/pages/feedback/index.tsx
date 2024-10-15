@@ -32,6 +32,7 @@ import {
   Snackbar,
 } from '@mui/material';
 import styled from 'styled-components';
+import { SyncLoader } from 'react-spinners';
 
 interface FeedbackProps {}
 
@@ -236,7 +237,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
                     },
                   }}
                 >
-                  {event.date} {event.court.name}
+                  {event.date}&nbsp;&nbsp;{event.court.name}
                 </Button>
               ))
             : '目前還無任何已結束的活動'}
@@ -383,7 +384,30 @@ const Feedback: React.FC<FeedbackProps> = () => {
     setOpen(true);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          width: '100vw',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        }}
+      >
+        <SyncLoader
+          margin={10}
+          size={20}
+          speedMultiplier={0.8}
+          color="var(--color-secondary)"
+        />
+      </div>
+    );
+  }
   if (error) return <div>Error: {error}</div>;
 
   return (
@@ -463,7 +487,7 @@ const ContinueButton = styled(Button)`
     align-items: center;
     width: 80px;
     height: 50px;
-    padding: 10px 16px;
+    padding: 8px 12px;
     background-color: var(--color-secondary);
     color: var(--color-dark);
     font-weight: 500;
@@ -490,7 +514,7 @@ const ReturnButton = styled(Button)`
     align-items: center;
     width: 80px;
     height: 50px;
-    padding: 10px 16px;
+    padding: 8px 12px;
     background-color: var(--color-primary);
     color: var(--color-light);
     font-weight: 500;
