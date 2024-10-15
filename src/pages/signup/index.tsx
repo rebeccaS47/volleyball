@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import styled from 'styled-components';
-import { Card, TextField, Button, Typography } from '@mui/material';
+import { Card, TextField, Typography } from '@mui/material';
 import { FirebaseError } from 'firebase/app';
 import { doc, setDoc } from 'firebase/firestore';
 import { db, storage } from '../../../firebaseConfig';
@@ -104,9 +104,7 @@ const Signup: React.FC = () => {
           required
         />
         {error && <ErrorText>{error}</ErrorText>}
-        <Button type="submit" variant="contained" fullWidth>
-          註冊
-        </Button>
+        <SignupButton type="submit">註冊</SignupButton>
       </Form>
       <Divider>
         <Hr />
@@ -165,3 +163,37 @@ const Hr = styled.hr`
 const ErrorText = styled.div`
   color: red;
 `;
+
+const SignupButton = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px 16px;
+  background-color: var(--color-secondary);
+  color: var(--color-dark);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 24px;
+  border: 2px solid var(--color-dark);
+  border-radius: 14px;
+  box-shadow: -4px 3px 0 0 var(--color-dark);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: -2px 1px 0 0 var(--color-dark);
+    background-color: var(--color-light);
+    transform: translateY(-2px);
+    transform: translateX(-1px);
+  }
+`;
+
+// const StyledTitle = styled.h1`
+//   color: var(--color-secondary);
+//   font-weight: bold;
+//   text-shadow: -6px 6px 0px black;
+//   -webkit-text-stroke: 1px black;
+//   font-size: 3rem;
+//   margin: 0;
+//   padding: 10px;
+// `;

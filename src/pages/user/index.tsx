@@ -27,7 +27,7 @@ import type {
 import HistoryDetail from '../../components/HistoryDetail.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { SyncLoader } from 'react-spinners';
-// import styled from 'styled-components';
+import EventDetail from '../../components/EventDetail';
 
 interface UserProps {}
 
@@ -35,7 +35,8 @@ const User: React.FC<UserProps> = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const { user, updateUser } = useUserAuth();
   const localizer = momentLocalizer(moment);
-  const [eventDeatil, setEventDeatil] = useState<Event | null>(null);
+  const [eventDetail, setEventDetail] = useState<Event | null>(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const [userData, setUserData] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -175,12 +176,11 @@ const User: React.FC<UserProps> = () => {
 
   const handleSelectEvent = async (event: CalendarEvent) => {
     try {
-      console.log('event', event);
       const eventRef = doc(db, 'events', event.eventId);
       const eventSnap = await getDoc(eventRef);
-      console.log('snap', eventSnap.data(), 'id: ', eventSnap.id);
       if (eventSnap.exists()) {
-        setEventDeatil({ id: eventSnap.id, ...eventSnap.data() } as Event);
+        setEventDetail({ id: eventSnap.id, ...eventSnap.data() } as Event);
+        setModalIsOpen(true); 
       } else {
         throw new Error('Event not found');
       }
@@ -188,39 +188,28 @@ const User: React.FC<UserProps> = () => {
       console.error(err);
       return;
     }
+  };
 
-    if (!eventDeatil) return;
-    // 發起人: ${eventDeatil.createUserId}
-    // 隊員名單: ${eventDeatil.playerList}
-    // 動建立日期: ${eventDeatil.createdEventAt}
-    // 申請人名單: ${eventDeatil.applicationList}
-    alert(`
-      活動id: ${eventDeatil.id}
-      場地: ${eventDeatil.court.name}
-      日期: ${eventDeatil.date}
-      起始時間: ${eventDeatil.startTime}
-      結束時間: ${eventDeatil.endTimeStamp.toDate().toLocaleString()}
-      網高: ${eventDeatil.netHeight}
-      友善程度: ${eventDeatil.friendlinessLevel}
-      能力: ${eventDeatil.level}
-      是否有冷氣: ${eventDeatil.isAC ? '有' : '沒有'}
-      尋找人數: ${eventDeatil.findNum}
-      總費用: ${eventDeatil.totalCost}
-      備註: ${eventDeatil.notes}
-    `);
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setEventDetail(null);
   };
 
   const eventStyleGetter = (event: CalendarEvent) => {
     let backgroundColor = '';
+    let color = '';
     switch (event.state) {
       case 'pending':
         backgroundColor = '#515050ce';
+        color = '#FFFFFF';
         break;
       case 'accept':
-        backgroundColor = '#357835';
+        backgroundColor = 'rgba(255, 191, 0)';
+        color = '#000000';
         break;
       case 'decline':
-        backgroundColor = '#ad6771';
+        backgroundColor = 'rgba(0, 129, 204)';
+        color = '#FFFFFF';
         break;
       default:
         backgroundColor = '#FFFFFF';
@@ -229,7 +218,7 @@ const User: React.FC<UserProps> = () => {
       style: {
         backgroundColor,
         opacity: 0.8,
-        color: '#FFFFFF',
+        color: color,
       },
     };
   };
@@ -240,6 +229,7 @@ const User: React.FC<UserProps> = () => {
     // width: '80%',
     margin: '0 auto',
     padding: '20px 0',
+    zIndex: 0
   };
 
   // const calendarStyle: React.CSSProperties = {
@@ -294,16 +284,30 @@ const User: React.FC<UserProps> = () => {
               type="text"
               value={newDisplayName}
               onChange={(e) => setNewDisplayName(e.target.value)}
-              style={{ marginBottom: '10px' }}
+              style={{
+                marginBottom: '10px',
+                borderRadius: '15px',
+                width: 'fit-content',
+                padding: '5px 10px',
+              }}
             />
             <input
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              style={{ marginBottom: '10px' }}
+              style={{
+                marginBottom: '10px'
+              }}
             />
             <div>
-              <button onClick={handleUpdate} style={{ marginRight: '10px' }}>
+              <button
+                onClick={handleUpdate}
+                style={{
+                  marginRight: '10px',
+                  padding: '5px 10px',
+                  borderRadius: '15px',
+                }}
+              >
                 儲存{' '}
               </button>
               <button
@@ -313,6 +317,9 @@ const User: React.FC<UserProps> = () => {
                   setNewDisplayName(userData.name);
                   setImgURL(userData.imgURL);
                 }}
+                style={{
+                  padding: '5px 10px',
+                  borderRadius: '15px',}}
               >
                 取消
               </button>
@@ -335,7 +342,10 @@ const User: React.FC<UserProps> = () => {
                 <HistoryDetail userHistory={historyData[user.id] || []} />
               )}
             </div>
-            <SettingsIcon onClick={() => setIsEditing(true)} />
+            <SettingsIcon
+              style={{ cursor: 'pointer' }}
+              onClick={() => setIsEditing(true)}
+            />
           </>
         )}
       </div>
@@ -352,6 +362,14 @@ const User: React.FC<UserProps> = () => {
           // style={calendarStyle}
         />
       </div>
+      {eventDetail &&
+      <EventDetail
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        event={eventDetail}
+        hasApplyBtn={false}
+      />}
+      
     </div>
   );
 };

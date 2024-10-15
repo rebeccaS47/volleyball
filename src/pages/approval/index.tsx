@@ -178,55 +178,63 @@ const Approval: React.FC<ApprovalProps> = () => {
           </StyledTr>
         </thead>
         <Tbody>
-          {eventList.flatMap((event) =>
-            event.applicationList.length > 0
-              ? event.applicationList.map((applicantId, index) => (
-                  <StyledTr key={`${event.id}-${index}`}>
-                    {index === 0 && (
-                      <>
-                        <StyledTd rowSpan={event.applicationList.length}>
-                          {event.date}
-                          {/* {" "}{event.startTimeStamp.toDate().toLocaleTimeString() } */}
-                          {/* '~' +
-                            event.endTimeStamp.toDate().toLocaleTimeString()} */}
-                        </StyledTd>
-                        <StyledTd rowSpan={event.applicationList.length}>
-                          {event.court.name}
-                        </StyledTd>
-                      </>
-                    )}
-                    <StyledTd>
-                      {applicantData[applicantId]?.name || 'Loading...'}
-                    </StyledTd>
-                    <StyledTd>
-                      {calculateAverageGrade(
-                        historyData[applicantId] || []
-                      ).toFixed(2)}
-                      <HistoryDetail
-                        userHistory={historyData[applicantId] || []}
-                      />
-                    </StyledTd>
-                    <StyledTd>
-                      <AcceptButton
-                        onClick={() =>
-                          handleAccept(
-                            applicantId,
-                            event.id,
-                            Number(event.findNum)
-                          )
-                        }
-                      >
-                        接受
-                      </AcceptButton>
-                      <DeclineButton
-                        onClick={() => handleDecline(applicantId, event.id)}
-                      >
-                        拒絕
-                      </DeclineButton>
-                    </StyledTd>
-                  </StyledTr>
-                ))
-              : []
+          {Object.keys(applicantData).length === 0 ? (
+            <StyledTr>
+              <StyledTd colSpan={5} style={{ textAlign: 'center', padding: '32px', fontSize: '20px' }}>
+                暫無待審核資料
+              </StyledTd>
+            </StyledTr>
+          ) : (
+            eventList.flatMap((event) =>
+              event.applicationList.length > 0
+                ? event.applicationList.map((applicantId, index) => (
+                    <StyledTr key={`${event.id}-${index}`}>
+                      {index === 0 && (
+                        <>
+                          <StyledTd rowSpan={event.applicationList.length}>
+                            {event.date}
+                            {/* {" "}{event.startTimeStamp.toDate().toLocaleTimeString() } */}
+                            {/* '~' +
+                      event.endTimeStamp.toDate().toLocaleTimeString()} */}
+                          </StyledTd>
+                          <StyledTd rowSpan={event.applicationList.length}>
+                            {event.court.name}
+                          </StyledTd>
+                        </>
+                      )}
+                      <StyledTd>
+                        {applicantData[applicantId]?.name || 'Loading...'}
+                      </StyledTd>
+                      <StyledTd>
+                        {calculateAverageGrade(
+                          historyData[applicantId] || []
+                        ).toFixed(2)}
+                        <HistoryDetail
+                          userHistory={historyData[applicantId] || []}
+                        />
+                      </StyledTd>
+                      <StyledTd>
+                        <AcceptButton
+                          onClick={() =>
+                            handleAccept(
+                              applicantId,
+                              event.id,
+                              Number(event.findNum)
+                            )
+                          }
+                        >
+                          接受
+                        </AcceptButton>
+                        <DeclineButton
+                          onClick={() => handleDecline(applicantId, event.id)}
+                        >
+                          拒絕
+                        </DeclineButton>
+                      </StyledTd>
+                    </StyledTr>
+                  ))
+                : []
+            )
           )}
         </Tbody>
       </StyledTable>
@@ -262,7 +270,7 @@ const Tbody = styled.tbody`
 
 const StyledTh = styled.th`
   text-align: left;
-  padding: 8px;
+  padding: 8px 16px;
   /* background-color: #f2f2f2; */
   /* border-bottom: 2px dashed #ffc100; */
   border-bottom: 2px dashed;
@@ -280,7 +288,7 @@ const StyledTh = styled.th`
 
 const StyledTd = styled.td`
   text-align: left;
-  padding: 8px 15px;
+  padding: 8px 16px;
   position: relative;
   white-space: nowrap;
 
@@ -328,7 +336,7 @@ const AcceptButton = styled(Button)`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 80%;
+  width: 50%;
   padding: 10px 16px;
   background-color: var(--color-secondary);
   color: var(--color-dark);
@@ -353,7 +361,7 @@ const DeclineButton = styled(Button)`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 80%;
+  width: 50%;
   padding: 10px 16px;
   background-color: var(--color-primary);
   color: var(--color-light);

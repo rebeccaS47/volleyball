@@ -14,21 +14,20 @@ interface EventDetailProps {
   isOpen: boolean;
   onRequestClose: () => void;
   event: Event | null;
+  hasApplyBtn: boolean;
 }
 
 const EventDetail: React.FC<EventDetailProps> = ({
   isOpen,
   onRequestClose,
   event,
+  hasApplyBtn,
 }) => {
   const [playerNames, setPlayerNames] = useState<string>('');
   const { user } = useUserAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
-  const [severity, setSeverity] = useState<'success' | 'error' | 'info'>(
-    'info'
-  );
 
   useEffect(() => {
     if (event === null) return;
@@ -43,26 +42,25 @@ const EventDetail: React.FC<EventDetailProps> = ({
     setOpen(false);
   };
 
-  const showSnackbar = (msg: string, sev: 'success' | 'error' | 'info') => {
+  const showSnackbar = (msg: string) => {
     setMessage(msg);
-    setSeverity(sev);
     setOpen(true);
   };
 
   const handleApply = async () => {
     console.log('eventDetail', { event });
     if (!user) {
-      showSnackbar('請先登入', 'error');
+      showSnackbar('請先登入');
       navigate('/login');
       return;
     }
     if (!event) return;
     if (event.playerList.includes(user?.id)) {
-      showSnackbar('你已是隊員', 'info');
+      showSnackbar('你已是隊員');
       return;
     }
     if (event.applicationList.includes(user?.id)) {
-      showSnackbar('你已申請過', 'info');
+      showSnackbar('你已申請過');
       return;
     }
     if (event.id) {
@@ -87,10 +85,10 @@ const EventDetail: React.FC<EventDetailProps> = ({
           endTimeStamp: event.endTimeStamp,
         });
 
-        showSnackbar('成功申請', 'success');
+        showSnackbar('成功申請');
       } catch (error) {
         console.error('申請失敗: ', error);
-        showSnackbar('申請失敗，請稍後再試', 'error');
+        showSnackbar('申請失敗，請稍後再試');
       }
     }
   };
@@ -103,6 +101,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
         contentLabel="Event Details"
         style={{
           overlay: {
+            zIndex: 999,
             backgroundColor: 'rgba(0, 0, 0, 0.75)',
           },
           content: {
@@ -183,7 +182,8 @@ const EventDetail: React.FC<EventDetailProps> = ({
               <Label>剩餘名額</Label>
               <Value>{event.findNum}</Value>
             </EventInfo>
-            <ApplyButton onClick={handleApply}>申請加入</ApplyButton>
+            {hasApplyBtn ? <ApplyButton onClick={handleApply}>申請加入</ApplyButton> : <></>}
+            
           </>
         )}
       </Modal>
@@ -193,7 +193,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
         onClose={handleClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <SnackbarContent severity={severity}>{message}</SnackbarContent>
+        <SnackbarContent>{message}</SnackbarContent>
       </StyledSnackbar>
     </>
   );
@@ -278,18 +278,11 @@ const StyledSnackbar = styled(Snackbar)`
   }
 `;
 
-const SnackbarContent = styled.div<{ severity: 'success' | 'error' | 'info' }>`
+const SnackbarContent = styled.div`
   padding: 10px 16px;
   width: 200px;
   border-radius: 4px;
   color: var(--color-dark);
   font-weight: 500;
   background-color: var(--color-light);
-
-  /* color: ${(props) =>
-    props.severity === 'success'
-      ? '#4caf50'
-      : props.severity === 'error'
-      ? '#f44336'
-      : 'var(--color-dark)'}; */
 `;

@@ -98,29 +98,51 @@ const Chat: React.FC<ChatProps> = () => {
   return (
     <ChatContainer>
       {(!isMobile || (isMobile && !showChatWindow)) && (
-        <GroupList>
-          {groupChats.map((groupChat) => (
-            <GroupItem
-              key={groupChat.eventId}
-              $selected={selectedEventId === groupChat.eventId}
-              onClick={() => handleGroupChatSelect(groupChat.eventId)}
+        <>
+          <GroupList>
+            {groupChats.map((groupChat) => (
+              <GroupItem
+                key={groupChat.eventId}
+                $selected={selectedEventId === groupChat.eventId}
+                onClick={() => handleGroupChatSelect(groupChat.eventId)}
+              >
+                <p
+                  style={{
+                    padding: '10px 5px',
+                    fontWeight: '700',
+                    fontSize: '20px',
+                  }}
+                >
+                  {groupChat.date}
+                </p>
+                <p style={{ padding: '5px' }}>
+                  {groupChat.startTimeStamp.toDate().toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}{' '}
+                  -{' '}
+                  {groupChat.endTimeStamp.toDate().toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+                <p style={{ padding: '5px' }}>{groupChat.courtName}</p>
+              </GroupItem>
+            ))}
+          </GroupList>
+          {!selectedEventId && (
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
-              <p>{groupChat.date}</p>
-              <p>
-                {groupChat.startTimeStamp.toDate().toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}{' '}
-                -{' '}
-                {groupChat.endTimeStamp.toDate().toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </p>
-              <p>{groupChat.courtName}</p>
-            </GroupItem>
-          ))}
-        </GroupList>
+              請選擇左側任一聊天室...
+            </div>
+          )}
+        </>
       )}
       {selectedEventId && (!isMobile || (isMobile && showChatWindow)) && (
         <ChatWindow>
@@ -134,7 +156,7 @@ const Chat: React.FC<ChatProps> = () => {
                 <ArrowLeft />
               </BackButton>
             )}
-            Group Chat
+            聊天室
           </ChatHeader>
           <MessageList>
             {messages.map((message, index) => (
@@ -166,9 +188,9 @@ const Chat: React.FC<ChatProps> = () => {
               type="text"
               value={newMessage}
               onChange={(event) => setNewMessage(event.target.value)}
-              placeholder="Type your message here..."
+              placeholder="請輸入..."
             />
-            <SendButton type="submit">Send</SendButton>
+            <SendButton type="submit">傳送</SendButton>
           </ChatForm>
         </ChatWindow>
       )}
@@ -192,11 +214,10 @@ const GroupList = styled.div`
 `;
 
 const GroupItem = styled.div<{ $selected: boolean }>`
-  margin: 10px 0;
   padding: 10px;
   background-color: ${(props) => (props.$selected ? '#e9ebee' : 'white')};
   cursor: pointer;
-  border-radius: 8px;
+  border-bottom: 1px solid darkgray;
 
   &:hover {
     background-color: #f5f6f7;
@@ -218,7 +239,7 @@ const ChatWindow = styled.div`
 `;
 
 const ChatHeader = styled.div`
-  padding: 10px;
+  padding: 10px 16px;
   background-color: #f5f6f7;
   border-bottom: 1px solid #dddfe2;
   font-weight: bold;
@@ -261,6 +282,7 @@ const UserImage = styled.img<{ $isUser: boolean }>`
   width: 32px;
   height: 32px;
   border-radius: 50%;
+  object-fit: fill;
   margin: ${(props) => (props.$isUser ? '0 0 0 10px' : '0 10px 0 0')};
 `;
 
@@ -294,7 +316,7 @@ const ChatForm = styled.form`
 
 const ChatInput = styled.input`
   flex-grow: 1;
-  padding: 8px;
+  padding: 8px 20px;
   border: 1px solid #dddfe2;
   border-radius: 20px;
   margin-right: 10px;

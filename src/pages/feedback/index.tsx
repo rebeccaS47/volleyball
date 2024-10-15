@@ -221,6 +221,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
                   variant="outlined"
                   onClick={() => handleEventClick(event)}
                   sx={{
+                    fontSize:'16px',
                     margin: '5px',
                     backgroundColor:
                       selectedEvent?.id === event.id
@@ -366,7 +367,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
             '&.Mui-active': {
               color: '#f1b709',
             },
-            fontSize: '1.2rem',
+            fontSize: '1.3rem',
           },
         },
       },
@@ -424,7 +425,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
                               feedback.grade === ''))
                         }
                       >
-                        {index === steps.length - 1 ? '提交回饋' : '繼續'}
+                        {index === steps.length - 1 ? '提交' : '繼續'}
                       </ContinueButton>
                       <ReturnButton
                         disabled={index === 0}
@@ -460,7 +461,7 @@ const ContinueButton = styled(Button)`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 120px;
+    width: 80px;
     height: 50px;
     padding: 10px 16px;
     background-color: var(--color-secondary);
@@ -487,7 +488,7 @@ const ReturnButton = styled(Button)`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 120px;
+    width: 80px;
     height: 50px;
     padding: 10px 16px;
     background-color: var(--color-primary);

@@ -343,6 +343,7 @@ const Event: React.FC<EventProps> = () => {
         isOpen={isModalOpen}
         onRequestClose={handleCloseModal}
         event={selectedEvent}
+        hasApplyBtn={true}
       />
     </IndexContainer>
   );
@@ -373,7 +374,7 @@ const EventCard = styled.div`
   box-sizing: content-box;
   /* border: 3px dashed var(--color-dark); */
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 3rem 1.5rem;
 
   width: calc(33.333% - 62px);
   transition: transform 0.3s ease;
@@ -389,7 +390,6 @@ const EventCard = styled.div`
     position: absolute;
     width: 2rem;
     height: 2rem;
-    background-color: var(--color-primary);
     border-radius: 12px;
   }
 
@@ -404,12 +404,14 @@ const EventCard = styled.div`
     top: 0;
     right: 0;
     border-bottom-left-radius: 100%;
+    background-color: var(--color-primary);
   }
 
   & > ::before {
     bottom: 0;
     left: 0;
     border-top-right-radius: 100%;
+    background-color: var(--color-primary);
   }
 
   & > ::after {
@@ -431,7 +433,7 @@ const EventCard = styled.div`
 `;
 
 const EventInfo = styled.p`
-  margin: 10px 0;
+  padding: 12px 24px 0px;;
   font-size: 1.2rem;
   color: var(--color-dark);
   display: flex;
@@ -440,7 +442,8 @@ const EventInfo = styled.p`
 `;
 
 const EventTitle = styled.h3`
-  margin: 0 0 15px;
+  margin: 0px;
+  padding: 0px 0px 28px 0px;
   font-size: 2rem;
   text-align: center;
   color: var(--color-dark);
@@ -461,7 +464,7 @@ const FilterContainer = styled.div`
   padding: 10px;
   border-radius: 5px;
   width: fit-content;
-  margin: auto;
+  margin: 32px auto;
 `;
 
 const StyledSelect = styled.select`

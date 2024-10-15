@@ -77,11 +77,11 @@ const Login: React.FC = () => {
           required
         />
         {error && <Typography color="error">{error}</Typography>}
-        <Button type="submit" variant="contained" fullWidth>
+        <LoginButton type="submit">
           登入
-        </Button>
+        </LoginButton>
       </Form>
-      <Typography variant="body2" style={{ marginTop: '5px' }}>
+      <Typography variant="body2" style={{ marginTop: '10px' }}>
         還沒有帳號?{' '}
         <a
           href="/signup"
@@ -145,4 +145,28 @@ const Hr = styled.hr`
   height: 1px;
   background-color: rgb(204, 204, 204);
   margin: 0 10px;
+`;
+
+const LoginButton = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px 16px;
+  background-color: var(--color-secondary);
+  color: var(--color-dark);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 24px;
+  border: 2px solid var(--color-dark);
+  border-radius: 14px;
+  box-shadow: -4px 3px 0 0 var(--color-dark);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: -2px 1px 0 0 var(--color-dark);
+    background-color: var(--color-light);
+    transform: translateY(-2px);
+    transform: translateX(-1px);
+  }
 `;

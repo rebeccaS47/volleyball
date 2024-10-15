@@ -33,8 +33,8 @@ const GlobalStyle = createGlobalStyle`
   }
   
     :root{
-    --color-primary: #0080cc;
-    --color-secondary: rgb(255, 190, 0);
+    --color-primary: rgba(0, 129, 204);
+    --color-secondary: rgba(242, 186, 21);
     /* --color-secondary: rgb(255, 193, 0); */
     --color-tertiary: #36678c;
     --color-light: #f8f8f8;
