@@ -55,9 +55,9 @@ const Login: React.FC = () => {
 
   return (
     <LoginCard>
-      <Typography variant="h4" gutterBottom>
+      <h1 >
         登入
-      </Typography>
+      </h1>
       <Form onSubmit={handleLogin}>
         <TextField
           label="Email"
@@ -99,6 +99,7 @@ const Login: React.FC = () => {
         variant="outlined"
         fullWidth
         onClick={handleGoogleLogin}
+        style={{ color: 'black' }}
       >
         <img src={google} style={{ width: '20px', marginRight: '5px' }} />
         Sign in with Google
@@ -121,6 +122,7 @@ const LoginCard = styled(Card)`
 `;
 
 const Form = styled.form`
+  padding: 10px 0px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -128,7 +130,46 @@ const Form = styled.form`
 `;
 
 const SocialLoginButton = styled(Button)`
+  /* color: black; */
   margin-top: 30px;
+  &::before,
+  &::after,
+  & > ::before,
+  & > ::after {
+    content: '';
+    position: absolute;
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 12px;
+  }
+
+  &::before {
+    top: 0;
+    left: 0;
+    border-bottom-right-radius: 100%;
+    background-color: var(--color-secondary);
+  }
+
+  &::after {
+    top: 0;
+    right: 0;
+    border-bottom-left-radius: 100%;
+    background-color: var(--color-primary);
+  }
+
+  & > ::before {
+    bottom: 0;
+    left: 0;
+    border-top-right-radius: 100%;
+    background-color: var(--color-primary);
+  }
+
+  & > ::after {
+    bottom: 0;
+    right: 0;
+    border-top-left-radius: 100%;
+    background-color: var(--color-secondary);
+  }
 `;
 
 const Divider = styled.div`

@@ -55,6 +55,10 @@ const EventDetail: React.FC<EventDetailProps> = ({
       return;
     }
     if (!event) return;
+    if (event.findNum === 0) {
+      showSnackbar('已無名額');
+      return;
+    }
     if (event.playerList.includes(user?.id)) {
       showSnackbar('你已是隊員');
       return;
