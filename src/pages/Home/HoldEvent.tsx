@@ -1,20 +1,15 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { db } from '../../../firebaseConfig';
+import { Timestamp } from 'firebase/firestore';
 import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  updateDoc,
-  Timestamp,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-} from 'firebase/firestore';
+  createEvent,
+  fetchDropdownCities,
+  fetchDropdownCourts,
+  fetchCourtDetails,
+} from '../../firebase.ts';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
-import type { Court, Event, Option } from '../../types';
+import type { Event, Option } from '../../types';
 import Select, { SingleValue } from 'react-select';
 import UserSelector from '../../components/UserSelector';
 import { Snackbar } from '@mui/material';
@@ -73,46 +68,19 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const fetchCities = async () => {
-      const courtsRef = collection(db, 'courts');
-      const snapshot = await getDocs(courtsRef);
-      const allCourts: Court[] = snapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() } as Court)
-      );
-
-      const uniqueCities = Array.from(
-        new Set(allCourts.map((court) => court.city))
-      );
-      setCities(uniqueCities.map((city) => ({ value: city, label: city })));
+    const loadDroupdownCities = async () => {
+      const cityOptions = await fetchDropdownCities();
+      setCities(cityOptions);
     };
-
-    fetchCities();
+    loadDroupdownCities();
   }, []);
 
   useEffect(() => {
-    const fetchCourts = async () => {
-      if (selectedCity) {
-        const courtsRef = collection(db, 'courts');
-        const snapshot = await getDocs(courtsRef);
-        const allCourts: Court[] = snapshot.docs.map(
-          (doc) => ({ id: doc.id, ...doc.data() } as Court)
-        );
-
-        const filteredCourts = allCourts.filter(
-          (court) => court.city === selectedCity.value
-        );
-        setCourts(
-          filteredCourts.map((court) => ({
-            value: court.id,
-            label: court.name,
-          }))
-        );
-      } else {
-        setCourts([]);
-      }
+    const loadDroupdownCourts = async () => {
+      const courtOptions = await fetchDropdownCourts(selectedCity);
+      setCourts(courtOptions);
     };
-
-    fetchCourts();
+    loadDroupdownCourts();
   }, [selectedCity]);
 
   const validateForm = () => {
@@ -156,10 +124,8 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
   const handleCourtChange = async (selectedOption: Option | null) => {
     setSelectedCourt(selectedOption);
     if (selectedOption) {
-      const courtRef = doc(db, 'courts', selectedOption.value);
-      const courtDoc = await getDoc(courtRef);
-      if (courtDoc.exists()) {
-        const courtData = { id: courtDoc.id, ...courtDoc.data() } as Court;
+      const courtData = await fetchCourtDetails(selectedOption.value);
+      if (courtData) {
         setFormData((prevData) => ({
           ...prevData,
           court: courtData,
@@ -224,69 +190,11 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     console.log('Form Data Submitted:', formData);
     if (validateForm()) {
       try {
-        const [year, month, day] = formData.date.split('-').map(Number);
-
-        const [startHours, startMinutes] = formData.startTime
-          .split(':')
-          .map(Number);
-
-        const startDate = new Date(
-          year,
-          month - 1,
-          day,
-          startHours,
-          startMinutes
-        );
-        const startTimeStamp = Timestamp.fromDate(startDate);
-
-        const endDate = new Date(
-          startDate.getTime() + formData.duration * 60 * 60 * 1000
-        );
-        const endTimeStamp = Timestamp.fromDate(endDate);
-
-        const totalParticipants =
-          Number(formData.findNum) + formData.playerList.length + 1;
-        const averageCost =
-          totalParticipants > 0
-            ? Math.round(Number(formData.totalCost) / totalParticipants)
-            : 0;
-
-        const eventCollectionRef = collection(db, 'events');
-        const docRef = await addDoc(eventCollectionRef, {
-          ...formData,
-          createdEventAt: serverTimestamp(),
-          applicationList: [],
-          playerList: [formData.createUserId, ...formData.playerList],
-          startTimeStamp,
-          endTimeStamp,
-          averageCost,
-        });
-        await updateDoc(docRef, { id: docRef.id });
-
-        await Promise.all(
-          [formData.createUserId, ...formData.playerList].map(
-            async (playerId) => {
-              const participationRef = doc(
-                db,
-                'teamParticipation',
-                `${docRef.id}_${playerId}`
-              );
-              await setDoc(participationRef, {
-                eventId: docRef.id,
-                userId: playerId,
-                courtName: formData.court.name,
-                state: 'accept',
-                date: formData.date,
-                startTimeStamp,
-                endTimeStamp,
-              });
-            }
-          )
-        );
-
+        await createEvent(formData);
         showSnackbar('活動建立成功！');
       } catch (error) {
-        console.log(error);
+        console.error(error);
+        showSnackbar('活動建立失敗，請稍後再試。');
       }
     }
   };
@@ -326,11 +234,6 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
                 options={cities}
                 isClearable
                 placeholder="請選擇城市"
-                // styles={{
-                //   container: (provided) => ({
-                //     ...provided,
-                //   }),
-                // }}
               />
             </FormField>
             <FormField>
@@ -397,7 +300,6 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
                 onChange={handleInputChange}
                 min="1"
                 max="12"
-                // step="0.5"
               />
             </FormField>
           </FormSection>
@@ -560,11 +462,9 @@ const HoldEventContainer = styled.div`
 `;
 
 const Form = styled.form`
-  /* border-radius: 15px; */
   padding: 30px 30px;
   max-width: 800px;
   margin: 0px auto;
-  /* box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); */
 
   @media (max-width: 600px) {
     padding: 20px 20px;

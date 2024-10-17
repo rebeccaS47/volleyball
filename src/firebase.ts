@@ -8,8 +8,11 @@ import {
   getDocs,
   Timestamp,
   setDoc,
+  addDoc,
+  updateDoc,
+  serverTimestamp,
 } from 'firebase/firestore';
-import type { User, Event, Feedback } from './types';
+import type { User, Event, Feedback, Court, Option } from './types';
 
 export const handleUserNameList = async (
   playerList: string[]
@@ -84,4 +87,104 @@ export const getPlayerFeedback = async (
   } else {
     return null;
   }
+};
+
+export const createEvent = async (formData: Event): Promise<void> => {
+  const [year, month, day] = formData.date.split('-').map(Number);
+  const [startHours, startMinutes] = formData.startTime.split(':').map(Number);
+  const startDate = new Date(year, month - 1, day, startHours, startMinutes);
+  const startTimeStamp = Timestamp.fromDate(startDate);
+  const endDate = new Date(
+    startDate.getTime() + formData.duration * 60 * 60 * 1000
+  );
+  const endTimeStamp = Timestamp.fromDate(endDate);
+
+  const totalParticipants =
+    Number(formData.findNum) + formData.playerList.length + 1;
+  const averageCost =
+    totalParticipants > 0
+      ? Math.round(Number(formData.totalCost) / totalParticipants)
+      : 0;
+
+  const eventCollectionRef = collection(db, 'events');
+  const docRef = await addDoc(eventCollectionRef, {
+    ...formData,
+    createdEventAt: serverTimestamp(),
+    applicationList: [],
+    playerList: [formData.createUserId, ...formData.playerList],
+    startTimeStamp,
+    endTimeStamp,
+    averageCost,
+  });
+
+  await updateDoc(docRef, { id: docRef.id });
+
+  await Promise.all(
+    [formData.createUserId, ...formData.playerList].map(async (playerId) => {
+      const participationRef = doc(
+        db,
+        'teamParticipation',
+        `${docRef.id}_${playerId}`
+      );
+      await setDoc(participationRef, {
+        eventId: docRef.id,
+        userId: playerId,
+        courtName: formData.court.name,
+        state: 'accept',
+        date: formData.date,
+        startTimeStamp,
+        endTimeStamp,
+      });
+    })
+  );
+};
+
+export const fetchDropdownCities = async (): Promise<
+  { value: string; label: string }[]
+> => {
+  const courtsRef = collection(db, 'courts');
+  const snapshot = await getDocs(courtsRef);
+  const allCourts: Court[] = snapshot.docs.map(
+    (doc) => ({ id: doc.id, ...doc.data() } as Court)
+  );
+  const uniqueCities = Array.from(
+    new Set(allCourts.map((court) => court.city))
+  );
+  return uniqueCities.map((city) => ({ value: city, label: city }));
+};
+
+export const fetchDropdownCourts = async (
+  selectedCity: Option | null
+): Promise<Option[]> => {
+  if (!selectedCity) {
+    return [];
+  }
+
+  const courtsRef = collection(db, 'courts');
+  const snapshot = await getDocs(courtsRef);
+  const allCourts: Court[] = snapshot.docs.map(
+    (doc) => ({ id: doc.id, ...doc.data() } as Court)
+  );
+
+  const filteredCourts = allCourts.filter(
+    (court) => court.city === selectedCity.value
+  );
+
+  return filteredCourts.map((court) => ({
+    value: court.id,
+    label: court.name,
+  }));
+};
+
+export const fetchCourtDetails = async (
+  courtId: string
+): Promise<Court | null> => {
+  const courtRef = doc(db, 'courts', courtId);
+  const courtDoc = await getDoc(courtRef);
+
+  if (courtDoc.exists()) {
+    return { id: courtDoc.id, ...courtDoc.data() } as Court;
+  }
+
+  return null;
 };
