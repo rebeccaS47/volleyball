@@ -105,3 +105,8 @@ export interface FilterState {
   endTime: string;
   level: string;
 }
+
+export interface UserName {
+  id: string;
+  name: string;
+}

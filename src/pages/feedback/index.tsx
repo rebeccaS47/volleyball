@@ -1,18 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
-import { db } from '../../../firebaseConfig.ts';
 import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  setDoc,
-  getDoc,
-  Timestamp,
-} from 'firebase/firestore';
-import { findUserById } from '../../firebase.ts';
-import type { Event, Feedback } from '../../types.ts';
+  findUserById,
+  feedbackFetchClosedEvents,
+  submitFeedback,
+  getPlayerFeedback,
+} from '../../firebase.ts';
+import type { Event, Feedback, UserName } from '../../types.ts';
 import {
   Stepper,
   Step,
@@ -36,10 +30,6 @@ import { SyncLoader } from 'react-spinners';
 
 interface FeedbackProps {}
 
-interface UserName {
-  id: string;
-  name: string;
-}
 const Feedback: React.FC<FeedbackProps> = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [closedEvents, setClosedEvents] = useState<Event[]>([]);
@@ -68,24 +58,11 @@ const Feedback: React.FC<FeedbackProps> = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const fetchClosedEvents = async () => {
+    const loadClosedEvents = async () => {
       if (!user) return;
       try {
-        const eventsRef = collection(db, 'events');
-        const q = query(
-          eventsRef,
-          where('createUserId', '==', user.id),
-          where('endTimeStamp', '<', Timestamp.now())
-        );
-
-        const querySnapshot = await getDocs(q);
-        const fetchedEvents: Event[] = [];
-        querySnapshot.forEach((doc) => {
-          fetchedEvents.push({ id: doc.id, ...doc.data() } as Event);
-        });
-
-        setClosedEvents(fetchedEvents);
-        console.log('closedEvent: ', fetchedEvents);
+        const events = await feedbackFetchClosedEvents(user.id);
+        setClosedEvents(events);
       } catch (err) {
         setError(
           'Error fetching events: ' +
@@ -96,7 +73,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
       }
     };
 
-    fetchClosedEvents();
+    loadClosedEvents();
   }, [user]);
 
   useEffect(() => {
@@ -115,9 +92,8 @@ const Feedback: React.FC<FeedbackProps> = () => {
         })
       );
       setUserNames(names);
-      console.log('搜到名字', names);
     } catch (error) {
-      console.error('Error fetching user names:', error);
+      console.error('抓取用戶名稱失敗:', error);
     } finally {
       setLoadingNames(false);
     }
@@ -156,21 +132,18 @@ const Feedback: React.FC<FeedbackProps> = () => {
 
     if (player) {
       try {
-        const docRef = doc(db, 'history', `${event.id}_${player}`);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+        const feedbackData = await getPlayerFeedback(event.id, player);
+        if (feedbackData) {
           setFeedback({
             ...initialFeedback,
-            friendlinessLevel: data.friendlinessLevel || '',
-            level: data.level || '',
-            grade: data.grade ?? '',
-            note: data.note || '',
+            friendlinessLevel: feedbackData.friendlinessLevel || '',
+            level: feedbackData.level || '',
+            grade: feedbackData.grade ?? '',
+            note: feedbackData.note || '',
           });
         }
       } catch (error) {
-        console.error('Error fetching feedback data:', error);
+        console.error('抓取回饋資料失敗:', error);
       }
     }
   };
@@ -191,13 +164,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
   const handleSubmitFeedback = async () => {
     if (!selectedEvent || !selectedPlayer) return;
     try {
-      const feedbackDocRef = doc(
-        db,
-        'history',
-        `${selectedEvent.id}_${selectedPlayer}`
-      );
-      await setDoc(feedbackDocRef, { ...feedback });
-
+      await submitFeedback(selectedEvent.id, selectedPlayer, feedback);
       showSnackbar('回饋提交成功！');
       setSelectedPlayer(null);
       setActiveStep(0);
@@ -222,7 +189,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
                   variant="outlined"
                   onClick={() => handleEventClick(event)}
                   sx={{
-                    fontSize:'16px',
+                    fontSize: '16px',
                     margin: '5px',
                     backgroundColor:
                       selectedEvent?.id === event.id
@@ -417,8 +384,6 @@ const Feedback: React.FC<FeedbackProps> = () => {
           sx={{
             maxWidth: 800,
             m: '32px auto',
-            // border: '1px solid rgb(204, 204, 204)',
-            // borderRadius: '4px',
             padding: '20px',
           }}
         >
