@@ -3,15 +3,17 @@ import { db } from '../../../firebaseConfig';
 import {
   collection,
   onSnapshot,
-  doc,
-  getDoc,
-  getDocs,
   query,
   orderBy,
   where,
   Timestamp,
 } from 'firebase/firestore';
-import type { Event, Option, Court, FilterState } from '../../types';
+import type { Event, Option, FilterState } from '../../types';
+import {
+  fetchDropdownCities,
+  fetchDropdownCourts,
+  fetchCourtDetails,
+} from '../../firebase.ts';
 import styled from 'styled-components';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -61,46 +63,19 @@ const Event: React.FC<EventProps> = () => {
   };
 
   useEffect(() => {
-    const fetchCities = async () => {
-      const courtsRef = collection(db, 'courts');
-      const snapshot = await getDocs(courtsRef);
-      const allCourts: Court[] = snapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() } as Court)
-      );
-
-      const uniqueCities = Array.from(
-        new Set(allCourts.map((court) => court.city))
-      );
-      setCities(uniqueCities.map((city) => ({ value: city, label: city })));
+    const loadDroupdownCities = async () => {
+      const cityOptions = await fetchDropdownCities();
+      setCities(cityOptions);
     };
-
-    fetchCities();
+    loadDroupdownCities();
   }, []);
 
   useEffect(() => {
-    const fetchCourts = async () => {
-      if (selectedCity) {
-        const courtsRef = collection(db, 'courts');
-        const snapshot = await getDocs(courtsRef);
-        const allCourts: Court[] = snapshot.docs.map(
-          (doc) => ({ id: doc.id, ...doc.data() } as Court)
-        );
-
-        const filteredCourts = allCourts.filter(
-          (court) => court.city === selectedCity.value
-        );
-        setCourts(
-          filteredCourts.map((court) => ({
-            value: court.id,
-            label: court.name,
-          }))
-        );
-      } else {
-        setCourts([]);
-      }
+    const loadDroupdownCourts = async () => {
+      const courtOptions = await fetchDropdownCourts(selectedCity);
+      setCourts(courtOptions);
     };
-
-    fetchCourts();
+    loadDroupdownCourts();
   }, [selectedCity]);
 
   const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -121,10 +96,8 @@ const Event: React.FC<EventProps> = () => {
       courts.find((court) => court.value === courtValue) || null;
     setSelectedCourt(courtOption);
     if (courtOption) {
-      const courtRef = doc(db, 'courts', courtOption.value);
-      const courtDoc = await getDoc(courtRef);
-      if (courtDoc.exists()) {
-        const courtData = { id: courtDoc.id, ...courtDoc.data() } as Court;
+      const courtData = await fetchCourtDetails(courtOption.value);
+      if (courtData) {
         setFilterState((prevData) => ({
           ...prevData,
           court: courtData.name,
@@ -168,19 +141,23 @@ const Event: React.FC<EventProps> = () => {
 
       //const data = await getDocs(q);
       // const data = await getDocs(eventCollectionRef);
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const filteredData = snapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        })) as Event[];
-        setEventList(filteredData);
-        setIsLoading(false);
-      }, (error) => {
-        console.error("Error fetching events:", error);
-        setIsLoading(false);
-      });
-  
-      return unsubscribe; 
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          const filteredData = snapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          })) as Event[];
+          setEventList(filteredData);
+          setIsLoading(false);
+        },
+        (error) => {
+          console.error('Error fetching events:', error);
+          setIsLoading(false);
+        }
+      );
+
+      return unsubscribe;
     } catch (error) {
       console.log(error);
       setIsLoading(false);
@@ -214,7 +191,6 @@ const Event: React.FC<EventProps> = () => {
       }
     };
   }, [getEventList]);
-  
 
   useEffect(() => {
     if (!isLoading) {
@@ -276,7 +252,6 @@ const Event: React.FC<EventProps> = () => {
             value={filterState.startTime}
             onChange={handleInputChange}
           />{' '}
-          {/* <span> ~ </span> */}
           <FilterInput
             type="time"
             name="endTime"
@@ -313,7 +288,7 @@ const Event: React.FC<EventProps> = () => {
             style={{
               color: 'var(--color-dark)',
               backgroundColor: 'var(--color-light)',
-              display: 'flex',
+              margin: '0 auto',
             }}
           >
             暫無相關活動
@@ -351,7 +326,6 @@ const Event: React.FC<EventProps> = () => {
                 {event.court.city}
                 {event.court.address}
               </EventInfoAddress>
-              
             </EventCard>
           ))
         )}
@@ -389,10 +363,8 @@ const EventListContainer = styled.div`
 const EventCard = styled.div`
   background-color: #f8f8f8;
   box-sizing: content-box;
-  /* border: 3px dashed var(--color-dark); */
   border-radius: 12px;
   padding: 3rem 1.5rem;
-
   width: calc(33.333% - 62px);
   transition: transform 0.3s ease;
   position: relative;
@@ -450,7 +422,7 @@ const EventCard = styled.div`
 `;
 
 const EventInfo = styled.p`
-  padding: 12px 24px 0px;;
+  padding: 12px 24px 0px;
   font-size: 1.2rem;
   color: var(--color-dark);
   display: flex;
@@ -459,7 +431,7 @@ const EventInfo = styled.p`
 `;
 
 const EventInfoAddress = styled.p`
-  padding: 24px 24px 0px;;
+  padding: 24px 24px 0px;
   font-size: 16px;
   color: gray;
   display: flex;
