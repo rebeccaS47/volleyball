@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { db } from '../../../firebaseConfig';
 import {
   collection,
+  onSnapshot,
   doc,
   getDoc,
   getDocs,
@@ -153,7 +154,7 @@ const Event: React.FC<EventProps> = () => {
     }));
   };
 
-  const getEventList = useCallback(async () => {
+  const getEventList = useCallback(() => {
     setIsLoading(true);
     try {
       const eventCollectionRef = collection(db, 'events');
@@ -164,17 +165,26 @@ const Event: React.FC<EventProps> = () => {
         orderBy('date', 'asc'),
         orderBy('startTimeStamp', 'asc')
       );
-      const data = await getDocs(q);
+
+      //const data = await getDocs(q);
       // const data = await getDocs(eventCollectionRef);
-      const filteredData = data.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      })) as Event[];
-      setEventList(filteredData);
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const filteredData = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        })) as Event[];
+        setEventList(filteredData);
+        setIsLoading(false);
+      }, (error) => {
+        console.error("Error fetching events:", error);
+        setIsLoading(false);
+      });
+  
+      return unsubscribe; 
     } catch (error) {
       console.log(error);
-    } finally {
       setIsLoading(false);
+      return undefined;
     }
   }, []);
 
@@ -197,8 +207,14 @@ const Event: React.FC<EventProps> = () => {
   }, [filterState, eventList]);
 
   useEffect(() => {
-    getEventList();
+    const unsubscribe = getEventList();
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [getEventList]);
+  
 
   useEffect(() => {
     if (!isLoading) {
