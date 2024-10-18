@@ -1,18 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { db } from '../../../firebaseConfig';
-import {
-  collection,
-  onSnapshot,
-  query,
-  orderBy,
-  where,
-  Timestamp,
-} from 'firebase/firestore';
 import type { Event, Option, FilterState } from '../../types';
 import {
   fetchDropdownCities,
   fetchDropdownCourts,
   fetchCourtDetails,
+  fetchHomeEventList,
 } from '../../firebase.ts';
 import styled from 'styled-components';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -127,39 +119,16 @@ const Event: React.FC<EventProps> = () => {
     }));
   };
 
-  const getEventList = useCallback(() => {
+  const fetchEventList = useCallback(() => {
     setIsLoading(true);
     try {
-      const eventCollectionRef = collection(db, 'events');
-      const now = Timestamp.now();
-      const q = query(
-        eventCollectionRef,
-        where('startTimeStamp', '>=', now),
-        orderBy('date', 'asc'),
-        orderBy('startTimeStamp', 'asc')
-      );
-
-      //const data = await getDocs(q);
-      // const data = await getDocs(eventCollectionRef);
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          const filteredData = snapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-          })) as Event[];
-          setEventList(filteredData);
-          setIsLoading(false);
-        },
-        (error) => {
-          console.error('Error fetching events:', error);
-          setIsLoading(false);
-        }
-      );
+      const unsubscribe = fetchHomeEventList((events) => {
+        setEventList(events);
+        setIsLoading(false);
+      });
 
       return unsubscribe;
-    } catch (error) {
-      console.log(error);
+    } catch {
       setIsLoading(false);
       return undefined;
     }
@@ -184,13 +153,13 @@ const Event: React.FC<EventProps> = () => {
   }, [filterState, eventList]);
 
   useEffect(() => {
-    const unsubscribe = getEventList();
+    const unsubscribe = fetchEventList();
     return () => {
       if (unsubscribe) {
         unsubscribe();
       }
     };
-  }, [getEventList]);
+  }, [fetchEventList]);
 
   useEffect(() => {
     if (!isLoading) {

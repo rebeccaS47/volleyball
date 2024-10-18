@@ -11,6 +11,8 @@ import {
   addDoc,
   updateDoc,
   serverTimestamp,
+  onSnapshot,
+  orderBy,
 } from 'firebase/firestore';
 import type { User, Event, Feedback, Court, Option } from './types';
 
@@ -187,4 +189,25 @@ export const fetchCourtDetails = async (
   }
 
   return null;
+};
+
+export const fetchHomeEventList = (onSuccess: (events: Event[]) => void) => {
+  const eventCollectionRef = collection(db, 'events');
+  const now = Timestamp.now();
+  const q = query(
+    eventCollectionRef,
+    where('startTimeStamp', '>=', now),
+    orderBy('date', 'asc'),
+    orderBy('startTimeStamp', 'asc')
+  );
+
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const filteredData = snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    })) as Event[];
+    onSuccess(filteredData);
+  });
+
+  return unsubscribe;
 };
