@@ -13,8 +13,18 @@ import {
   serverTimestamp,
   onSnapshot,
   orderBy,
+  arrayRemove,
+  arrayUnion,
 } from 'firebase/firestore';
-import type { User, Event, Feedback, Court, Option } from './types';
+import type {
+  User,
+  Event,
+  Feedback,
+  Court,
+  Option,
+  ApplicantData,
+  History,
+} from './types';
 
 export const handleUserNameList = async (
   playerList: string[]
@@ -210,4 +220,137 @@ export const fetchHomeEventList = (onSuccess: (events: Event[]) => void) => {
   });
 
   return unsubscribe;
+};
+
+export const listenToNeedApprovalEvents = (
+  userId: string,
+  setEventList: (events: Event[]) => void,
+  setApplicantData: (data: { [key: string]: ApplicantData }) => void,
+  setHistoryData: (data: { [key: string]: History[] }) => void,
+  setLoading: (loading: boolean) => void
+) => {
+  const eventsRef = collection(db, 'events');
+  const q = query(eventsRef, where('createUserId', '==', userId));
+
+  return onSnapshot(q, async (querySnapshot) => {
+    const events: Event[] = [];
+    const applicants: Set<string> = new Set();
+    querySnapshot.forEach((doc) => {
+      const event = { id: doc.id, ...doc.data() } as Event;
+      events.push(event);
+      event.applicationList.forEach((applicantId) =>
+        applicants.add(applicantId)
+      );
+    });
+
+    setEventList(events);
+
+    try {
+      const applicantDataPromises = Array.from(applicants).map(
+        async (applicantId) => {
+          const applicantUser = await findUserById(applicantId);
+          if (applicantUser) {
+            return {
+              id: applicantId,
+              name: applicantUser.name,
+            };
+          }
+          return null;
+        }
+      );
+
+      const historyPromises = Array.from(applicants).map(
+        async (applicantId) => {
+          const historyRef = collection(db, 'history');
+          const historyQuery = query(
+            historyRef,
+            where('userId', '==', applicantId)
+          );
+          const historySnapshot = await getDocs(historyQuery);
+          const history = historySnapshot.docs.map(
+            (doc) => doc.data() as History
+          );
+          return { id: applicantId, history };
+        }
+      );
+
+      const [applicantDataResults, historyResults] = await Promise.all([
+        Promise.all(applicantDataPromises),
+        Promise.all(historyPromises),
+      ]);
+
+      const newApplicantData = applicantDataResults.reduce((acc, result) => {
+        if (result) {
+          acc[result.id] = {
+            name: result.name,
+          };
+        }
+        return acc;
+      }, {} as { [key: string]: ApplicantData });
+
+      const newHistoryData = historyResults.reduce((acc, result) => {
+        acc[result.id] = result.history;
+        return acc;
+      }, {} as { [key: string]: History[] });
+
+      setApplicantData(newApplicantData);
+      setHistoryData(newHistoryData);
+
+      console.log('監聽到的 events:', events);
+      console.log('申請者資料:', newApplicantData);
+      console.log('歷史數據:', newHistoryData);
+    } catch (error) {
+      console.error('獲取資料時出錯:', error);
+    } finally {
+      setLoading(false);
+    }
+  });
+};
+
+export const acceptApplicant = async (
+  applicant: string,
+  eventId: string,
+  findNum: number
+) => {
+  try {
+    const eventRef = doc(db, 'events', eventId);
+    await updateDoc(eventRef, {
+      applicationList: arrayRemove(applicant),
+      playerList: arrayUnion(applicant),
+      findNum: typeof findNum === 'number' ? findNum - 1 : 0,
+    });
+
+    const participationRef = doc(
+      db,
+      'teamParticipation',
+      `${eventId}_${applicant}`
+    );
+    await updateDoc(participationRef, {
+      state: 'accept',
+    });
+  } catch (error) {
+    console.error('更新參與狀態時發生錯誤:', error);
+    throw error;
+  }
+};
+
+export const declineApplicant = async (applicant: string, eventId: string) => {
+  try {
+    const eventRef = doc(db, 'events', eventId);
+    await updateDoc(eventRef, {
+      applicationList: arrayRemove(applicant),
+    });
+
+    const participationRef = doc(
+      db,
+      'teamParticipation',
+      `${eventId}_${applicant}`
+    );
+    await updateDoc(participationRef, {
+      state: 'decline',
+    });
+  } catch (error) {
+    console.error('更新參與狀態時發生錯誤:', error);
+    throw error;
+  }
 };
