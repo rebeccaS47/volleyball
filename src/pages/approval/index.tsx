@@ -1,26 +1,14 @@
 import { useEffect, useState } from 'react';
-import { db } from '../../../firebaseConfig.ts';
-import {
-  collection,
-  onSnapshot,
-  query,
-  where,
-  getDocs,
-  doc,
-  updateDoc,
-  arrayRemove,
-  arrayUnion,
-} from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
-import type { Event, History } from '../../types.ts';
-import { findUserById } from '../../firebase.ts';
+import type { Event, History, ApplicantData } from '../../types.ts';
+import {
+  acceptApplicant,
+  declineApplicant,
+  listenToNeedApprovalEvents,
+} from '../../firebase.ts';
 import HistoryDetail from '../../components/HistoryDetail.tsx';
 import styled from 'styled-components';
 import { SyncLoader } from 'react-spinners';
-
-interface ApplicantData {
-  name: string;
-}
 
 interface ApprovalProps {}
 
@@ -38,81 +26,13 @@ const Approval: React.FC<ApprovalProps> = () => {
 
   useEffect(() => {
     if (!user) return;
-    const eventsRef = collection(db, 'events');
-    const q = query(eventsRef, where('createUserId', '==', user.id));
-
-    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-      const events: Event[] = [];
-      const applicants: Set<string> = new Set();
-      querySnapshot.forEach((doc) => {
-        const event = { id: doc.id, ...doc.data() } as Event;
-        events.push(event);
-        event.applicationList.forEach((applicantId) =>
-          applicants.add(applicantId)
-        );
-      });
-
-      setEventList(events);
-
-      try {
-        const applicantDataPromises = Array.from(applicants).map(
-          async (applicantId) => {
-            const applicantUser = await findUserById(applicantId);
-            if (applicantUser) {
-              return {
-                id: applicantId,
-                name: applicantUser.name,
-              };
-            }
-            return null;
-          }
-        );
-
-        const historyPromises = Array.from(applicants).map(
-          async (applicantId) => {
-            const historyRef = collection(db, 'history');
-            const historyQuery = query(
-              historyRef,
-              where('userId', '==', applicantId)
-            );
-            const historySnapshot = await getDocs(historyQuery);
-            const history = historySnapshot.docs.map(
-              (doc) => doc.data() as History
-            );
-            return { id: applicantId, history };
-          }
-        );
-        const [applicantDataResults, historyResults] = await Promise.all([
-          Promise.all(applicantDataPromises),
-          Promise.all(historyPromises),
-        ]);
-
-        const newApplicantData = applicantDataResults.reduce((acc, result) => {
-          if (result) {
-            acc[result.id] = {
-              name: result.name,
-            };
-          }
-          return acc;
-        }, {} as { [key: string]: ApplicantData });
-
-        const newHistoryData = historyResults.reduce((acc, result) => {
-          acc[result.id] = result.history;
-          return acc;
-        }, {} as { [key: string]: History[] });
-
-        setApplicantData(newApplicantData);
-        setHistoryData(newHistoryData);
-
-        console.log('監聽到的 events:', events);
-        console.log('申請者資料:', newApplicantData);
-        console.log('歷史數據:', newHistoryData);
-      } catch (error) {
-        console.error('獲取資料時出錯:', error);
-      } finally {
-        setLoading(false);
-      }
-    });
+    const unsubscribe = listenToNeedApprovalEvents(
+      user.id,
+      setEventList,
+      setApplicantData,
+      setHistoryData,
+      setLoading
+    );
 
     return () => unsubscribe();
   }, [user]);
@@ -133,42 +53,15 @@ const Approval: React.FC<ApprovalProps> = () => {
     findNum: number
   ) => {
     try {
-      const eventRef = doc(db, 'events', eventId);
-      await updateDoc(eventRef, {
-        applicationList: arrayRemove(applicant),
-        playerList: arrayUnion(applicant),
-        findNum: typeof findNum === 'number' ? findNum - 1 : 0,
-      });
-
-      const participationRef = doc(
-        db,
-        'teamParticipation',
-        `${eventId}_${applicant}`
-      );
-      await updateDoc(participationRef, {
-        state: 'accept',
-      });
+      await acceptApplicant(applicant, eventId, findNum);
     } catch (error) {
       console.error('更新參與狀態時發生錯誤:', error);
-      throw error;
     }
   };
 
   const handleDecline = async (applicant: string, eventId: string) => {
     try {
-      const eventRef = doc(db, 'events', eventId);
-      await updateDoc(eventRef, {
-        applicationList: arrayRemove(applicant),
-      });
-
-      const participationRef = doc(
-        db,
-        'teamParticipation',
-        `${eventId}_${applicant}`
-      );
-      await updateDoc(participationRef, {
-        state: 'decline',
-      });
+      await declineApplicant(applicant, eventId);
     } catch (error) {
       console.error('更新參與狀態時發生錯誤:', error);
       throw error;
@@ -235,9 +128,6 @@ const Approval: React.FC<ApprovalProps> = () => {
                         <>
                           <StyledTd rowSpan={event.applicationList.length}>
                             {event.date}
-                            {/* {" "}{event.startTimeStamp.toDate().toLocaleTimeString() } */}
-                            {/* '~' +
-                      event.endTimeStamp.toDate().toLocaleTimeString()} */}
                           </StyledTd>
                           <StyledTd rowSpan={event.applicationList.length}>
                             {event.court.name}
@@ -313,8 +203,6 @@ const Tbody = styled.tbody`
 const StyledTh = styled.th`
   text-align: left;
   padding: 8px 16px;
-  /* background-color: #f2f2f2; */
-  /* border-bottom: 2px dashed #ffc100; */
   border-bottom: 2px dashed;
   border-image: repeating-linear-gradient(
       to right,

@@ -110,3 +110,7 @@ export interface UserName {
   id: string;
   name: string;
 }
+
+export interface ApplicantData {
+  name: string;
+}
