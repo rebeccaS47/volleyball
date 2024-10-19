@@ -24,6 +24,8 @@ import type {
   Option,
   ApplicantData,
   History,
+  TeamParticipation,
+  Message,
 } from './types';
 
 export const handleUserNameList = async (
@@ -353,4 +355,64 @@ export const declineApplicant = async (applicant: string, eventId: string) => {
     console.error('更新參與狀態時發生錯誤:', error);
     throw error;
   }
+};
+
+export const listenToTeamParticipations = (
+  userId: string,
+  callback: (participations: TeamParticipation[]) => void
+) => {
+  const q = query(
+    collection(db, 'teamParticipation'),
+    where('userId', '==', userId),
+    where('state', '==', 'accept'),
+    orderBy('startTimeStamp')
+  );
+
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const participationsData: TeamParticipation[] = [];
+    querySnapshot.forEach((doc) => {
+      participationsData.push(doc.data() as TeamParticipation);
+    });
+    callback(participationsData);
+  });
+
+  return unsubscribe;
+};
+
+export const listenToMessages = (
+  roomId: string,
+  callback: (messages: Message[]) => void
+) => {
+  const queryMessages = query(
+    collection(db, 'messages'),
+    where('roomId', '==', roomId),
+    orderBy('createdAt')
+  );
+
+  const unsubscribe = onSnapshot(queryMessages, (snapshot) => {
+    const messages: Message[] = [];
+    snapshot.forEach((doc) => {
+      messages.push({ ...doc.data() } as Message);
+    });
+    callback(messages);
+  });
+
+  return unsubscribe;
+};
+
+export const addChatMessage = async (
+  newMessage: string,
+  user: User,
+  selectedEventId: string
+) => {
+  if (newMessage === '' || !user) return;
+
+  await addDoc(collection(db, 'messages'), {
+    text: newMessage,
+    createdAt: serverTimestamp(),
+    userName: user.name,
+    userId: user.id,
+    userImgURL: user.imgURL,
+    roomId: selectedEventId,
+  });
 };

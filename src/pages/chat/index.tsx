@@ -1,16 +1,11 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { db } from '../../../firebaseConfig';
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  addDoc,
-  serverTimestamp,
-} from 'firebase/firestore';
 import { useUserAuth } from '../../context/userAuthContext';
+import {
+  listenToTeamParticipations,
+  listenToMessages,
+  addChatMessage,
+} from '../../firebase.ts';
 import type { TeamParticipation, Message } from '../../types';
 import { ArrowLeft } from '@mui/icons-material';
 
@@ -27,39 +22,24 @@ const Chat: React.FC<ChatProps> = () => {
 
   useEffect(() => {
     if (!user) return;
-    const q = query(
-      collection(db, 'teamParticipation'),
-      where('userId', '==', user.id),
-      where('state', '==', 'accept'),
-      orderBy('startTimeStamp')
+
+    const unsubscribe = listenToTeamParticipations(
+      user.id,
+      (participations) => {
+        setgroupChats(participations);
+      }
     );
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const participationsData: TeamParticipation[] = [];
-      querySnapshot.forEach((doc) => {
-        participationsData.push(doc.data() as TeamParticipation);
-      });
-      setgroupChats(participationsData);
-    });
     return () => unsubscribe();
   }, [user]);
 
   useEffect(() => {
     if (!selectedEventId) return;
 
-    const queryMessages = query(
-      collection(db, 'messages'),
-      where('roomId', '==', selectedEventId),
-      orderBy('createdAt')
-    );
-
-    const unsubscribe = onSnapshot(queryMessages, (snapshot) => {
-      const messages: Message[] = [];
-      snapshot.forEach((doc) => {
-        messages.push({ ...doc.data(), roomId: doc.id } as Message);
-      });
+    const unsubscribe = listenToMessages(selectedEventId, (messages) => {
       setMessages(messages);
     });
+
     return () => unsubscribe();
   }, [selectedEventId]);
 
@@ -74,17 +54,9 @@ const Chat: React.FC<ChatProps> = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!user || !selectedEventId) return;
 
-    if (newMessage === '') return;
-    if (!user) return;
-    await addDoc(collection(db, 'messages'), {
-      text: newMessage,
-      createdAt: serverTimestamp(),
-      userName: user.name,
-      userId: user.id,
-      userImgURL: user.imgURL,
-      roomId: selectedEventId,
-    });
+    await addChatMessage(newMessage, user, selectedEventId);
     setNewMessage('');
   };
 
@@ -130,7 +102,7 @@ const Chat: React.FC<ChatProps> = () => {
               </GroupItem>
             ))}
           </GroupList>
-          {!selectedEventId && (
+          {!selectedEventId && !isMobile && (
             <div
               style={{
                 width: '100%',
@@ -211,6 +183,11 @@ const GroupList = styled.div`
   min-width: 300px;
   padding: 10px;
   overflow-y: auto;
+
+  @media (max-width: 600px) {
+    margin: 0px auto;
+    width: 100%;
+  }
 `;
 
 const GroupItem = styled.div<{ $selected: boolean }>`
