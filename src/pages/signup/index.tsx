@@ -59,15 +59,12 @@ const Signup: React.FC = () => {
       } else {
         setError('註冊失敗，請稍後再試');
       }
-      console.error(error);
     }
   };
 
   return (
     <SignupCard>
-      <Typography variant="h4" gutterBottom>
-        註冊
-      </Typography>
+      <h1>註冊</h1>
       <Form onSubmit={handleSignup}>
         <TextField
           label="Email"
@@ -187,13 +184,3 @@ const SignupButton = styled.button`
     transform: translateX(-1px);
   }
 `;
-
-// const StyledTitle = styled.h1`
-//   color: var(--color-secondary);
-//   font-weight: bold;
-//   text-shadow: -6px 6px 0px black;
-//   -webkit-text-stroke: 1px black;
-//   font-size: 3rem;
-//   margin: 0;
-//   padding: 10px;
-// `;

@@ -20,9 +20,8 @@ const Login: React.FC = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/');
-    } catch (error) {
-      setError('Failed to log in. Please check your credentials.');
-      console.error(error);
+    } catch {
+      setError('登入失敗，請檢查您的email及密碼是否正確');
     }
   };
 
