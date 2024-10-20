@@ -15,6 +15,8 @@ import {
   orderBy,
   arrayRemove,
   arrayUnion,
+  QuerySnapshot,
+  DocumentData,
 } from 'firebase/firestore';
 import type {
   User,
@@ -26,6 +28,7 @@ import type {
   History,
   TeamParticipation,
   Message,
+  CalendarEvent,
 } from './types';
 
 export const handleUserNameList = async (
@@ -297,10 +300,6 @@ export const listenToNeedApprovalEvents = (
 
       setApplicantData(newApplicantData);
       setHistoryData(newHistoryData);
-
-      console.log('監聽到的 events:', events);
-      console.log('申請者資料:', newApplicantData);
-      console.log('歷史數據:', newHistoryData);
     } catch (error) {
       console.error('獲取資料時出錯:', error);
     } finally {
@@ -415,4 +414,50 @@ export const addChatMessage = async (
     userImgURL: user.imgURL,
     roomId: selectedEventId,
   });
+};
+
+export const fetchUserData = async (userId: string): Promise<User> => {
+  const userDoc = await getDoc(doc(db, 'users', userId));
+  if (userDoc.exists()) {
+    return userDoc.data() as User;
+  } else {
+    throw new Error('User document not found');
+  }
+};
+
+export const listenToEventsForUserCalendar = (
+  userId: string,
+  callback: (events: CalendarEvent[]) => void
+): (() => void) => {
+  const eventsRef = collection(db, 'teamParticipation');
+  const q = query(eventsRef, where('userId', '==', userId));
+
+  return onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
+    const fetchedEvents: CalendarEvent[] = snapshot.docs
+      .map((doc) => {
+        const data = doc.data() as TeamParticipation;
+        return {
+          title: data.courtName,
+          start: new Date(data.startTimeStamp.seconds * 1000),
+          end: new Date(data.endTimeStamp.seconds * 1000),
+          eventId: data.eventId,
+          state: data.state,
+          userId: data.userId,
+        };
+      })
+      .filter((event): event is CalendarEvent => event !== null);
+    callback(fetchedEvents);
+  });
+};
+
+export const fetchUserHistory = async (userId: string): Promise<History[]> => {
+  const historyRef = collection(db, 'history');
+  const q = query(historyRef, where('userId', '==', userId));
+
+  const querySnapshot = await getDocs(q);
+  const items: History[] = [];
+  querySnapshot.forEach((doc) => {
+    items.push({ ...doc.data() } as History);
+  });
+  return items;
 };

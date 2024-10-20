@@ -1,29 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
 import { db, storage } from '../../../firebaseConfig.ts';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import {
-  collection,
-  onSnapshot,
-  query,
-  where,
-  QuerySnapshot,
-  DocumentData,
-  doc,
-  getDoc,
-  getDocs,
-  updateDoc,
-} from 'firebase/firestore';
+  fetchUserData,
+  listenToEventsForUserCalendar,
+  fetchUserHistory,
+} from '../../firebase.ts';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import type {
-  TeamParticipation,
-  Event,
-  User,
-  History,
-  CalendarEvent,
-} from '../../types.ts';
+import type { Event, User, History, CalendarEvent } from '../../types.ts';
 import HistoryDetail from '../../components/HistoryDetail.tsx';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { SyncLoader } from 'react-spinners';
@@ -49,76 +37,34 @@ const User: React.FC<UserProps> = () => {
   const [historyData, setHistoryData] = useState<{
     [key: string]: History[];
   }>({});
+
   useEffect(() => {
     if (!user) return;
 
-    const fetchUserData = async () => {
+    const loadData = async () => {
       setLoading(true);
       setError(null);
+
       try {
-        const userDoc = await getDoc(doc(db, 'users', user.id));
-        if (userDoc.exists()) {
-          const data = userDoc.data() as User;
-          setUserData(data);
-          setNewDisplayName(data.name);
-          setImgURL(data.imgURL);
-        } else {
-          throw new Error('User document not found');
-        }
+        const data = await fetchUserData(user.id);
+        setUserData(data);
+        setNewDisplayName(data.name);
+        setImgURL(data.imgURL);
+
+        const unsubscribe = listenToEventsForUserCalendar(user.id, setEvents);
+
+        const historyItems = await fetchUserHistory(user.id);
+        setHistoryData({ [user.id]: historyItems });
+
+        return unsubscribe;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : '發生載入錯誤');
       } finally {
         setLoading(false);
       }
     };
 
-    const fetchEvents = async () => {
-      const eventsRef = collection(db, 'teamParticipation');
-      const q = query(eventsRef, where('userId', '==', user.id));
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot: QuerySnapshot<DocumentData>) => {
-          const fetchedEvents: CalendarEvent[] = snapshot.docs
-            .map((doc) => {
-              const data = doc.data() as TeamParticipation;
-              return {
-                title: data.courtName,
-                start: new Date(data.startTimeStamp.seconds * 1000),
-                end: new Date(data.endTimeStamp.seconds * 1000),
-                eventId: data.eventId,
-                state: data.state,
-                userId: data.userId,
-              };
-            })
-            .filter((event): event is CalendarEvent => event !== null);
-          setEvents(fetchedEvents);
-        }
-      );
-
-      return () => unsubscribe();
-    };
-
-    const fetchHistory = async () => {
-      if (user) {
-        const historyRef = collection(db, 'history');
-        const q = query(historyRef, where('userId', '==', user.id));
-
-        try {
-          const querySnapshot = await getDocs(q);
-          const items: History[] = [];
-          querySnapshot.forEach((doc) => {
-            items.push({ ...doc.data() } as History);
-          });
-          setHistoryData({ [user.id]: items });
-        } catch (error) {
-          console.error('Error fetching history: ', error);
-        }
-      }
-    };
-
-    fetchUserData();
-    fetchEvents();
-    fetchHistory();
+    loadData();
   }, [user]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,9 +112,7 @@ const User: React.FC<UserProps> = () => {
       setIsEditing(false);
       setNewImgFile(null);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'An error occurred while updating'
-      );
+      setError(err instanceof Error ? err.message : '上傳時發生錯誤');
     } finally {
       setLoading(false);
     }
@@ -180,12 +124,12 @@ const User: React.FC<UserProps> = () => {
       const eventSnap = await getDoc(eventRef);
       if (eventSnap.exists()) {
         setEventDetail({ id: eventSnap.id, ...eventSnap.data() } as Event);
-        setModalIsOpen(true); 
+        setModalIsOpen(true);
       } else {
-        throw new Error('Event not found');
+        throw new Error('沒有找到任何活動');
       }
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : '抓取資料時發生錯誤');
       return;
     }
   };
@@ -226,16 +170,10 @@ const User: React.FC<UserProps> = () => {
   const containerStyle: React.CSSProperties = {
     overflow: 'auto',
     height: '500px',
-    // width: '80%',
     margin: '0 auto',
     padding: '20px 0',
-    zIndex: 0
+    zIndex: 0,
   };
-
-  // const calendarStyle: React.CSSProperties = {
-  //   height: '100%',
-  //   width: '100%',
-  // };
 
   if (loading) {
     return (
@@ -272,7 +210,6 @@ const User: React.FC<UserProps> = () => {
           alt="User profile"
           style={{
             borderRadius: '50%',
-            // border: '5px solid white',
             width: '100px',
             height: '100px',
             margin: '20px',
@@ -296,7 +233,7 @@ const User: React.FC<UserProps> = () => {
               accept="image/*"
               onChange={handleFileChange}
               style={{
-                marginBottom: '10px'
+                marginBottom: '10px',
               }}
             />
             <div>
@@ -319,7 +256,8 @@ const User: React.FC<UserProps> = () => {
                 }}
                 style={{
                   padding: '5px 10px',
-                  borderRadius: '15px',}}
+                  borderRadius: '15px',
+                }}
               >
                 取消
               </button>
@@ -359,17 +297,16 @@ const User: React.FC<UserProps> = () => {
           eventPropGetter={eventStyleGetter}
           step={15}
           timeslots={4}
-          // style={calendarStyle}
         />
       </div>
-      {eventDetail &&
-      <EventDetail
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        event={eventDetail}
-        hasApplyBtn={false}
-      />}
-      
+      {eventDetail && (
+        <EventDetail
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          event={eventDetail}
+          hasApplyBtn={false}
+        />
+      )}
     </div>
   );
 };
