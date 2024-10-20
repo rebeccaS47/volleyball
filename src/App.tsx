@@ -23,7 +23,6 @@ const GlobalStyle = createGlobalStyle`
   body {
     padding: 20px 30px;
     margin: 0;
-    /* background-color: var(--color-secondary); */
     font-family: 'SweiGothicCJK', sans-serif;
     font-weight: 400;
 
@@ -35,7 +34,6 @@ const GlobalStyle = createGlobalStyle`
     :root{
     --color-primary: rgba(0, 129, 204);
     --color-secondary: rgba(242, 186, 21);
-    /* --color-secondary: rgb(255, 193, 0); */
     --color-tertiary: #36678c;
     --color-light: #f8f8f8;
     --color-dark: #262626;

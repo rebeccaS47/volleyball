@@ -48,7 +48,6 @@ const EventDetail: React.FC<EventDetailProps> = ({
   };
 
   const handleApply = async () => {
-    console.log('eventDetail', { event });
     if (!user) {
       showSnackbar('請先登入');
       navigate('/login');
@@ -186,14 +185,16 @@ const EventDetail: React.FC<EventDetailProps> = ({
               <Label>剩餘名額</Label>
               <Value>{event.findNum}</Value>
             </EventInfo>
-            {hasApplyBtn ? <ApplyButton onClick={handleApply}>申請加入</ApplyButton> : <></>}
-            
+            {hasApplyBtn ? (
+              <ApplyButton onClick={handleApply}>申請加入</ApplyButton>
+            ) : (
+              <></>
+            )}
           </>
         )}
       </Modal>
       <StyledSnackbar
         open={open}
-        // autoHideDuration={6000}
         onClose={handleClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
@@ -227,8 +228,6 @@ const Value = styled.span`
 
 const Divider = styled.br`
   margin: 15px 0;
-  /* border: none; */
-  /* border-top: 1px solid #e0e0e0; */
 `;
 
 const ApplyButton = styled.button`

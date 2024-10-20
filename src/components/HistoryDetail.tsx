@@ -28,12 +28,12 @@ const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
         <table>
           <thead>
             <tr>
-              <Th>日期</Th>
-              <Th>地點</Th>
-              <Th>友善度</Th>
-              <Th>等級</Th>
-              <Th>評分</Th>
-              <Th>備註</Th>
+              <th>日期</th>
+              <th>地點</th>
+              <th>友善度</th>
+              <th>等級</th>
+              <th>評分</th>
+              <th>備註</th>
             </tr>
           </thead>
 
@@ -71,8 +71,6 @@ const TitleText = styled.p`
   justify-content: center;
   margin: 16px 12px;
   font-size: 28px;
-  /* font-weight: 900; */
-  /* -webkit-text-stroke: 0.5px black; */
 `;
 
 const customModalStyles = {
@@ -96,20 +94,13 @@ const customModalStyles = {
   },
 };
 
-const Th = styled.th`
-  /* font-size: 24px;
-  font-weight: 600; */
-`;
-
 const Td = styled.td`
   text-align: center;
-  /* font-size: 20px; */
 `;
 
 const Button = styled.button`
   display: flex;
   align-items: center;
-  /* background: transparent; */
   margin-top: 5px;
   padding: 5px 10px;
   border-radius: 15px;

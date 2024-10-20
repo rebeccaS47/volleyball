@@ -44,9 +44,7 @@ const UserAuthProvider: React.FC<{ children: React.ReactNode }> = ({
             const userFirestore = await findUserById(authUser.uid);
             if (userFirestore) {
               setUser(userFirestore);
-              console.log('user認證資料', userFirestore);
             } else {
-              console.log('未找到用戶數據');
               setUser(null);
             }
           } catch (error) {

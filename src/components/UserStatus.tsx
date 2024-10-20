@@ -13,7 +13,6 @@ import {
 import { Logout } from '@mui/icons-material';
 import MailIcon from '@mui/icons-material/Mail';
 import LoginIcon from '@mui/icons-material/Login';
-// import styled from 'styled-components';
 
 const UserStatus: React.FC = () => {
   const { user, logOut } = useUserAuth();
@@ -41,7 +40,6 @@ const UserStatus: React.FC = () => {
     >
       {user ? (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {/* <UserName>Hi, {user.name}</UserName> */}
           <IconButton
             size="large"
             aria-label="show 4 new mails"
@@ -56,7 +54,6 @@ const UserStatus: React.FC = () => {
           <IconButton
             onClick={handleClick}
             size="small"
-            // sx={{ ml: 2 }}
             aria-controls={open ? 'account-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
@@ -152,10 +149,3 @@ const UserStatus: React.FC = () => {
 };
 
 export default UserStatus;
-
-// const UserName = styled.div`
-//   font-size: large;
-//   @media (max-width: 768px) {
-//     display: none;
-//   }
-// `;

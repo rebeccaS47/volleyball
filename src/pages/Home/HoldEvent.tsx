@@ -187,7 +187,6 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Form Data Submitted:', formData);
     if (validateForm()) {
       try {
         await createEvent(formData);
