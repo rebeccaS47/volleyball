@@ -1,14 +1,12 @@
 import { useState } from 'react';
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useUserAuth } from '../../context/userAuthContext';
-import { auth, provider } from '../../../firebaseConfig';
+import { auth } from '../../../firebaseConfig';
+import { signInWithGoogleAndSyncUser } from '../../firebase.ts';
 import { useNavigate } from 'react-router-dom';
-import { setDoc, doc, getDoc } from 'firebase/firestore';
-import { db } from '../../../firebaseConfig';
 import styled from 'styled-components';
 import { Card, TextField, Button, Typography } from '@mui/material';
 import google from '../../assets/google.svg';
-import type { User } from '../../types.ts';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -30,34 +28,17 @@ const Login: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-      const userData: User = {
-        name: user.displayName || 'Anonymous',
-        imgURL: user.photoURL || '',
-        id: user.uid,
-        email: user.email || 'No email',
-      };
-
-      if (!userDocSnap.exists()) {
-        await setDoc(userDocRef, userData);
-      }
-      updateUser(userData as User);
+      const userData = await signInWithGoogleAndSyncUser();
+      updateUser(userData);
       navigate('/');
-    } catch (error) {
-      setError('Failed to log in with Google.');
-      console.error(error);
+    } catch {
+      setError('使用 Google 登錄失敗');
     }
   };
 
   return (
     <LoginCard>
-      <h1 >
-        登入
-      </h1>
+      <h1>登入</h1>
       <Form onSubmit={handleLogin}>
         <TextField
           label="Email"
@@ -77,9 +58,7 @@ const Login: React.FC = () => {
           required
         />
         {error && <Typography color="error">{error}</Typography>}
-        <LoginButton type="submit">
-          登入
-        </LoginButton>
+        <LoginButton type="submit">登入</LoginButton>
       </Form>
       <Typography variant="body2" style={{ marginTop: '10px' }}>
         還沒有帳號?{' '}
@@ -130,7 +109,6 @@ const Form = styled.form`
 `;
 
 const SocialLoginButton = styled(Button)`
-  /* color: black; */
   margin-top: 30px;
   &::before,
   &::after,

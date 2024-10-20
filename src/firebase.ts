@@ -1,4 +1,6 @@
 import { db } from '../firebaseConfig';
+import { auth, provider } from '../firebaseConfig';
+import { signInWithPopup } from 'firebase/auth';
 import {
   doc,
   getDoc,
@@ -415,4 +417,24 @@ export const addChatMessage = async (
     userImgURL: user.imgURL,
     roomId: selectedEventId,
   });
+};
+
+export const signInWithGoogleAndSyncUser = async (): Promise<User> => {
+  const result = await signInWithPopup(auth, provider);
+  const user = result.user;
+
+  const userDocRef = doc(db, 'users', user.uid);
+  const userDocSnap = await getDoc(userDocRef);
+  const userData: User = {
+    name: user.displayName || 'Anonymous',
+    imgURL: user.photoURL || '',
+    id: user.uid,
+    email: user.email || 'No email',
+  };
+
+  if (!userDocSnap.exists()) {
+    await setDoc(userDocRef, userData);
+  }
+
+  return userData;
 };
