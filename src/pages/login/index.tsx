@@ -9,8 +9,8 @@ import { Card, TextField, Button, Typography } from '@mui/material';
 import google from '../../assets/google.svg';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('chris0205@gmail.com');
+  const [password, setPassword] = useState('123123');
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { updateUser } = useUserAuth();
