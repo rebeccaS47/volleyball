@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
 import Modal from 'react-modal';
+import App from './app/App.tsx';
 
 Modal.setAppElement('#root');
 

@@ -1,32 +1,32 @@
-import { useState, useEffect } from 'react';
-import { useUserAuth } from '../../context/userAuthContext.tsx';
 import {
-  findUserById,
-  feedbackFetchClosedEvents,
-  submitFeedback,
-  getPlayerFeedback,
-} from '../../firebase.ts';
-import type { Event, Feedback, UserName } from '../../types.ts';
-import {
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
+  Box,
   Button,
-  Typography,
-  TextField,
-  Select,
-  MenuItem,
+  createTheme,
   FormControl,
   InputLabel,
-  Box,
+  MenuItem,
+  Select,
   SelectChangeEvent,
-  ThemeProvider,
-  createTheme,
   Snackbar,
+  Step,
+  StepContent,
+  StepLabel,
+  Stepper,
+  TextField,
+  ThemeProvider,
+  Typography,
 } from '@mui/material';
-import styled from 'styled-components';
+import { useEffect, useState } from 'react';
 import { SyncLoader } from 'react-spinners';
+import styled from 'styled-components';
+import { useUserAuth } from '../../context/userAuthContext.tsx';
+import {
+  feedbackFetchClosedEvents,
+  findUserById,
+  getPlayerFeedback,
+  submitFeedback,
+} from '../../firebase.ts';
+import type { Event, Feedback, UserName } from '../../types.ts';
 
 interface FeedbackProps {}
 

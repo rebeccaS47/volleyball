@@ -1,13 +1,13 @@
 import { RouterProvider } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
-import UserAuthProvider from './context/userAuthContext';
-import router from './routes';
+import UserAuthProvider from '../context/userAuthContext.tsx';
+import Router from './Router.tsx';
 function App() {
   return (
     <>
       <GlobalStyle />
       <UserAuthProvider>
-        <RouterProvider router={router} />
+        <RouterProvider router={Router} />
       </UserAuthProvider>
     </>
   );

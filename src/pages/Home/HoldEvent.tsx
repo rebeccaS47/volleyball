@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { Snackbar } from '@mui/material';
 import { Timestamp } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Select, { SingleValue } from 'react-select';
+import styled from 'styled-components';
+import UserSelector from '../../components/UserSelector';
+import { useUserAuth } from '../../context/userAuthContext.tsx';
 import {
   createEvent,
+  fetchCourtDetails,
   fetchDropdownCities,
   fetchDropdownCourts,
-  fetchCourtDetails,
 } from '../../firebase.ts';
-import { useUserAuth } from '../../context/userAuthContext.tsx';
-import { useNavigate } from 'react-router-dom';
 import type { Event, Option } from '../../types';
-import Select, { SingleValue } from 'react-select';
-import UserSelector from '../../components/UserSelector';
-import { Snackbar } from '@mui/material';
 
 interface HoldEventProps {}
 

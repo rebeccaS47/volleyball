@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useUserAuth } from '../../context/userAuthContext.tsx';
-import { db, storage } from '../../../firebaseConfig.ts';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { SyncLoader } from 'react-spinners';
+import { db, storage } from '../../../firebaseConfig.ts';
+import EventDetail from '../../components/EventDetail';
+import HistoryDetail from '../../components/HistoryDetail.tsx';
+import { useUserAuth } from '../../context/userAuthContext.tsx';
 import {
   fetchUserData,
-  listenToEventsForUserCalendar,
   fetchUserHistory,
+  listenToEventsForUserCalendar,
 } from '../../firebase.ts';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import type { Event, User, History, CalendarEvent } from '../../types.ts';
-import HistoryDetail from '../../components/HistoryDetail.tsx';
-import SettingsIcon from '@mui/icons-material/Settings';
-import { SyncLoader } from 'react-spinners';
-import EventDetail from '../../components/EventDetail';
+import type { CalendarEvent, Event, History, User } from '../../types.ts';
 
 interface UserProps {}
 

@@ -1,36 +1,35 @@
-import { db } from '../firebaseConfig';
-import { auth, provider } from '../firebaseConfig';
 import { signInWithPopup } from 'firebase/auth';
 import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  Timestamp,
-  setDoc,
   addDoc,
-  updateDoc,
-  serverTimestamp,
-  onSnapshot,
-  orderBy,
   arrayRemove,
   arrayUnion,
-  QuerySnapshot,
+  collection,
+  doc,
   DocumentData,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  QuerySnapshot,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+  updateDoc,
+  where,
 } from 'firebase/firestore';
+import { auth, db, provider } from '../firebaseConfig';
 import type {
-  User,
+  ApplicantData,
+  CalendarEvent,
+  Court,
   Event,
   Feedback,
-  Court,
-  Option,
-  ApplicantData,
   History,
-  TeamParticipation,
   Message,
-  CalendarEvent,
+  Option,
+  TeamParticipation,
+  User,
 } from './types';
 
 export const handleUserNameList = async (

@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
+  createUserWithEmailAndPassword,
   User as FirebaseUser,
   signOut,
-  createUserWithEmailAndPassword,
 } from 'firebase/auth';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../../firebaseConfig';
 import { findUserById } from '../firebase';
 import type { User } from '../types.ts';

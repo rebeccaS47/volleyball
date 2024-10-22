@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useUserAuth } from '../context/userAuthContext';
 import { SyncLoader } from 'react-spinners';
+import { useUserAuth } from '../context/userAuthContext';
 
 interface ProtectedRoutesProps {}
 

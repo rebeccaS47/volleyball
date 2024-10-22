@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
+import { SyncLoader } from 'react-spinners';
+import styled from 'styled-components';
+import HistoryDetail from '../../components/HistoryDetail.tsx';
 import { useUserAuth } from '../../context/userAuthContext.tsx';
-import type { Event, History, ApplicantData } from '../../types.ts';
 import {
   acceptApplicant,
   declineApplicant,
   listenToNeedApprovalEvents,
 } from '../../firebase.ts';
-import HistoryDetail from '../../components/HistoryDetail.tsx';
-import styled from 'styled-components';
-import { SyncLoader } from 'react-spinners';
+import type { ApplicantData, Event, History } from '../../types.ts';
 
 interface ApprovalProps {}
 

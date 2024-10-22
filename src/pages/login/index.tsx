@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { Button, Card, TextField, Typography } from '@mui/material';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useUserAuth } from '../../context/userAuthContext';
-import { auth } from '../../../firebaseConfig';
-import { signInWithGoogleAndSyncUser } from '../../firebase.ts';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { Card, TextField, Button, Typography } from '@mui/material';
+import { auth } from '../../../firebaseConfig';
 import google from '../../assets/google.svg';
+import { useUserAuth } from '../../context/userAuthContext';
+import { signInWithGoogleAndSyncUser } from '../../firebase.ts';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('chris0205@gmail.com');
