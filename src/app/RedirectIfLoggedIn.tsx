@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useUserAuth } from './context/userAuthContext';
+import { useUserAuth } from '../context/userAuthContext';
 
 interface RedirectIfLoggedInProps {
   children: ReactNode;
