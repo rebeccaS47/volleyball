@@ -1,18 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { Event, Option, FilterState } from '../../types';
-import {
-  fetchDropdownCities,
-  fetchDropdownCourts,
-  fetchCourtDetails,
-  fetchHomeEventList,
-} from '../../firebase.ts';
-import styled from 'styled-components';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import EventDetail from '../../components/EventDetail';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { useCallback, useEffect, useState } from 'react';
 import { SyncLoader } from 'react-spinners';
+import styled from 'styled-components';
+import EventDetail from '../../components/EventDetail';
+import {
+  fetchCourtDetails,
+  fetchDropdownCities,
+  fetchDropdownCourts,
+  fetchHomeEventList,
+} from '../../firebase.ts';
+import type { Event, FilterState, Option } from '../../types';
 
 interface EventProps {}
 

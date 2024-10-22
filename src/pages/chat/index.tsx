@@ -1,13 +1,13 @@
+import { ArrowLeft } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useUserAuth } from '../../context/userAuthContext';
 import {
-  listenToTeamParticipations,
-  listenToMessages,
   addChatMessage,
+  listenToMessages,
+  listenToTeamParticipations,
 } from '../../firebase.ts';
-import type { TeamParticipation, Message } from '../../types';
-import { ArrowLeft } from '@mui/icons-material';
+import type { Message, TeamParticipation } from '../../types';
 
 interface ChatProps {}
 

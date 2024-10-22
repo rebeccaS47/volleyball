@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useUserAuth } from '../../context/userAuthContext.tsx';
-import styled from 'styled-components';
 import { Card, TextField, Typography } from '@mui/material';
 import { FirebaseError } from 'firebase/app';
 import { doc, setDoc } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { db, storage } from '../../../firebaseConfig';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import type { User } from '../../types';
 import DefaultPhoto from '../../assets/defaultPhoto.png';
+import { useUserAuth } from '../../context/userAuthContext.tsx';
+import type { User } from '../../types';
 
 const Signup: React.FC = () => {
   const [email, setEmail] = useState('');

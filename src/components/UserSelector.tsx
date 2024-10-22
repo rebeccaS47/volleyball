@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import Select, { MultiValue, StylesConfig } from 'react-select';
 import { collection, getDocs } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import Select, { MultiValue, StylesConfig } from 'react-select';
 import { db } from '../../firebaseConfig';
 import type { Option, User } from '../types';
 

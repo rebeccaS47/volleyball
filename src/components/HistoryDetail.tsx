@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import type { History } from '../types';
-import Modal from 'react-modal';
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import CloseIcon from '@mui/icons-material/Close';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import { useState } from 'react';
+import Modal from 'react-modal';
 import styled from 'styled-components';
+import type { History } from '../types';
 
 const HistoryDetail: React.FC<{ userHistory: History[] }> = ({
   userHistory,

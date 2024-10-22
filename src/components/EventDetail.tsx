@@ -1,14 +1,14 @@
-import Modal from 'react-modal';
-import { useEffect, useState } from 'react';
-import type { Event } from '../types';
-import { handleUserNameList } from '../firebase';
-import { useUserAuth } from '../context/userAuthContext.tsx';
-import { useNavigate } from 'react-router-dom';
-import { db } from '../../firebaseConfig';
-import { doc, updateDoc, arrayUnion, setDoc } from 'firebase/firestore';
 import CloseIcon from '@mui/icons-material/Close';
 import { Snackbar } from '@mui/material';
+import { arrayUnion, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import Modal from 'react-modal';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { db } from '../../firebaseConfig';
+import { useUserAuth } from '../context/userAuthContext.tsx';
+import { handleUserNameList } from '../firebase';
+import type { Event } from '../types';
 
 interface EventDetailProps {
   isOpen: boolean;

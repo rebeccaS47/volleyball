@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { useUserAuth } from '../context/userAuthContext.tsx';
-import { useNavigate, Link } from 'react-router-dom';
+import { Logout } from '@mui/icons-material';
+import LoginIcon from '@mui/icons-material/Login';
+import MailIcon from '@mui/icons-material/Mail';
 import {
-  Box,
   Avatar,
+  Badge,
+  Box,
   IconButton,
+  ListItemIcon,
   Menu,
   MenuItem,
-  ListItemIcon,
-  Badge,
 } from '@mui/material';
-import { Logout } from '@mui/icons-material';
-import MailIcon from '@mui/icons-material/Mail';
-import LoginIcon from '@mui/icons-material/Login';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useUserAuth } from '../context/userAuthContext.tsx';
 
 const UserStatus: React.FC = () => {
   const { user, logOut } = useUserAuth();
