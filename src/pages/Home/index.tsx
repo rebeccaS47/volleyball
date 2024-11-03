@@ -422,6 +422,14 @@ const FilterInput = styled.input`
   max-width: 100px;
   border: none;
   background-color: transparent;
+
+  &[type='time'] {
+    min-width: 100px; 
+  }
+
+  &[type='date'] {
+    min-width: 110px; 
+  }
 `;
 
 const FilterContainer = styled.div`
@@ -442,7 +450,5 @@ const StyledSelect = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #a0a0a0;
-    box-shadow: 0 0 0 1px #a0a0a0;
   }
 `;
