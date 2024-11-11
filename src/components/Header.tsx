@@ -21,46 +21,67 @@ const Header = () => {
   ];
 
   return (
-    <HeaderContainer>
-      <Nav>
-        <LogoContainer>
-          <Logo onClick={() => navigate('/')}>
-            揪排球
-            <img src={volleyBall} style={{ width: '40px' }} />
-          </Logo>
-        </LogoContainer>
-
-        <HamburgerButton onClick={toggleMenu}>
-          <MenuIcon />
-        </HamburgerButton>
-        <MenuItems $isOpen={isMenuOpen}>
-          {menuItems.map((item) => (
-            <MenuItem
-              key={item.path}
-              onClick={() => {
-                navigate(item.path);
-                setIsMenuOpen(false);
-              }}
-              $isActive={location.pathname === item.path}
-            >
-              {item.label}
-            </MenuItem>
-          ))}
-        </MenuItems>
-      </Nav>
-      <UserStatus />
-    </HeaderContainer>
+    <>
+      <HeaderContainer>
+        <Nav>
+          <LogoContainer>
+            <Logo onClick={() => navigate('/')}>
+              揪排球
+              <Img src={volleyBall} />
+            </Logo>
+          </LogoContainer>
+          <HamburgerButton onClick={toggleMenu}>
+            <MenuIcon />
+          </HamburgerButton>
+          <MenuItems $isOpen={isMenuOpen}>
+            {menuItems.map((item) => (
+              <MenuItem
+                key={item.path}
+                onClick={() => {
+                  navigate(item.path);
+                  setIsMenuOpen(false);
+                }}
+                $isActive={location.pathname === item.path}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
+          </MenuItems>
+        </Nav>
+        <UserStatus />
+      </HeaderContainer>
+      <BlurOverlay $isOpen={isMenuOpen} onClick={toggleMenu} />
+    </>
   );
 };
 
 export default Header;
 
+const BlurOverlay = styled.div<{ $isOpen: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  z-index: 1;
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
+  visibility: ${({ $isOpen }) => ($isOpen ? 'visible' : 'hidden')};
+  transition: all 0.3s ease-in-out;
+  pointer-events: ${({ $isOpen }) => ($isOpen ? 'auto' : 'none')};
+`;
+
 const HeaderContainer = styled.header`
+  position: relative;
+  padding: 0px 5px;
   background-color: var(--color-light);
   border: 2px solid var(--color-light);
   display: flex;
+  justify-content: space-between;
   height: 70px;
   border-radius: 15px;
+  z-index: 2;
 `;
 
 const LogoContainer = styled.div`
@@ -87,6 +108,9 @@ const Logo = styled.div`
   align-items: center;
 `;
 
+const Img = styled.img`
+  width: 40px;
+`;
 const MenuItems = styled.ul<{ $isOpen: boolean }>`
   display: flex;
   align-items: center;
@@ -96,20 +120,23 @@ const MenuItems = styled.ul<{ $isOpen: boolean }>`
   order: 2;
 
   @media (max-width: 768px) {
-    flex-direction: column;
     position: absolute;
-    top: 90px;
+    flex-direction: column;
+    top: 68px;
     left: 0;
     width: 100%;
-    padding: 0px 15px;
-    display: ${({ $isOpen }) => ($isOpen ? 'flex' : 'none')};
     order: 3;
     z-index: 2;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    max-height: ${({ $isOpen }) => ($isOpen ? '300px' : '0')};
+    opacity: ${({ $isOpen }) => ($isOpen ? '1' : '0')};
+    transform: ${({ $isOpen }) => ($isOpen ? 'translateY(0)' : 'translateY(-10px)')};
   }
 `;
 
 const MenuItem = styled.div<{ $isActive: boolean }>`
-  height: 50px;
+  height: 70px;
   padding: 0.5rem 1.5rem;
   display: flex;
   align-items: center;
@@ -138,7 +165,6 @@ const HamburgerButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  margin-left: 10px;
   order: 1;
 
   @media (max-width: 768px) {
