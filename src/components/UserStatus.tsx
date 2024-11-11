@@ -1,6 +1,6 @@
 import { Logout } from '@mui/icons-material';
+import ChatIcon from '@mui/icons-material/Chat';
 import LoginIcon from '@mui/icons-material/Login';
-import MailIcon from '@mui/icons-material/Mail';
 import {
   Avatar,
   Badge,
@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { useUserAuth } from '../context/userAuthContext.tsx';
 
 const UserStatus: React.FC = () => {
@@ -29,17 +30,9 @@ const UserStatus: React.FC = () => {
   };
 
   return (
-    <Box
-      sx={{
-        position: 'absolute',
-        top: 32,
-        right: 40,
-        display: 'flex',
-        alignItems: 'center',
-      }}
-    >
+    <Container>
       {user ? (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <UserContainer>
           <IconButton
             size="large"
             aria-label="show 4 new mails"
@@ -48,7 +41,7 @@ const UserStatus: React.FC = () => {
             }}
           >
             <Badge badgeContent={0} color="error">
-              <MailIcon />
+              <ChatIcon />
             </Badge>
           </IconButton>
           <IconButton
@@ -58,48 +51,15 @@ const UserStatus: React.FC = () => {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar
-              src={user.imgURL}
-              alt={user.name}
-              sx={{ border: '3px solid white' }}
-            />
+            <StyledAvatar src={user.imgURL} alt={user.name} />
           </IconButton>
 
-          <Menu
+          <StyledMenu
             anchorEl={anchorEl}
             id="account-menu"
             open={open}
             onClose={handleClose}
             onClick={handleClose}
-            slotProps={{
-              paper: {
-                elevation: 0,
-                sx: {
-                  overflow: 'visible',
-                  filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                  mt: 1.5,
-                  width: 150,
-                  '& .MuiAvatar-root': {
-                    width: 32,
-                    height: 32,
-                    ml: -0.5,
-                    mr: 1,
-                  },
-                  '&::before': {
-                    content: '""',
-                    display: 'block',
-                    position: 'absolute',
-                    top: 0,
-                    right: 20,
-                    width: 10,
-                    height: 10,
-                    bgcolor: 'background.paper',
-                    transform: 'translateY(-50%) rotate(45deg)',
-                    zIndex: 0,
-                  },
-                },
-              },
-            }}
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
@@ -116,36 +76,76 @@ const UserStatus: React.FC = () => {
               </ListItemIcon>
               &nbsp;&nbsp;登出
             </MenuItem>
-          </Menu>
-        </Box>
+          </StyledMenu>
+        </UserContainer>
       ) : (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            cursor: 'pointer',
-            height: '50px',
-            marginRight: '5px',
-          }}
-        >
+        <LoginContainer>
           <LoginIcon />
-          <Link
-            to="/login"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              marginLeft: '5px',
-              height: '1.5rem',
-              color: 'black',
-              fontSize: 'large',
-            }}
-          >
-            登入
-          </Link>
-        </Box>
+          <LoginLink to="/login">登入</LoginLink>
+        </LoginContainer>
       )}
-    </Box>
+    </Container>
   );
 };
 
 export default UserStatus;
+
+const Container = styled(Box)`
+  display: flex;
+  align-items: center;
+`;
+
+const UserContainer = styled(Box)`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledAvatar = styled(Avatar)`
+  border: 3px solid white;
+`;
+
+const LoginContainer = styled(Box)`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  height: 50px;
+  margin-right: 5px;
+`;
+
+const LoginLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  margin-left: 5px;
+  height: 1.5rem;
+  color: black;
+  font-size: large;
+`;
+
+const StyledMenu = styled(Menu)`
+  .MuiPaper-root {
+    overflow: visible;
+    filter: drop-shadow(0px 2px 8px rgba(0, 0, 0, 0.32));
+    margin-top: 1.5px;
+    width: 150px;
+
+    .MuiAvatar-root {
+      width: 32px;
+      height: 32px;
+      margin-left: -0.5px;
+      margin-right: 1px;
+    }
+
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 20px;
+      width: 10px;
+      height: 10px;
+      background-color: #fff;
+      transform: translateY(-50%) rotate(45deg);
+      z-index: 0;
+    }
+  }
+`;
