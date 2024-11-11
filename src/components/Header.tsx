@@ -128,7 +128,7 @@ const MenuItem = styled.div<{ $isActive: boolean }>`
   @media (max-width: 768px) {
     padding: 1rem;
     text-align: center;
-    border: 1px solid #eaeaea;
+    border: 1px solid var(--color-lighthover);
     width: 100%;
   }
 `;
