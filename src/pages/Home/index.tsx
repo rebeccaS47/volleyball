@@ -103,6 +103,11 @@ const Event: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    if (name === 'endTime') {
+      if (filterState.startTime && value < filterState.startTime) {
+        return;
+      }
+    }
     setFilterState((prevData) => ({
       ...prevData,
       [name]: value,
@@ -232,6 +237,7 @@ const Event: React.FC = () => {
             name="endTime"
             value={filterState.endTime}
             onChange={handleInputChange}
+            min={filterState.startTime}
           />
         </InputWrapper>
       </FilterContainer>
