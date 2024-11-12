@@ -34,8 +34,8 @@ const GlobalStyle = createGlobalStyle`
     :root{
     --color-primary: rgba(0, 129, 204);
     --color-secondary: rgba(242, 186, 21);
-    --color-tertiary: #36678c;
     --color-light: #f8f8f8;
+    --color-lighthover: #eaeaea;
     --color-dark: #262626;
     --color-darkblue: #104265;
   }

@@ -14,9 +14,7 @@ import {
 } from '../../firebase.ts';
 import type { Event, FilterState, Option } from '../../types';
 
-interface EventProps {}
-
-const Event: React.FC<EventProps> = () => {
+const Event: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [eventList, setEventList] = useState<Event[]>([]);
   const [cities, setCities] = useState<Option[]>([]);
@@ -105,6 +103,11 @@ const Event: React.FC<EventProps> = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    if (name === 'endTime') {
+      if (filterState.startTime && value < filterState.startTime) {
+        return;
+      }
+    }
     setFilterState((prevData) => ({
       ...prevData,
       [name]: value,
@@ -170,7 +173,7 @@ const Event: React.FC<EventProps> = () => {
   return (
     <IndexContainer>
       <FilterContainer>
-        <div>
+        <InputWrapper>
           <StyledSelect
             value={selectedCity ? selectedCity.value : ''}
             onChange={handleCityChange}
@@ -182,6 +185,8 @@ const Event: React.FC<EventProps> = () => {
               </option>
             ))}
           </StyledSelect>
+        </InputWrapper>
+        <InputWrapper>
           <StyledSelect
             value={selectedCourt ? selectedCourt.value : ''}
             onChange={handleCourtChange}
@@ -194,6 +199,8 @@ const Event: React.FC<EventProps> = () => {
               </option>
             ))}
           </StyledSelect>
+        </InputWrapper>
+        <InputWrapper>
           <StyledSelect
             name="level"
             value={filterState.level}
@@ -206,62 +213,47 @@ const Event: React.FC<EventProps> = () => {
               </option>
             ))}
           </StyledSelect>
-        </div>
-        <div>
+        </InputWrapper>
+        <InputWrapper>
           <FilterInput
             type="date"
             name="date"
             value={filterState.date}
             onChange={handleInputChange}
             min={new Date().toISOString().split('T')[0]}
-          />{' '}
+          />
+        </InputWrapper>
+        <InputWrapper>
           <FilterInput
             type="time"
             name="startTime"
             value={filterState.startTime}
             onChange={handleInputChange}
-          />{' '}
+          />
+        </InputWrapper>
+        <InputWrapper>
           <FilterInput
             type="time"
             name="endTime"
             value={filterState.endTime}
             onChange={handleInputChange}
+            min={filterState.startTime}
           />
-        </div>
+        </InputWrapper>
       </FilterContainer>
       <br />
       <EventListContainer>
         {isLoading ? (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100vh',
-              width: '100vw',
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            }}
-          >
+          <LoadingContainer>
             <SyncLoader
               margin={10}
               size={20}
               speedMultiplier={0.8}
               color="var(--color-secondary)"
             />
-          </div>
+          </LoadingContainer>
         ) : filteredEventList.length === 0 ? (
-          <div
-            style={{
-              color: 'var(--color-dark)',
-              backgroundColor: 'var(--color-light)',
-              margin: '0 auto',
-            }}
-          >
-            暫無相關活動
-          </div>
+          <EmptyContainer>暫無相關活動</EmptyContainer>
         ) : (
           filteredEventList.map((event) => (
             <EventCard
@@ -316,6 +308,24 @@ const IndexContainer = styled.div`
   @media (max-width: 480px) {
     paddingx: 10px;
   }
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+`;
+
+const EmptyContainer = styled.div`
+  color: var(--color-dark);
+  background-color: var(--color-light);
+  margin: 0 auto;
 `;
 
 const EventListContainer = styled.div`
@@ -388,6 +398,14 @@ const EventCard = styled.div`
     width: 100%;
     padding: 2rem 4rem;
   }
+
+  @media (max-width: 430px) {
+    padding: 2rem 2rem;
+  }
+
+  @media (max-width: 360px) {
+    padding: 2rem 1rem;
+  }
 `;
 
 const EventInfo = styled.p`
@@ -397,6 +415,10 @@ const EventInfo = styled.p`
   display: flex;
   align-items: center;
   justify-content: flex-start;
+
+  @media (max-width: 480px) {
+    font-size: 1rem;
+  }
 `;
 
 const EventInfoAddress = styled.p`
@@ -416,33 +438,65 @@ const EventTitle = styled.h3`
   color: var(--color-dark);
 `;
 
-const FilterInput = styled.input`
-  min-height: 40px;
-  min-width: 70px;
-  max-width: 100px;
-  border: none;
-  background-color: transparent;
+const FilterContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  background-color: var(--color-light);
+  padding: 15px;
+  border-radius: 15px;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(6, 1fr);
+  }
 `;
 
-const FilterContainer = styled.div`
+const InputWrapper = styled.div`
   display: flex;
-  align-items: center;
-  background-color: #f8f8f8;
-  padding: 10px;
-  border-radius: 5px;
-  width: fit-content;
-  margin: 32px auto;
+  flex-direction: column;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const StyledSelect = styled.select`
-  padding: 5px;
-  margin-right: 5px;
+  padding: 8px;
+  border-radius: 10px;
   border: none;
-  background-color: transparent;
+  background-color: white;
+  width: 100%;
+  height: 40px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 
   &:focus {
     outline: none;
-    border-color: #a0a0a0;
-    box-shadow: 0 0 0 1px #a0a0a0;
+    border-color: var(--color-secondary);
+  }
+
+  &:disabled {
+    background-color: var(--color-light);
+    cursor: not-allowed;
+  }
+`;
+
+const FilterInput = styled.input`
+  padding: 8px;
+  border-radius: 10px;
+  border: none;
+  background-color: white;
+  width: 100%;
+  height: 40px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-secondary);
   }
 `;
