@@ -398,9 +398,13 @@ const EventCard = styled.div`
     width: 100%;
     padding: 2rem 4rem;
   }
-  
+
   @media (max-width: 430px) {
     padding: 2rem 2rem;
+  }
+
+  @media (max-width: 360px) {
+    padding: 2rem 1rem;
   }
 `;
 
@@ -411,6 +415,10 @@ const EventInfo = styled.p`
   display: flex;
   align-items: center;
   justify-content: flex-start;
+
+  @media (max-width: 480px) {
+    font-size: 1rem;
+  }
 `;
 
 const EventInfoAddress = styled.p`
@@ -438,8 +446,6 @@ const FilterContainer = styled.div`
   padding: 15px;
   border-radius: 15px;
   width: 100%;
-  max-width: 1200px;
-  margin: 32px auto;
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(3, 1fr);
@@ -454,15 +460,15 @@ const InputWrapper = styled.div`
   display: flex;
   flex-direction: column;
 
-  &:hover{
+  &:hover {
     cursor: pointer;
   }
 `;
 
 const StyledSelect = styled.select`
   padding: 8px;
-  border-radius: 15px; 
-  border:none;
+  border-radius: 10px;
+  border: none;
   background-color: white;
   width: 100%;
   height: 40px;
@@ -483,8 +489,8 @@ const StyledSelect = styled.select`
 
 const FilterInput = styled.input`
   padding: 8px;
-  border-radius: 15px; 
-  border:none;
+  border-radius: 10px;
+  border: none;
   background-color: white;
   width: 100%;
   height: 40px;
