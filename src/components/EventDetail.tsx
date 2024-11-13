@@ -1,8 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Snackbar } from '@mui/material';
+import { Modal, Snackbar, Zoom } from '@mui/material';
 import { arrayUnion, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import Modal from 'react-modal';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { db } from '../../firebaseConfig';
@@ -28,6 +27,11 @@ const EventDetail: React.FC<EventDetailProps> = ({
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const hasApplied = event?.applicationList.find(
+    (applicant) => applicant === user?.id
+  );
+  const isPlayer = event?.playerList.find((player) => player === user?.id);
+  const isFull = event?.findNum === 0;
 
   useEffect(() => {
     if (event === null) return;
@@ -50,22 +54,12 @@ const EventDetail: React.FC<EventDetailProps> = ({
   const handleApply = async () => {
     if (!user) {
       showSnackbar('請先登入');
-      navigate('/login');
+      setTimeout(() => {
+        navigate('/login');
+      }, 800);
       return;
     }
     if (!event) return;
-    if (event.findNum === 0) {
-      showSnackbar('已無名額');
-      return;
-    }
-    if (event.playerList.includes(user?.id)) {
-      showSnackbar('你已是隊員');
-      return;
-    }
-    if (event.applicationList.includes(user?.id)) {
-      showSnackbar('你已申請過');
-      return;
-    }
     if (event.id) {
       try {
         const docRef = doc(db, 'events', event.id);
@@ -87,8 +81,6 @@ const EventDetail: React.FC<EventDetailProps> = ({
           startTimeStamp: event.startTimeStamp,
           endTimeStamp: event.endTimeStamp,
         });
-
-        showSnackbar('成功申請');
       } catch (error) {
         console.error('申請失敗: ', error);
         showSnackbar('申請失敗，請稍後再試');
@@ -99,99 +91,96 @@ const EventDetail: React.FC<EventDetailProps> = ({
   return (
     <>
       <Modal
-        isOpen={isOpen}
-        onRequestClose={onRequestClose}
-        contentLabel="Event Details"
-        style={{
-          overlay: {
-            zIndex: 999,
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
-          },
-          content: {
-            top: '50%',
-            left: '50%',
-            right: 'auto',
-            bottom: 'auto',
-            marginRight: '-50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'white',
-            padding: '20px',
-            maxWidth: '500px',
-            width: '90%',
-            borderRadius: '5px',
-            position: 'relative',
-          },
-        }}
+        open={isOpen}
+        onClose={onRequestClose}
+        aria-labelledby="event-detail-modal"
+        aria-describedby="event-detail-description"
       >
-        {event && (
-          <>
-            <StyledCloseIcon onClick={onRequestClose} />
-            <EventTitle>{event.court.name}</EventTitle>
-            <EventInfo>
-              <Label>日期</Label>
-              <Value>{event.date}</Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>時間</Label>
-              <Value>
-                {event.startTimeStamp.toDate().toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}{' '}
-                ~{' '}
-                {event.endTimeStamp.toDate().toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>地點</Label>
-              <Value>
-                {event.court.city}
-                {event.court.address}
-              </Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>場地</Label>
-              <Value>
-                {event.court.isInDoor ? '室內' : '室外'}場{' '}
-                {event.isAC ? '有' : '沒有'}冷氣
-              </Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>費用</Label>
-              <Value>{event.averageCost}/人</Value>
-            </EventInfo>
-            <Divider />
-            <EventInfo>
-              <Label>友善程度</Label>
-              <Value>
-                {event.friendlinessLevel
-                  ? event.friendlinessLevel
-                  : '無特別規定'}
-              </Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>分級</Label>
-              <Value>{event.level ? event.level : '無特別規定'}</Value>
-            </EventInfo>
-            <Divider />
-            <EventInfo>
-              <Label>隊員名單</Label>
-              <Value>{playerNames}</Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>剩餘名額</Label>
-              <Value>{event.findNum}</Value>
-            </EventInfo>
-            {hasApplyBtn ? (
-              <ApplyButton onClick={handleApply}>申請加入</ApplyButton>
-            ) : (
-              <></>
-            )}
-          </>
-        )}
+        <ModalWrapper>
+          <Zoom in={isOpen} timeout={300}>
+            <ModalContent>
+              {event && (
+                <>
+                  <StyledCloseIcon onClick={onRequestClose} />
+                  <EventTitle>{event.court.name}</EventTitle>
+                  <EventInfo>
+                    <Label>日期</Label>
+                    <Value>{event.date}</Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>時間</Label>
+                    <Value>
+                      {event.startTimeStamp.toDate().toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}{' '}
+                      ~{' '}
+                      {event.endTimeStamp.toDate().toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>地點</Label>
+                    <Value>
+                      {event.court.city}
+                      {event.court.address}
+                    </Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>場地</Label>
+                    <Value>
+                      {event.court.isInDoor ? '室內' : '室外'}場{' '}
+                      {event.isAC ? '有' : '沒有'}冷氣
+                    </Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>費用</Label>
+                    <Value>{event.averageCost}/人</Value>
+                  </EventInfo>
+                  <Divider />
+                  <EventInfo>
+                    <Label>友善程度</Label>
+                    <Value>
+                      {event.friendlinessLevel
+                        ? event.friendlinessLevel
+                        : '無特別規定'}
+                    </Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>分級</Label>
+                    <Value>{event.level ? event.level : '無特別規定'}</Value>
+                  </EventInfo>
+                  <Divider />
+                  <EventInfo>
+                    <Label>隊員名單</Label>
+                    <Value>{playerNames}</Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>剩餘名額</Label>
+                    <Value>{event.findNum}</Value>
+                  </EventInfo>
+                  {hasApplyBtn && (
+                    <>
+                      {hasApplied ? (
+                        <DisabledButton>您已申請，審核中...</DisabledButton>
+                      ) : isPlayer ? (
+                        <DisabledButton>您已是球員</DisabledButton>
+                      ) : isFull ? (
+                        <DisabledButton>名額已滿</DisabledButton>
+                      ) : (
+                        <ApplyButton onClick={handleApply}>
+                          申請加入
+                        </ApplyButton>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </ModalContent>
+          </Zoom>
+        </ModalWrapper>
       </Modal>
       <StyledSnackbar
         open={open}
@@ -205,6 +194,27 @@ const EventDetail: React.FC<EventDetailProps> = ({
 };
 
 export default EventDetail;
+
+const ModalWrapper = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  outline: none;
+  width: 90%;
+  max-width: 500px;
+`;
+
+const ModalContent = styled.div`
+  background-color: white;
+  padding: 20px;
+  width: 100%;
+  border: 3px solid var(--color-dark);
+  border-radius: 15px;
+  box-shadow: -4px 3px 0 2px var(--color-dark);
+  max-height: 90vh;
+  overflow-y: auto;
+`;
 
 const EventTitle = styled.h1`
   margin-bottom: 30px;
@@ -253,6 +263,24 @@ const ApplyButton = styled.button`
     transform: translateY(-2px);
     transform: translateX(-1px);
   }
+`;
+
+const DisabledButton = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px 16px;
+  margin-top: 30px;
+  background-color: darkgray;
+  color: var(--color-light);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 20px;
+  border: 2px solid var(--color-dark);
+  border-radius: 14px;
+  box-shadow: -4px 3px 0 0 var(--color-dark);
+  cursor: not-allowed;
 `;
 
 const StyledCloseIcon = styled(CloseIcon)(() => ({
