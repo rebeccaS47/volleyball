@@ -28,6 +28,11 @@ const EventDetail: React.FC<EventDetailProps> = ({
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const hasApplied = event?.applicationList.find(
+    (applicant) => applicant === user?.id
+  );
+  const isPlayer = event?.playerList.find((player) => player === user?.id);
+  const isFull = event?.findNum === 0;
 
   useEffect(() => {
     if (event === null) return;
@@ -54,18 +59,6 @@ const EventDetail: React.FC<EventDetailProps> = ({
       return;
     }
     if (!event) return;
-    if (event.findNum === 0) {
-      showSnackbar('已無名額');
-      return;
-    }
-    if (event.playerList.includes(user?.id)) {
-      showSnackbar('你已是隊員');
-      return;
-    }
-    if (event.applicationList.includes(user?.id)) {
-      showSnackbar('你已申請過');
-      return;
-    }
     if (event.id) {
       try {
         const docRef = doc(db, 'events', event.id);
@@ -185,10 +178,18 @@ const EventDetail: React.FC<EventDetailProps> = ({
               <Label>剩餘名額</Label>
               <Value>{event.findNum}</Value>
             </EventInfo>
-            {hasApplyBtn ? (
-              <ApplyButton onClick={handleApply}>申請加入</ApplyButton>
-            ) : (
-              <></>
+            {hasApplyBtn && (
+              <>
+                {hasApplied ? (
+                  <DisabledButton>您已申請，審核中...</DisabledButton>
+                ) : isPlayer ? (
+                  <DisabledButton>您已是球員</DisabledButton>
+                ) : isFull ? (
+                  <DisabledButton>名額已滿</DisabledButton>
+                ) : (
+                  <ApplyButton onClick={handleApply}>申請加入</ApplyButton>
+                )}
+              </>
             )}
           </>
         )}
@@ -253,6 +254,24 @@ const ApplyButton = styled.button`
     transform: translateY(-2px);
     transform: translateX(-1px);
   }
+`;
+
+const DisabledButton = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 10px 16px;
+  margin-top: 30px;
+  background-color: darkgray;
+  color: var(--color-light);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 20px;
+  border: 2px solid var(--color-dark);
+  border-radius: 14px;
+  box-shadow: -4px 3px 0 0 var(--color-dark);
+  cursor: not-allowed;
 `;
 
 const StyledCloseIcon = styled(CloseIcon)(() => ({
