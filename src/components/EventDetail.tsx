@@ -1,8 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { Snackbar } from '@mui/material';
+import { Modal, Snackbar, Zoom } from '@mui/material';
 import { arrayUnion, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import Modal from 'react-modal';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { db } from '../../firebaseConfig';
@@ -92,107 +91,96 @@ const EventDetail: React.FC<EventDetailProps> = ({
   return (
     <>
       <Modal
-        isOpen={isOpen}
-        onRequestClose={onRequestClose}
-        contentLabel="Event Details"
-        style={{
-          overlay: {
-            zIndex: 999,
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
-          },
-          content: {
-            top: '50%',
-            left: '50%',
-            right: 'auto',
-            bottom: 'auto',
-            marginRight: '-50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'white',
-            padding: '20px',
-            maxWidth: '500px',
-            width: '90%',
-            borderRadius: '5px',
-            position: 'relative',
-          },
-        }}
+        open={isOpen}
+        onClose={onRequestClose}
+        aria-labelledby="event-detail-modal"
+        aria-describedby="event-detail-description"
       >
-        {event && (
-          <>
-            <StyledCloseIcon onClick={onRequestClose} />
-            <EventTitle>{event.court.name}</EventTitle>
-            <EventInfo>
-              <Label>日期</Label>
-              <Value>{event.date}</Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>時間</Label>
-              <Value>
-                {event.startTimeStamp.toDate().toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}{' '}
-                ~{' '}
-                {event.endTimeStamp.toDate().toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>地點</Label>
-              <Value>
-                {event.court.city}
-                {event.court.address}
-              </Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>場地</Label>
-              <Value>
-                {event.court.isInDoor ? '室內' : '室外'}場{' '}
-                {event.isAC ? '有' : '沒有'}冷氣
-              </Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>費用</Label>
-              <Value>{event.averageCost}/人</Value>
-            </EventInfo>
-            <Divider />
-            <EventInfo>
-              <Label>友善程度</Label>
-              <Value>
-                {event.friendlinessLevel
-                  ? event.friendlinessLevel
-                  : '無特別規定'}
-              </Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>分級</Label>
-              <Value>{event.level ? event.level : '無特別規定'}</Value>
-            </EventInfo>
-            <Divider />
-            <EventInfo>
-              <Label>隊員名單</Label>
-              <Value>{playerNames}</Value>
-            </EventInfo>
-            <EventInfo>
-              <Label>剩餘名額</Label>
-              <Value>{event.findNum}</Value>
-            </EventInfo>
-            {hasApplyBtn && (
-              <>
-                {hasApplied ? (
-                  <DisabledButton>您已申請，審核中...</DisabledButton>
-                ) : isPlayer ? (
-                  <DisabledButton>您已是球員</DisabledButton>
-                ) : isFull ? (
-                  <DisabledButton>名額已滿</DisabledButton>
-                ) : (
-                  <ApplyButton onClick={handleApply}>申請加入</ApplyButton>
-                )}
-              </>
-            )}
-          </>
-        )}
+        <ModalWrapper>
+          <Zoom in={isOpen} timeout={300}>
+            <ModalContent>
+              {event && (
+                <>
+                  <StyledCloseIcon onClick={onRequestClose} />
+                  <EventTitle>{event.court.name}</EventTitle>
+                  <EventInfo>
+                    <Label>日期</Label>
+                    <Value>{event.date}</Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>時間</Label>
+                    <Value>
+                      {event.startTimeStamp.toDate().toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}{' '}
+                      ~{' '}
+                      {event.endTimeStamp.toDate().toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>地點</Label>
+                    <Value>
+                      {event.court.city}
+                      {event.court.address}
+                    </Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>場地</Label>
+                    <Value>
+                      {event.court.isInDoor ? '室內' : '室外'}場{' '}
+                      {event.isAC ? '有' : '沒有'}冷氣
+                    </Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>費用</Label>
+                    <Value>{event.averageCost}/人</Value>
+                  </EventInfo>
+                  <Divider />
+                  <EventInfo>
+                    <Label>友善程度</Label>
+                    <Value>
+                      {event.friendlinessLevel
+                        ? event.friendlinessLevel
+                        : '無特別規定'}
+                    </Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>分級</Label>
+                    <Value>{event.level ? event.level : '無特別規定'}</Value>
+                  </EventInfo>
+                  <Divider />
+                  <EventInfo>
+                    <Label>隊員名單</Label>
+                    <Value>{playerNames}</Value>
+                  </EventInfo>
+                  <EventInfo>
+                    <Label>剩餘名額</Label>
+                    <Value>{event.findNum}</Value>
+                  </EventInfo>
+                  {hasApplyBtn && (
+                    <>
+                      {hasApplied ? (
+                        <DisabledButton>您已申請，審核中...</DisabledButton>
+                      ) : isPlayer ? (
+                        <DisabledButton>您已是球員</DisabledButton>
+                      ) : isFull ? (
+                        <DisabledButton>名額已滿</DisabledButton>
+                      ) : (
+                        <ApplyButton onClick={handleApply}>
+                          申請加入
+                        </ApplyButton>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </ModalContent>
+          </Zoom>
+        </ModalWrapper>
       </Modal>
       <StyledSnackbar
         open={open}
@@ -206,6 +194,27 @@ const EventDetail: React.FC<EventDetailProps> = ({
 };
 
 export default EventDetail;
+
+const ModalWrapper = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  outline: none;
+  width: 90%;
+  max-width: 500px;
+`;
+
+const ModalContent = styled.div`
+  background-color: white;
+  padding: 20px;
+  width: 100%;
+  border: 3px solid var(--color-dark);
+  border-radius: 15px;
+  box-shadow: -4px 3px 0 2px var(--color-dark);
+  max-height: 90vh;
+  overflow-y: auto;
+`;
 
 const EventTitle = styled.h1`
   margin-bottom: 30px;
