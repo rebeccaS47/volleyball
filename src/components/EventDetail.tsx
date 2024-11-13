@@ -55,7 +55,9 @@ const EventDetail: React.FC<EventDetailProps> = ({
   const handleApply = async () => {
     if (!user) {
       showSnackbar('請先登入');
-      navigate('/login');
+      setTimeout(() => {
+        navigate('/login');
+      }, 800);
       return;
     }
     if (!event) return;
@@ -80,8 +82,6 @@ const EventDetail: React.FC<EventDetailProps> = ({
           startTimeStamp: event.startTimeStamp,
           endTimeStamp: event.endTimeStamp,
         });
-
-        showSnackbar('成功申請');
       } catch (error) {
         console.error('申請失敗: ', error);
         showSnackbar('申請失敗，請稍後再試');
