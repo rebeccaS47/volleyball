@@ -1,10 +1,7 @@
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SyncLoader } from 'react-spinners';
 import styled from 'styled-components';
+import EventCard from '../../components/EventCard.tsx';
 import EventDetail from '../../components/EventDetail';
 import {
   fetchCourtDetails,
@@ -42,15 +39,15 @@ const Event: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleEventClick = (event: Event) => {
+  const handleEventClick = useCallback((event: Event) => {
     setSelectedEvent(event);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseModal = useCallback(() => {
     setSelectedEvent(null);
-  };
+    setIsModalOpen(false);
+  }, []);
 
   useEffect(() => {
     const loadDroupdownCities = async () => {
@@ -137,7 +134,7 @@ const Event: React.FC = () => {
     }
   }, []);
 
-  const filterEvents = useCallback(async () => {
+  const filterEvents = useCallback(() => {
     const filteredList = eventList.filter((event) => {
       const endTimeDate = event.endTimeStamp.toDate();
       const hours = endTimeDate.getHours().toString().padStart(2, '0');
@@ -154,6 +151,20 @@ const Event: React.FC = () => {
     });
     setFilteredEventList(filteredList);
   }, [filterState, eventList]);
+
+  const renderedEventList = useMemo(() => {
+    return filteredEventList.map((event) => (
+      <EventCard key={event.id} event={event} onClick={handleEventClick} />
+    ));
+  }, [filteredEventList, handleEventClick]);
+
+  const currentSelectedEvent = useMemo(() => {
+    if (!selectedEvent) return null;
+    return (
+      filteredEventList.find((event) => event.id === selectedEvent.id) ||
+      selectedEvent
+    );
+  }, [selectedEvent, filteredEventList]);
 
   useEffect(() => {
     const unsubscribe = fetchEventList();
@@ -255,46 +266,13 @@ const Event: React.FC = () => {
         ) : filteredEventList.length === 0 ? (
           <EmptyContainer>暫無相關活動</EmptyContainer>
         ) : (
-          filteredEventList.map((event) => (
-            <EventCard
-              data-eventid={event.id}
-              key={event.id}
-              onClick={() => handleEventClick(event)}
-            >
-              <EventTitle>{event.court.name}</EventTitle>
-              <EventInfo>
-                <CalendarMonthIcon />
-                {event.date}
-              </EventInfo>
-              <EventInfo>
-                <AccessTimeIcon />
-                {event.startTimeStamp.toDate().toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}{' '}
-                ~{' '}
-                {event.endTimeStamp.toDate().toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </EventInfo>
-              <EventInfo>
-                <AttachMoneyIcon />
-                {event.averageCost} /人
-              </EventInfo>
-              <EventInfoAddress>
-                <LocationOnIcon />
-                {event.court.city}
-                {event.court.address}
-              </EventInfoAddress>
-            </EventCard>
-          ))
+          renderedEventList
         )}
       </EventListContainer>
       <EventDetail
         isOpen={isModalOpen}
         onRequestClose={handleCloseModal}
-        event={selectedEvent}
+        event={currentSelectedEvent}
         hasApplyBtn={true}
       />
     </IndexContainer>
@@ -305,6 +283,7 @@ export default Event;
 
 const IndexContainer = styled.div`
   padding: 20px 0px;
+  
   @media (max-width: 480px) {
     paddingx: 10px;
   }
@@ -334,108 +313,10 @@ const EventListContainer = styled.div`
   gap: 20px;
   border-radius: 15px;
   justify-content: flex-start;
+
   @media (max-width: 768px) {
     gap: 5px;
   }
-`;
-
-const EventCard = styled.div`
-  background-color: #f8f8f8;
-  box-sizing: content-box;
-  border-radius: 12px;
-  padding: 3rem 1.5rem;
-  width: calc(33.333% - 62px);
-  transition: transform 0.3s ease;
-  position: relative;
-  overflow: visible;
-  cursor: pointer;
-
-  &::before,
-  &::after,
-  & > ::before,
-  & > ::after {
-    content: '';
-    position: absolute;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 12px;
-  }
-
-  &::before {
-    top: 0;
-    left: 0;
-    border-bottom-right-radius: 100%;
-    background-color: var(--color-secondary);
-  }
-
-  &::after {
-    top: 0;
-    right: 0;
-    border-bottom-left-radius: 100%;
-    background-color: var(--color-primary);
-  }
-
-  & > ::before {
-    bottom: 0;
-    left: 0;
-    border-top-right-radius: 100%;
-    background-color: var(--color-primary);
-  }
-
-  & > ::after {
-    bottom: 0;
-    right: 0;
-    border-top-left-radius: 100%;
-    background-color: var(--color-secondary);
-  }
-
-  @media (max-width: 1024px) {
-    width: calc(50% - 70px);
-    padding: 1.5rem 1.8rem;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    padding: 2rem 4rem;
-  }
-
-  @media (max-width: 430px) {
-    padding: 2rem 2rem;
-  }
-
-  @media (max-width: 360px) {
-    padding: 2rem 1rem;
-  }
-`;
-
-const EventInfo = styled.p`
-  padding: 12px 24px 0px;
-  font-size: 1.2rem;
-  color: var(--color-dark);
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-
-  @media (max-width: 480px) {
-    font-size: 1rem;
-  }
-`;
-
-const EventInfoAddress = styled.p`
-  padding: 24px 24px 0px;
-  font-size: 16px;
-  color: gray;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-`;
-
-const EventTitle = styled.h3`
-  margin: 0px;
-  padding: 0px 0px 28px 0px;
-  font-size: 2rem;
-  text-align: center;
-  color: var(--color-dark);
 `;
 
 const FilterContainer = styled.div`
