@@ -56,18 +56,12 @@ const Login: React.FC = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        {error && <Typography color="error">{error}</Typography>}
+        {error && <ErrorText>{error}</ErrorText>}
         <LoginButton type="submit">登入</LoginButton>
       </Form>
-      <Typography variant="body2" style={{ marginTop: '10px' }}>
-        還沒有帳號?{' '}
-        <a
-          href="/signup"
-          style={{ color: 'black', textDecoration: 'underline' }}
-        >
-          註冊
-        </a>
-      </Typography>
+      <SignupText>
+        還沒有帳號? <SignupLink href="/signup">註冊</SignupLink>
+      </SignupText>
       <Divider>
         <Hr />
         <span>or</span>
@@ -77,9 +71,8 @@ const Login: React.FC = () => {
         variant="outlined"
         fullWidth
         onClick={handleGoogleLogin}
-        style={{ color: 'black' }}
       >
-        <img src={google} style={{ width: '20px', marginRight: '5px' }} />
+        <GoogleIcon src={google} />
         Sign in with Google
       </SocialLoginButton>
     </LoginCard>
@@ -89,14 +82,15 @@ const Login: React.FC = () => {
 export default Login;
 
 const LoginCard = styled(Card)`
-  width: 300px;
-  padding: 20px;
+  width: 500px;
+  padding: 20px 20px 40px 20px;
   margin: 100px auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
   border: 1px solid rgb(204, 204, 204);
+  border-radius: 15px !important;
 `;
 
 const Form = styled.form`
@@ -107,8 +101,28 @@ const Form = styled.form`
   width: 100%;
 `;
 
+const ErrorText = styled(Typography)`
+  color: error;
+`;
+
+const SignupText = styled(Typography)`
+  margin-top: 10px;
+`;
+
+const SignupLink = styled.a`
+  color: black;
+  text-decoration: underline;
+`;
+
+const GoogleIcon = styled.img`
+  width: 20px;
+  margin-right: 5px;
+`;
+
 const SocialLoginButton = styled(Button)`
   margin-top: 30px;
+  color: black;
+
   &::before,
   &::after,
   & > ::before,
