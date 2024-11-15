@@ -1,15 +1,14 @@
 import { createBrowserRouter } from 'react-router-dom';
-import RedirectIfLoggedIn from './RedirectIfLoggedIn';
-import Login from '../pages/Login';
-import Signup from '../pages/Signup';
+import AuthCard from '../components/AuthCard';
+import ProtectedRoutes from '../components/ProtectedRoutes';
+import Approval from '../pages/Approval';
+import Chat from '../pages/Chat';
+import Feedback from '../pages/Feedback';
 import Home from '../pages/Home';
 import HoldEvent from '../pages/Home/HoldEvent';
 import User from '../pages/User';
-import ProtectedRoutes from '../components/ProtectedRoutes';
-import Approval from '../pages/Approval';
 import Layout from './Layout';
-import Feedback from '../pages/Feedback';
-import Chat from '../pages/Chat';
+import RedirectIfLoggedIn from './RedirectIfLoggedIn';
 
 const router = createBrowserRouter([
   {
@@ -31,15 +30,7 @@ const router = createBrowserRouter([
         path: '/login',
         element: (
           <RedirectIfLoggedIn>
-            <Login />
-          </RedirectIfLoggedIn>
-        ),
-      },
-      {
-        path: '/signup',
-        element: (
-          <RedirectIfLoggedIn>
-            <Signup />
+            <AuthCard />
           </RedirectIfLoggedIn>
         ),
       },
