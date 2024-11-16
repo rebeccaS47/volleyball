@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { SyncLoader } from 'react-spinners';
+import styled from 'styled-components';
 import { useUserAuth } from '../context/userAuthContext';
 
 interface ProtectedRoutesProps {}
@@ -10,26 +11,14 @@ const ProtectedRoutes: React.FC<ProtectedRoutesProps> = () => {
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          width: '100vw',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        }}
-      >
+      <LoadingContainer>
         <SyncLoader
           margin={10}
           size={20}
           speedMultiplier={0.8}
           color="var(--color-secondary)"
         />
-      </div>
+      </LoadingContainer>
     );
   }
 
@@ -37,3 +26,15 @@ const ProtectedRoutes: React.FC<ProtectedRoutesProps> = () => {
 };
 
 export default ProtectedRoutes;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+`;

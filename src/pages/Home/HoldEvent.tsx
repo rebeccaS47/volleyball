@@ -219,9 +219,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
     <>
       <HoldEventContainer>
         <Form onSubmit={handleSubmit}>
-          <center>
-            <h1 style={{ marginTop: 0 }}>活動表單</h1>
-          </center>
+          <FormTitle>活動表單</FormTitle>
           <FormSection>
             <FormField>
               <SelectLabelText>
@@ -250,19 +248,11 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
             </FormField>
           </FormSection>
           {formData.court && (
-            <div
-              style={{ color: 'gray', fontSize: '0.9rem', marginBottom: '5px' }}
-            >
+            <CourtAddress>
               {formData.court.city + formData.court.address}
-            </div>
+            </CourtAddress>
           )}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              marginBottom: '10px',
-            }}
-          >
+          <InputContainer>
             <LabelText>
               日期 *{errors.date && <ErrorText>{errors.date}</ErrorText>}
             </LabelText>
@@ -272,7 +262,7 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
               value={formData.date}
               onChange={handleInputChange}
             />
-          </div>
+          </InputContainer>
           <FormSection>
             <FormField>
               <LabelText>
@@ -379,19 +369,13 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
               />
             </FormField>
           </FormSection>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              marginBottom: '10px',
-            }}
-          >
+          <InputContainer>
             <SelectLabelText>內建名單</SelectLabelText>
             <UserSelector
               onSelect={handleUserSelect}
               currentUserId={formData.createUserId}
             />
-          </div>
+          </InputContainer>
           <FormSection>
             <FormField>
               <LabelText>
@@ -418,21 +402,14 @@ const HoldEvent: React.FC<HoldEventProps> = () => {
               />
             </FormField>
           </FormSection>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              marginBottom: '10px',
-            }}
-          >
+          <InputContainer>
             <LabelText>備註</LabelText>
             <TextArea
               name="notes"
               value={formData.notes}
               onChange={handleInputChange}
             />
-          </div>
-
+          </InputContainer>
           <Button type="submit">建立活動</Button>
         </Form>
       </HoldEventContainer>
@@ -470,6 +447,11 @@ const Form = styled.form`
   }
 `;
 
+const FormTitle = styled.h1`
+  text-align: center;
+  margin-top: 0;
+`;
+
 const FormSection = styled.div`
   display: flex;
   justify-content: space-between;
@@ -505,6 +487,18 @@ const FormFieldRow = styled.div`
   flex-direction: column;
   justify-content: center;
   width: 49%;
+  margin-bottom: 5px;
+`;
+
+const InputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+`;
+
+const CourtAddress = styled.div`
+  color: gray;
+  font-size: 0.9rem;
   margin-bottom: 5px;
 `;
 

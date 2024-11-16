@@ -70,26 +70,14 @@ const Approval: React.FC<ApprovalProps> = () => {
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          width: '100vw',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        }}
-      >
+      <LoadingContainer>
         <SyncLoader
           margin={10}
           size={20}
           speedMultiplier={0.8}
           color="var(--color-secondary)"
         />
-      </div>
+      </LoadingContainer>
     );
   }
 
@@ -108,16 +96,7 @@ const Approval: React.FC<ApprovalProps> = () => {
         <Tbody>
           {Object.keys(applicantData).length === 0 ? (
             <StyledTr>
-              <StyledTd
-                colSpan={5}
-                style={{
-                  textAlign: 'center',
-                  padding: '32px',
-                  fontSize: '20px',
-                }}
-              >
-                暫無待審核資料
-              </StyledTd>
+              <StyledTdEmpty colSpan={5}>暫無待審核資料</StyledTdEmpty>
             </StyledTr>
           ) : (
             eventList.flatMap((event) =>
@@ -176,6 +155,18 @@ const Approval: React.FC<ApprovalProps> = () => {
 
 export default Approval;
 
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+`;
+
 const TableWrapper = styled.div`
   padding: 32px 0px;
   overflow-x: auto;
@@ -214,6 +205,12 @@ const StyledTh = styled.th`
     1 20;
   white-space: nowrap;
   font-size: 24px;
+`;
+
+const StyledTdEmpty = styled.td`
+  text-align: center;
+  padding: 32px;
+  font-size: 20px;
 `;
 
 const StyledTd = styled.td`

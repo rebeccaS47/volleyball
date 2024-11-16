@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { SyncLoader } from 'react-spinners';
+import styled from 'styled-components';
 import { db, storage } from '../../../firebaseConfig.ts';
 import EventDetail from '../../components/EventDetail';
 import HistoryDetail from '../../components/HistoryDetail.tsx';
@@ -167,36 +168,16 @@ const User: React.FC<UserProps> = () => {
     };
   };
 
-  const containerStyle: React.CSSProperties = {
-    overflow: 'auto',
-    height: '500px',
-    margin: '0 auto',
-    padding: '20px 0',
-    zIndex: 0,
-  };
-
   if (loading) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          width: '100vw',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        }}
-      >
+      <LoadingContainer>
         <SyncLoader
           margin={10}
           size={20}
           speedMultiplier={0.8}
           color="var(--color-secondary)"
         />
-      </div>
+      </LoadingContainer>
     );
   }
   if (error) return <div>{error}</div>;
@@ -204,90 +185,50 @@ const User: React.FC<UserProps> = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <img
-          src={imgURL}
-          alt="User profile"
-          style={{
-            borderRadius: '50%',
-            width: '100px',
-            height: '100px',
-            margin: '20px',
-          }}
-        />
+      <UserProfileContainer>
+        <ProfileImage src={imgURL} alt="User profile" />
         {isEditing ? (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <input
+          <EditContainer>
+            <StyledInput
               type="text"
               value={newDisplayName}
               onChange={(e) => setNewDisplayName(e.target.value)}
-              style={{
-                marginBottom: '10px',
-                borderRadius: '15px',
-                width: 'fit-content',
-                padding: '5px 10px',
-              }}
             />
-            <input
+            <FileInput
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              style={{
-                marginBottom: '10px',
-              }}
             />
-            <div>
-              <button
-                onClick={handleUpdate}
-                style={{
-                  marginRight: '10px',
-                  padding: '5px 10px',
-                  borderRadius: '15px',
-                }}
-              >
-                儲存{' '}
-              </button>
-              <button
+            <ButtonContainer>
+              <StyledButton onClick={handleUpdate}>儲存 </StyledButton>
+              <StyledButton
                 onClick={() => {
                   setIsEditing(false);
                   setNewImgFile(null);
                   setNewDisplayName(userData.name);
                   setImgURL(userData.imgURL);
                 }}
-                style={{
-                  padding: '5px 10px',
-                  borderRadius: '15px',
-                }}
               >
                 取消
-              </button>
-            </div>
-          </div>
+              </StyledButton>
+            </ButtonContainer>
+          </EditContainer>
         ) : (
           <>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <h1 style={{ marginRight: '10px', marginBottom: '5px' }}>
-                {' '}
-                {userData.name}
-              </h1>
+            <UserInfoContainer>
+              <UserName>{userData.name}</UserName>
               {user && (
                 <HistoryDetail userHistory={historyData[user.id] || []} />
               )}
-            </div>
+            </UserInfoContainer>
             <SettingsIcon
-              style={{ cursor: 'pointer' }}
+              sx={{ cursor: 'pointer' }}
               onClick={() => setIsEditing(true)}
             />
           </>
         )}
-      </div>
-      <div style={containerStyle}>
+      </UserProfileContainer>
+      <Container>
         <Calendar
           localizer={localizer}
           events={events}
@@ -298,7 +239,7 @@ const User: React.FC<UserProps> = () => {
           step={15}
           timeslots={4}
         />
-      </div>
+      </Container>
       {eventDetail && (
         <EventDetail
           isOpen={modalIsOpen}
@@ -312,3 +253,71 @@ const User: React.FC<UserProps> = () => {
 };
 
 export default User;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+`;
+
+const Container = styled.div`
+  overflow: auto;
+  height: 500px;
+  margin: 0 auto;
+  padding: 20px 0;
+  z-index: 0;
+`;
+
+const UserProfileContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const ProfileImage = styled.img`
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  margin: 20px;
+`;
+
+const EditContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+const StyledInput = styled.input`
+  margin-bottom: 10px;
+  border-radius: 15px;
+  width: fit-content;
+  padding: 5px 10px;
+`;
+
+const FileInput = styled.input`
+  margin-bottom: 10px;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const StyledButton = styled.button`
+  padding: 5px 10px;
+  border-radius: 15px;
+`;
+
+const UserInfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const UserName = styled.h1`
+  margin-right: 10px;
+  margin-bottom: 5px;
+`;

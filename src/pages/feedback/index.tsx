@@ -353,26 +353,14 @@ const Feedback: React.FC<FeedbackProps> = () => {
 
   if (loading) {
     return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          width: '100vw',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        }}
-      >
+      <LoadingContainer>
         <SyncLoader
           margin={10}
           size={20}
           speedMultiplier={0.8}
           color="var(--color-secondary)"
         />
-      </div>
+      </LoadingContainer>
     );
   }
   if (error) return <div>Error: {error}</div>;
@@ -393,37 +381,35 @@ const Feedback: React.FC<FeedbackProps> = () => {
                 <StepLabel>{step.label}</StepLabel>
                 <StepContent>
                   {step.content}
-                  <Box sx={{ mb: 2 }}>
-                    <div style={{ display: 'flex' }}>
-                      <ContinueButton
-                        variant="contained"
-                        onClick={() => {
-                          if (index === steps.length - 1) {
-                            handleSubmitFeedback();
-                          } else {
-                            setActiveStep(index + 1);
-                          }
-                        }}
-                        sx={{ mt: 1, mr: 1, ml: 0.5 }}
-                        disabled={
-                          (index === 0 && !selectedEvent) ||
-                          (index === 1 && !selectedPlayer) ||
-                          (index === steps.length - 1 &&
-                            (!feedback.friendlinessLevel ||
-                              !feedback.level ||
-                              feedback.grade === ''))
+                  <Box sx={{ mb: 2, display: 'flex' }}>
+                    <ContinueButton
+                      variant="contained"
+                      onClick={() => {
+                        if (index === steps.length - 1) {
+                          handleSubmitFeedback();
+                        } else {
+                          setActiveStep(index + 1);
                         }
-                      >
-                        {index === steps.length - 1 ? '提交' : '繼續'}
-                      </ContinueButton>
-                      <ReturnButton
-                        disabled={index === 0}
-                        onClick={() => setActiveStep(index - 1)}
-                        sx={{ mt: 1, mr: 1 }}
-                      >
-                        返回
-                      </ReturnButton>
-                    </div>
+                      }}
+                      sx={{ mt: 1, mr: 1, ml: 0.5 }}
+                      disabled={
+                        (index === 0 && !selectedEvent) ||
+                        (index === 1 && !selectedPlayer) ||
+                        (index === steps.length - 1 &&
+                          (!feedback.friendlinessLevel ||
+                            !feedback.level ||
+                            feedback.grade === ''))
+                      }
+                    >
+                      {index === steps.length - 1 ? '提交' : '繼續'}
+                    </ContinueButton>
+                    <ReturnButton
+                      disabled={index === 0}
+                      onClick={() => setActiveStep(index - 1)}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      返回
+                    </ReturnButton>
                   </Box>
                 </StepContent>
               </Step>
@@ -444,6 +430,18 @@ const Feedback: React.FC<FeedbackProps> = () => {
 };
 
 export default Feedback;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+`;
 
 const ContinueButton = styled(Button)`
   &.MuiButton-root {
