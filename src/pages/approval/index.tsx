@@ -96,16 +96,7 @@ const Approval: React.FC<ApprovalProps> = () => {
         <Tbody>
           {Object.keys(applicantData).length === 0 ? (
             <StyledTr>
-              <StyledTd
-                colSpan={5}
-                style={{
-                  textAlign: 'center',
-                  padding: '32px',
-                  fontSize: '20px',
-                }}
-              >
-                暫無待審核資料
-              </StyledTd>
+              <StyledTdEmpty colSpan={5}>暫無待審核資料</StyledTdEmpty>
             </StyledTr>
           ) : (
             eventList.flatMap((event) =>
@@ -214,6 +205,12 @@ const StyledTh = styled.th`
     1 20;
   white-space: nowrap;
   font-size: 24px;
+`;
+
+const StyledTdEmpty = styled.td`
+  text-align: center;
+  padding: 32px;
+  font-size: 20px;
 `;
 
 const StyledTd = styled.td`
