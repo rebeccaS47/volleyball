@@ -381,37 +381,35 @@ const Feedback: React.FC<FeedbackProps> = () => {
                 <StepLabel>{step.label}</StepLabel>
                 <StepContent>
                   {step.content}
-                  <Box sx={{ mb: 2 }}>
-                    <div style={{ display: 'flex' }}>
-                      <ContinueButton
-                        variant="contained"
-                        onClick={() => {
-                          if (index === steps.length - 1) {
-                            handleSubmitFeedback();
-                          } else {
-                            setActiveStep(index + 1);
-                          }
-                        }}
-                        sx={{ mt: 1, mr: 1, ml: 0.5 }}
-                        disabled={
-                          (index === 0 && !selectedEvent) ||
-                          (index === 1 && !selectedPlayer) ||
-                          (index === steps.length - 1 &&
-                            (!feedback.friendlinessLevel ||
-                              !feedback.level ||
-                              feedback.grade === ''))
+                  <Box sx={{ mb: 2, display: 'flex' }}>
+                    <ContinueButton
+                      variant="contained"
+                      onClick={() => {
+                        if (index === steps.length - 1) {
+                          handleSubmitFeedback();
+                        } else {
+                          setActiveStep(index + 1);
                         }
-                      >
-                        {index === steps.length - 1 ? '提交' : '繼續'}
-                      </ContinueButton>
-                      <ReturnButton
-                        disabled={index === 0}
-                        onClick={() => setActiveStep(index - 1)}
-                        sx={{ mt: 1, mr: 1 }}
-                      >
-                        返回
-                      </ReturnButton>
-                    </div>
+                      }}
+                      sx={{ mt: 1, mr: 1, ml: 0.5 }}
+                      disabled={
+                        (index === 0 && !selectedEvent) ||
+                        (index === 1 && !selectedPlayer) ||
+                        (index === steps.length - 1 &&
+                          (!feedback.friendlinessLevel ||
+                            !feedback.level ||
+                            feedback.grade === ''))
+                      }
+                    >
+                      {index === steps.length - 1 ? '提交' : '繼續'}
+                    </ContinueButton>
+                    <ReturnButton
+                      disabled={index === 0}
+                      onClick={() => setActiveStep(index - 1)}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      返回
+                    </ReturnButton>
                   </Box>
                 </StepContent>
               </Step>
