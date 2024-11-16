@@ -4,9 +4,7 @@ import { SyncLoader } from 'react-spinners';
 import styled from 'styled-components';
 import { useUserAuth } from '../context/userAuthContext';
 
-interface ProtectedRoutesProps {}
-
-const ProtectedRoutes: React.FC<ProtectedRoutesProps> = () => {
+const ProtectedRoutes: React.FC = () => {
   const { user, loading } = useUserAuth();
 
   if (loading) {

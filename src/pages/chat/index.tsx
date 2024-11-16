@@ -9,9 +9,7 @@ import {
 } from '../../firebase.ts';
 import type { Message, TeamParticipation } from '../../types';
 
-interface ChatProps {}
-
-const Chat: React.FC<ChatProps> = () => {
+const Chat: React.FC = () => {
   const { user } = useUserAuth();
   const [groupChats, setgroupChats] = useState<TeamParticipation[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
