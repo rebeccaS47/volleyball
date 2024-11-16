@@ -78,16 +78,8 @@ const Chat: React.FC<ChatProps> = () => {
                 $selected={selectedEventId === groupChat.eventId}
                 onClick={() => handleGroupChatSelect(groupChat.eventId)}
               >
-                <p
-                  style={{
-                    padding: '10px 5px',
-                    fontWeight: '700',
-                    fontSize: '20px',
-                  }}
-                >
-                  {groupChat.date}
-                </p>
-                <p style={{ padding: '5px' }}>
+                <EventDate>{groupChat.date}</EventDate>
+                <EventTime>
                   {groupChat.startTimeStamp.toDate().toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -97,22 +89,13 @@ const Chat: React.FC<ChatProps> = () => {
                     hour: '2-digit',
                     minute: '2-digit',
                   })}
-                </p>
-                <p style={{ padding: '5px' }}>{groupChat.courtName}</p>
+                </EventTime>
+                <CourtName>{groupChat.courtName}</CourtName>
               </GroupItem>
             ))}
           </GroupList>
           {!selectedEventId && !isMobile && (
-            <div
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              請選擇左側任一聊天室...
-            </div>
+            <EmptyStateMessage>請選擇左側任一聊天室...</EmptyStateMessage>
           )}
         </>
       )}
@@ -199,6 +182,27 @@ const GroupItem = styled.div<{ $selected: boolean }>`
   &:hover {
     background-color: #f5f6f7;
   }
+`;
+
+const EventDate = styled.p`
+  padding: 10px 5px;
+  font-weight: 700;
+  font-size: 20px;
+`;
+
+const EventTime = styled.p`
+  padding: 5px;
+`;
+
+const CourtName = styled.p`
+  padding: 5px;
+`;
+
+const EmptyStateMessage = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ChatWindow = styled.div`
