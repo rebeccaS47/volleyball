@@ -14,9 +14,7 @@ import {
 } from '../../firebase.ts';
 import type { Event, Option } from '../../types';
 
-interface HoldEventProps {}
-
-const HoldEvent: React.FC<HoldEventProps> = () => {
+const HoldEvent: React.FC = () => {
   const { user } = useUserAuth();
   const navigate = useNavigate();
 

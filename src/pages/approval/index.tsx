@@ -10,9 +10,7 @@ import {
 } from '../../firebase.ts';
 import type { ApplicantData, Event, History } from '../../types.ts';
 
-interface ApprovalProps {}
-
-const Approval: React.FC<ApprovalProps> = () => {
+const Approval: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [eventList, setEventList] = useState<Event[]>([]);
   const [applicantData, setApplicantData] = useState<{

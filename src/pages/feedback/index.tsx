@@ -28,9 +28,7 @@ import {
 } from '../../firebase.ts';
 import type { Event, Feedback, UserName } from '../../types.ts';
 
-interface FeedbackProps {}
-
-const Feedback: React.FC<FeedbackProps> = () => {
+const Feedback: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [closedEvents, setClosedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);

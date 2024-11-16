@@ -18,9 +18,7 @@ import {
 } from '../../firebase.ts';
 import type { CalendarEvent, Event, History, User } from '../../types.ts';
 
-interface UserProps {}
-
-const User: React.FC<UserProps> = () => {
+const User: React.FC = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const { user, updateUser } = useUserAuth();
   const localizer = momentLocalizer(moment);
