@@ -1,4 +1,4 @@
-import { Button, Card, TextField } from '@mui/material';
+import { Button, Card, Snackbar, TextField } from '@mui/material';
 import { FirebaseError } from 'firebase/app';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -22,6 +22,8 @@ const AuthCard: React.FC = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { signUp, updateUser } = useUserAuth();
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,8 +59,10 @@ const AuthCard: React.FC = () => {
 
       await setDoc(doc(db, 'users', userCredential.uid), userData);
       updateUser(userData as User);
-      alert('成功註冊!');
-      navigate('/');
+      showSnackbar('成功註冊!');
+      setTimeout(() => {
+        navigate('/');
+      }, 800);
     } catch (error) {
       if (error instanceof FirebaseError) {
         if (error.code === 'auth/weak-password') {
@@ -86,22 +90,12 @@ const AuthCard: React.FC = () => {
     }
   };
 
-  //   const handleReset = () => {
-  //     setEmail('');
-  //     setPassword('');
-  //     setName('');
-  //     setConfirmPassword('');
-  //     setError('');
-  //   };
-
   const switchMode = () => {
     setIsLogin(!isLogin);
     if (isLogin) {
-      // 切換到註冊時，清空所有欄位
       setEmail('');
       setPassword('');
     } else {
-      // 切換到登入時，設置預設值
       setEmail('chris0205@gmail.com');
       setPassword('123123');
     }
@@ -110,78 +104,96 @@ const AuthCard: React.FC = () => {
     setError('');
   };
 
-  return (
-    <AuthContainer>
-      <TabContainer>
-        <Tab $active={isLogin} onClick={() => isLogin || switchMode()}>
-          登入帳號
-        </Tab>
-        <Tab $active={!isLogin} onClick={() => isLogin && switchMode()}>
-          註冊帳號
-        </Tab>
-      </TabContainer>
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-      <Form onSubmit={isLogin ? handleLogin : handleSignup}>
-        <StyledTextField
-          label="Email"
-          variant="outlined"
-          fullWidth
-          value={email}
-          autoComplete="username"
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        {!isLogin && (
+  const showSnackbar = (msg: string) => {
+    setMessage(msg);
+    setOpen(true);
+  };
+
+  return (
+    <>
+      <AuthContainer>
+        <TabContainer>
+          <Tab $active={isLogin} onClick={() => isLogin || switchMode()}>
+            登入帳號
+          </Tab>
+          <Tab $active={!isLogin} onClick={() => isLogin && switchMode()}>
+            註冊帳號
+          </Tab>
+        </TabContainer>
+
+        <Form onSubmit={isLogin ? handleLogin : handleSignup}>
           <StyledTextField
-            label="名稱"
+            label="Email"
             variant="outlined"
             fullWidth
-            value={name}
-            autoComplete="name"
-            onChange={(e) => setName(e.target.value)}
+            value={email}
+            autoComplete="username"
+            onChange={(e) => setEmail(e.target.value)}
           />
-        )}
-        <StyledTextField
-          label="密碼"
-          type="password"
-          variant="outlined"
-          fullWidth
-          value={password}
-          autoComplete={isLogin ? 'current-password' : 'new-password'}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {!isLogin && (
+          {!isLogin && (
+            <StyledTextField
+              label="名稱"
+              variant="outlined"
+              fullWidth
+              value={name}
+              autoComplete="name"
+              onChange={(e) => setName(e.target.value)}
+            />
+          )}
           <StyledTextField
-            label="確認密碼"
+            label="密碼"
             type="password"
             variant="outlined"
             fullWidth
-            value={confirmPassword}
-            autoComplete="new-password"
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={password}
+            autoComplete={isLogin ? 'current-password' : 'new-password'}
+            onChange={(e) => setPassword(e.target.value)}
           />
-        )}
-        {error && <ErrorText>{error}</ErrorText>}
-        <AuthButton type="submit">{isLogin ? '登入' : '註冊'}</AuthButton>
-      </Form>
+          {!isLogin && (
+            <StyledTextField
+              label="確認密碼"
+              type="password"
+              variant="outlined"
+              fullWidth
+              value={confirmPassword}
+              autoComplete="new-password"
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          )}
+          {error && <ErrorText>{error}</ErrorText>}
+          <AuthButton type="submit">{isLogin ? '登入' : '註冊'}</AuthButton>
+        </Form>
 
-      {isLogin && (
-        <>
-          <Divider>
-            <Hr />
-            <span>or</span>
-            <Hr />
-          </Divider>
-          <SocialLoginButton
-            variant="outlined"
-            fullWidth
-            onClick={handleGoogleLogin}
-          >
-            <GoogleIcon src={google} />
-            Sign in with Google
-          </SocialLoginButton>
-        </>
-      )}
-    </AuthContainer>
+        {isLogin && (
+          <>
+            <Divider>
+              <Hr />
+              <span>or</span>
+              <Hr />
+            </Divider>
+            <SocialLoginButton
+              variant="outlined"
+              fullWidth
+              onClick={handleGoogleLogin}
+            >
+              <GoogleIcon src={google} />
+              Sign in with Google
+            </SocialLoginButton>
+          </>
+        )}
+      </AuthContainer>
+      <StyledSnackbar
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <SnackbarContent>{message}</SnackbarContent>
+      </StyledSnackbar>
+    </>
   );
 };
 
@@ -295,4 +307,19 @@ const AuthButton = styled.button`
     transform: translateY(-2px);
     transform: translateX(-1px);
   }
+`;
+
+const StyledSnackbar = styled(Snackbar)`
+  &.MuiSnackbar-root {
+    z-index: 1400;
+  }
+`;
+
+const SnackbarContent = styled.div`
+  padding: 10px 16px;
+  width: 200px;
+  border-radius: 4px;
+  font-weight: 500;
+  color: var(--color-light);
+  background-color: var(--color-dark);
 `;
