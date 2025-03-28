@@ -9,6 +9,7 @@ import type { Event } from '../types';
 const EventCard = memo(
   ({ event, onClick }: { event: Event; onClick: (event: Event) => void }) => (
     <EventCardContainer
+      className="autoShow"
       data-eventid={event.id}
       key={event.id}
       onClick={() => onClick(event)}
@@ -111,6 +112,21 @@ const EventCardContainer = styled.div`
 
   @media (max-width: 360px) {
     padding: 2rem 1rem;
+  }
+  &.autoShow {
+    animation: autoShowAnimation both;
+    animation-timeline: view(70% 0%);
+  }
+
+  @keyframes autoShowAnimation {
+    from {
+      opacity: 0;
+      transform: translateY(40px) scale(0.3);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
 `;
 
